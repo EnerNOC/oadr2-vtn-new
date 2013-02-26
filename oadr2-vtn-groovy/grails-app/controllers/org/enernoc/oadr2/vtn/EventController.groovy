@@ -45,6 +45,7 @@ import org.enernoc.open.oadr2.model.SignalPayload;
 import org.enernoc.open.oadr2.model.SignalTypeEnumeratedType;
 import org.enernoc.open.oadr2.model.Uid;
 import org.apache.commons.logging.LogFactory
+
 /*
 import play.data.Form;
 import play.data.validation.ValidationError;
@@ -204,10 +205,14 @@ import service.XmppService;
 		  def event = new Event(params)
 		def program = Program.find("from Program as p where p.programName=?", [event.programName])
 		def errorMessage = "" 
+		//def testing = new EiEvent()
 		if (program != null) {
 			program.addToEvent(event)
 		}
 		  if(event.validate()) {
+			//def ievent = buildEventFromForm(event)
+
+
 			Long duration = event.getMinutesDuration();
 			event.duration = duration.toString();
 			program.save()
@@ -667,7 +672,7 @@ import service.XmppService;
 	   * @param newEventForm - the wrapper from the scala.html form for EiEvent
 	   * @return the EiEvent built from the Event wrapper
 	   */
-	  public static EiEvent buildEventFromForm(Event newEventForm){
+      public static EiEvent buildEventFromForm(Event newEventForm){            
           Date currentDate = new Date();          
           GregorianCalendar calendar = new GregorianCalendar();
           calendar.setTime(currentDate);
@@ -676,7 +681,7 @@ import service.XmppService;
           
           JAXBElement<SignalPayload> signalPayload = objectFactory.createSignalPayload(new SignalPayload(new PayloadFloat(1)));
           
-          String contextName = newEventForm.programName
+          String contextName = newEventForm.programName;
           Intervals intervals = new Intervals();
           ArrayList<Interval> intervalList = new ArrayList<Interval>();
           EiEvent newEvent = newEventForm.toEiEvent();
@@ -691,7 +696,8 @@ import service.XmppService;
                   .withStreamPayloadBase(signalPayload));
           }
           intervals.setIntervals(intervalList);    
-          newEvent.withEiActivePeriod(new EiActivePeriod()
+          newEvent
+              .withEiActivePeriod(new EiActivePeriod()
                   .withProperties(new Properties()
                       .withDtstart(new Dtstart()
                           .withDateTime(new DateTime()
@@ -735,6 +741,6 @@ import service.XmppService;
                               .withSignalName("simple")
                               .withSignalType(SignalTypeEnumeratedType.LEVEL)));
           return newEvent;
-      }   
+      }  
 }
 
