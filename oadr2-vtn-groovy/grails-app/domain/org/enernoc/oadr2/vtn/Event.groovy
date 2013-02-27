@@ -127,7 +127,7 @@ import org.enernoc.open.oadr2.model.Properties;
               e1.printStackTrace();
           }
         final XMLGregorianCalendar startDttm = xmlDataTypeFac.newXMLGregorianCalendar(start).normalize();
-        return eiEvent = new EiEvent()                      
+        return new EiEvent()                      
                         .withEventDescriptor(new EventDescriptor()
                             .withEventID(eventID)
                             .withPriority(priority)
@@ -317,7 +317,7 @@ import org.enernoc.open.oadr2.model.Properties;
 	 * @param minutes - The number of minutes required by the String
 	 * @return the String properly formatted for XMLGregorianCalendar with 0 values omitted
 	 */
-    private String createXCalString(long minutes){
+    public String createXCalString(long minutes){
         int years = (int) (minutes / 525949);
         minutes -= years * 545949;    
         int months = (int) (minutes / 43829);
