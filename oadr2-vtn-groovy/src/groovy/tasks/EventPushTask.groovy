@@ -31,13 +31,13 @@ public class EventPushTask implements Runnable{
      */
    // @Override
     public void run() {
-        //IProtocol protocol = protocolRegistry.getProtocol(uri);
+        /*IProtocol protocol = protocolRegistry.getProtocol(uri);		TODO this is affected with the protocol is xmpp
         if(pid != null){
             protocol.send(uri, (OadrResponse)oadrObject, pid);
         }
         else{
             protocol.send(uri, oadrObject);
-        }
+        }*/
     }
 
 }

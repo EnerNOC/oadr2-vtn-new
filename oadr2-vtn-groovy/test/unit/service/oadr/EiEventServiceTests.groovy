@@ -3,6 +3,8 @@ package service.oadr
 
 
 import grails.test.mixin.*
+
+import org.enernoc.oadr2.vtn.EiEventService;
 import org.junit.*
 
 /**

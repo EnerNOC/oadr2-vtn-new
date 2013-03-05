@@ -64,7 +64,8 @@ import org.apache.commons.logging.LogFactory
 class EventController{
 	private static final log = LogFactory.getLog(this)
 	def messageSource
-	//def pushService
+	def pushService
+	def XmppService
 	//  @Inject static XmppService xmppService;
 	//  @Inject static PushService pushService;
 	//static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("Events");
@@ -145,6 +146,7 @@ class EventController{
 		xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
 		def events = Event.list()
 		for(Event e : events) {
+			def eiEvent = buildEventFromForm(e)
 			e.eiEvent.getEventDescriptor()
 					.withCreatedDateTime(new DateTime().withValue(xCalendar));
 			if(!e.eiEvent.getEventDescriptor().getEventStatus().equals(EventStatusEnumeratedType.CANCELLED))
@@ -206,23 +208,32 @@ class EventController{
 			program.addToEvent(event)
 		}
 		if(event.validate()) {
-			def ievent = buildEventFromForm(event)
-			Long duration = event.getMinutesDuration();
-			event.duration = event.createXCalString(duration);
+			def eiEvent = buildEventFromForm(event)
+			Long duration = event.getMinutesDuration()
+			if (duration < 0L) {
+				flash.message="Fail"
+				program.discard()
+				errorMessage += "The start time must be before the end time </br>"
+				return chain(action:"events", model:[error: errorMessage])
+			} else {
+			event.duration = event.createXCalString(duration)
+			event.status = updateStatus(eiEvent, (int)event.intervals).value
 			program.save()
-			//populateFromPush(newEvent);
-			//def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
-			//pushService.pushNewEvent(event.eiEvent, vens)
+			populateFromPush(event);
+			def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
+			pushService.pushNewEvent(eiEvent, vens)
 			flash.message="Success, your event has been created"
 			//def vens = getVENs(event.eiEvent)
-
+			}
 		} else {
 			flash.message="Fail"
 			event.errors?.allErrors?.each {
 				errorMessage += messageSource.getMessage(it, null) +"</br>"
 			}
+			return chain(action:"events", model:[error: errorMessage])
 		}
-		chain(action:"events", model:[error: errorMessage])
+		//chain(action:"events", model:[error: errorMessage])
+		redirect(controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID])
 
 	}
 	/**
@@ -237,23 +248,17 @@ class EventController{
 	 if(event.getEventDescriptor().getEventStatus() != EventStatusEnumeratedType.CANCELLED)
 	 event.getEventDescriptor().setEventStatus(EventStatusEnumeratedType.CANCELLED);
 	 else
-	 event.getEventDescriptor().setEventStatus(updateStatus(event, event.getEiEventSignals().getEiEventSignals().size()));
+	 event.getEventDescriptor().setEventStatus(updateStatus(event, event.getEiEventSignals().getEiEventSignals().size()));	//TODO ask thom whether this is persisted
 	 for(EiEventSignal e : event.getEiEventSignals().getEiEventSignals()){
 	 e.setCurrentValue(new CurrentValue().withPayloadFloat(new PayloadFloat(updateSignalPayload(event))));
 	 }
 	 return redirect(routes.Events.events());
 	 }*/
 	def cancelEvent(){
-		def eiEvent = buildEventFromForm(Event.get(params.id))
+		def event = Event.get(params.id)
 		//Event event = Event.get(params.id);
-		eiEvent.getEventDescriptor().setModificationNumber(eiEvent.getEventDescriptor().getModificationNumber() + 1);
-		if(eiEvent.getEventDescriptor().getEventStatus() != EventStatusEnumeratedType.CANCELLED)
-			eiEvent.getEventDescriptor().setEventStatus(EventStatusEnumeratedType.CANCELLED);
-		else
-			eiEvent.getEventDescriptor().setEventStatus(updateStatus(eiEvent, eiEvent.getEiEventSignals().getEiEventSignals().size()));
-		for(EiEventSignal e : eiEvent.getEiEventSignals().getEiEventSignals()){
-			e.setCurrentValue(new CurrentValue().withPayloadFloat(new PayloadFloat(updateSignalPayload(eiEvent))));
-		}
+		event.modificationNumber = event.modificationNumber + 1;
+		event.status = "cancelled"
 		redirect(action: "events");
 	}
 	/**
@@ -387,8 +392,16 @@ class EventController{
 		}
 		if(event.validate()) {
 			Long duration = alteredEvent.getMinutesDuration();
-			event.duration = duration.toString();
+			if (duration < 0L) {
+				flash.message="Fail"
+				programOld.discard()
+				programNew.discard()
+				errorMessage += "The start time must be before the end time </br>"
+				return chain(action:"events", model:[error: errorMessage])
+			}
+			def eiEvent = buildEventFromForm(event)
 			event.duration = event.createXCalString(duration);
+			event.status = updateStatus(eiEvent, (int)event.intervals).value
 			programNew.save()
 			//populateFromPush(newEvent);
 			//def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
@@ -547,17 +560,21 @@ class EventController{
 	 * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
 	 * @param event - Event containing the EventID which will be used for construction of a VENStatus object
 	 */
-	public static void prepareVENs(List<Ven> vens, EiEvent event){
+	public static void prepareVENs(List<Ven> vens, Event event){
 		for(Ven v : vens){
 			def venStatus = new VenStatus();
-			venStatus.OptStatus = "Pending 1"
-			venStatus.RequestID = v.ClientURI
-			venStatus.eventID = event.getEventDescriptor().getEventID();
-			venStatus.Program = v.ProgramID
-			venStatus.VenID = v.VenID
-			venStatus.Time = new Date()
+			venStatus.optStatus = "Pending 1"
+			venStatus.requestID = v.clientURI
+			venStatus.eventID = event.eventID;
+			venStatus.program = v.programID
+			venStatus.venID = v.venID
+			venStatus.time = new Date()
 			//JPA.em().persist(venStatus);
+			if (venStatus.validate()){
 			venStatus.save()
+			log.error(venStatus.time)
+			}
+			
 		}
 	}
 
@@ -679,10 +696,10 @@ class EventController{
 				.withEiMarketContext(new EiMarketContext()
 				.withMarketContext(new MarketContext()
 				.withValue(contextName)))
-				.withEventID(newEventForm.getEventID())
-				.withEventStatus(updateStatus(newEvent, (int)newEventForm.getIntervals()))
-				.withModificationNumber(0)
-				.withPriority(newEventForm.getPriority())
+				.withEventID(newEventForm.eventID)
+				.withEventStatus(updateStatus(newEvent, (int)newEventForm.intervals))
+				.withModificationNumber(newEventForm.modificationNumber) //changed to the set modification number
+				.withPriority(newEventForm.priority)
 				.withTestEvent("False")
 				.withVtnComment("No VTN Comment"))
 				.withEiEventSignals(new EiEventSignals()

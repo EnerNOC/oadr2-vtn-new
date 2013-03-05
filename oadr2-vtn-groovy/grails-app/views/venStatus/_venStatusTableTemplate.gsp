@@ -1,5 +1,5 @@
 <html>
-<table>
+<table class="table table-striped">
 	<thead>
 		<tr>
 			<th>VEN ID</th>
@@ -11,7 +11,7 @@
 		</tr>
 	<tfoot></tfoot>
 	<tbody>
-		<g:each in="${venStatus}">
+		<g:each in="${venStatusList}" var="venStatus">
 			<tr>
 				<td>${venStatus.venID}</td>
 				<td>${venStatus.eventID}</td>
@@ -25,7 +25,7 @@
 							<a disabled="disabled" class="btn success">Opted In</a>
 					</g:if>
 					<g:else>
-							<g:if test="${venStatus.OptStatus == "Pending 1"}">
+							<g:if test="${venStatus.optStatus == "Pending 1"}">
 								<a disabled="disabled" class="btn">Pending 1</a>
 							</g:if>
 							<g:else>

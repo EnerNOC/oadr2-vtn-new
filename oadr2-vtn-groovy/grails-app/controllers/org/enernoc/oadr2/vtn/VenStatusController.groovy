@@ -56,18 +56,10 @@ public class VenStatusController {
 //	@SuppressWarnings("unchecked")
  //   @Transactional
 	def venStatuses() {
-	    def eiEvents = Event.list()
-		def program = params.program
-		def listStatusObjects;
-		if(program != null){
-			listStatusObjects = VenStatus.findAll("from VenStatus as v where v.author=?", [program])
-		}
-		else{
-			listStatusObjects = VenStatus.listOrderByTime(order:"desc")
-		}
-		listStatusObjects.sort
-				
-		[eiEvents: eiEvents, program: program, venStatus:listStatusObjects]
+	    //def eventList = Event.list()
+		def venStatuses = VenStatus.findAllWhere(eventID: params.eventID) 
+		def	eventList = Event.executeQuery("SELECT distinct e.eventID FROM Event e")
+		[venStatusList: venStatuses, eventList: eventList, currentEventID: params.eventID]
 	}
 	
 	/**

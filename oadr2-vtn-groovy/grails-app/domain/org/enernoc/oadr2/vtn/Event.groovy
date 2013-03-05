@@ -61,6 +61,7 @@ import org.enernoc.open.oadr2.model.Properties;
 	//@Min(message = "Priority must be greater than or equal to one", value = 1)
 	//@Valid
 	 long intervals = 1;
+	 long modificationNumber = 0;
 	//@Required(message = ("Must select a program, if one is not available please create one."))
 	 //String marketContext;	
 	 String duration;	
@@ -82,6 +83,7 @@ import org.enernoc.open.oadr2.model.Properties;
 		start(nullable: true)
 		status(nullable: true)
 		eiEvent(nullable: true)
+		modificationNumber(nullable: true)
 		
 	}
 	/**

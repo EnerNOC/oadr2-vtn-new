@@ -16,6 +16,7 @@
 	<classpathentry kind="lib" path="lib/hyperjaxb3-ejb-runtime-0.5.6.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-impl-2.1.6.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-impl-2.2-promoted-b65.jar"/>
+	<classpathentry kind="lib" path="lib/oadr2-xmpp-0.1-SNAPSHOT.jar"/>
 	<classpathentry excluding="BuildConfig.groovy|*DataSource.groovy|UrlMappings.groovy|Config.groovy|BootStrap.groovy|spring/resources.groovy" kind="src" path=".link_to_grails_plugins/cache-1.0.0/grails-app/conf">
 		<attributes>
 			<attribute name="org.grails.ide.eclipse.core.SOURCE_FOLDER" value="true"/>

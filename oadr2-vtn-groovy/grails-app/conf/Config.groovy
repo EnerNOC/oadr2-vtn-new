@@ -76,7 +76,7 @@ log4j = {
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
-
+		
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
@@ -90,11 +90,6 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
-log4j = {
-	error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
-		   'org.codehaus.groovy.grails.web.pages' //  GSP
-	warn   'org.apache.catalina'
-}
 
 //configuration for jabber accounts
 xmpp.autoStartup = true

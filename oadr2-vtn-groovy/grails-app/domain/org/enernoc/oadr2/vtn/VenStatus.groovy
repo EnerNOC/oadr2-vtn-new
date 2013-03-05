@@ -31,7 +31,10 @@ package org.enernoc.oadr2.vtn
 	//@Column(name = "REQUESTID")
 	 String requestID;
 	
-
+    static constraints = {
+		requestID(nullable: true)		
+		//select a program id from one of the available programs
+    }	 
 	public String toString(){
 		return ("\nVEN ID: " + this.venID +
 				"\nEvent ID: " + this.eventID +

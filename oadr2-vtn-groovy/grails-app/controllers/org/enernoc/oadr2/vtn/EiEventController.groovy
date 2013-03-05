@@ -7,8 +7,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import jaxb.JAXBManager;
-import service.oadr.EiEventService;
+import org.enernoc.open.oadr2.xmpp.JAXBManager
+import org.apache.commons.logging.LogFactory
 
 /**
  * Controller to respond for OADR requests with an XML payload
@@ -17,13 +17,14 @@ import service.oadr.EiEventService;
  */
 public class EiEventController{
     
-
+	private static final log = LogFactory.getLog(this)
+	
     static JAXBManager jaxbManager;
     static{
         try {
             jaxbManager = new JAXBManager("org.enernoc.open.oadr2.model");
         } catch (JAXBException e) {
-            //Logger.error("Could not initialize JAXBManager in EiEvents", e);
+            log.error("Could not initialize JAXBManager in EiEvents", e);
         }
     }
     

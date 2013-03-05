@@ -1,24 +1,22 @@
 <html>
-<header>
-	<meta name="layout" content="bootstrap"/>
-</header>
-	<body>
+<head>
+<meta name="layout" content="bootstrap" />
+</head>
+<body>
 	<h3>Select Event:</h3>
-		<g:each in="${eiEvent}">
-		<g:if test="${program == p.getEventDescriptor().getEventID()}">
-		<option selected="selected" value="${program}">
-		<g:link action="venStatuses" params="[program:program]">${program}</g:link>
-		</option>
-		</g:if>
-		<g:else>
-		<option value="${eiEvent.programName}">
-		<:g:link action="venStatuses" params="[program:eiEvent.programName]">${eiEvent.programName}</:g:link>
-		</option>
-		</g:else>
-		</g:each> 
+	<select>
+		<g:each in="${eventList}" var="event">
+		
+			<option value="${event}">
+				<g:link controller="VenStatus" action="venStatuses" params="[eventID: event]" class="btn btn-inverse">
+					${event}
+				</g:link>
+			</option>
+		</g:each>
 	</select>
-	<h3>VEN Status</h3>	
-	<g:render template="venStatusTableTemplate" model="[venStatus: venStatus]"/>
+	<h3>VEN Status</h3>
+	<g:render template="venStatusTableTemplate"
+		model="[venStatusList: venStatusList]" />
 	<!--<div id=venStatusTable></div>	
 
 	<script>	
@@ -46,5 +44,5 @@
 		});	
 	</script>-->
 
-		</body>
+</body>
 </html>
