@@ -40,12 +40,12 @@ public class EiEventController{
     //@Transactional
     def sendHttpResponse() throws JAXBException{
         Unmarshaller unmarshaller = jaxbManager.getContext().createUnmarshaller();
-        Object payload = unmarshaller.unmarshal(new ByteArrayInputStream(request().body().asRaw().asBytes()));
+        Object payload = unmarshaller.unmarshal(request.inputStream);
         Object eiResponse = eiEventService.handleOadrPayload(payload);
         Marshaller marshaller = jaxbManager.createMarshaller();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         marshaller.marshal(eiResponse, outputStream);
-        response().setContentType("application/xml");
+        response.setContentType("application/xml");
         render(outputStream.toByteArray());
     }
     

@@ -3,14 +3,23 @@ import org.enernoc.oadr2.vtn.*
 class BootStrap {
 
     def init = { servletContext ->
-		def pro1 = new Program(programName:"test1", programURI:"testing.com")
-		def pro2 = new Program(programName:"test2", programURI:"testing-number-two.com")
+		def pro1 = new Program(programName:"test-program-one", programURI:"test-uri-one")
+		def pro2 = new Program(programName:"test-program-two", programURI:"test-uri-two")
+		def pro3 = new Program(programName:"test-program-three", programURI:"test-uri-three")
 		//pro1.save()
-		pro2.save()
+		//pro2.save()
 	
-		def Ven1 = new Ven(venID:"firstVen", programID:pro1.programName, venName:"firstVen")
+		def Ven1 = new Ven(venID:"test-customer-one", programID:pro1.programName, venName:"test-name-one", clientURI:"test-client-uri-one")
 		pro1.addToVen(Ven1)
 		pro1.save();
+		
+		def Ven2 = new Ven(venID:"test-customer-two", programID:pro2.programName, venName:"test-name-two", clientURI:"test-client-uri-two")
+		pro2.addToVen(Ven2)
+		pro2.save();
+		
+		def Ven3 = new Ven(venID:"test-customer-three", programID:pro3.programName, venName:"test-name-three", clientURI:"test-client-uri-three")
+		pro3.addToVen(Ven3)
+		pro3.save();
     }
     def destroy = {
     }

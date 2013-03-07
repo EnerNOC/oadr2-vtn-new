@@ -75,6 +75,8 @@ public class EiEventService{
             return handleOadrRequest((OadrRequestEvent)o);
         }
         else if(o instanceof OadrCreatedEvent){
+			log.error("this is an instance of oadrCreatedEvent")
+			
             return handleOadrCreated((OadrCreatedEvent)o);
         }
         else if(o instanceof OadrResponse){
@@ -118,6 +120,7 @@ public class EiEventService{
      */
     //@Transactional
     public static OadrResponse handleOadrCreated(OadrCreatedEvent oadrCreatedEvent){
+		log.error("now inside handleOadrCreated")	
         String responseCode = verifyOadrCreated(oadrCreatedEvent);
         if(oadrCreatedEvent.eiCreatedEvent.eiResponse.responseCode.value.charAt(0) == '2'){
             persistFromCreatedEvent(oadrCreatedEvent);
@@ -149,8 +152,8 @@ public class EiEventService{
    // @Transactional
     public static String verifyOadrCreated(OadrCreatedEvent oadrCreatedEvent){
         if(oadrCreatedEvent.eiCreatedEvent.eventResponses != null){
-            String eventId = oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses().get(0).getQualifiedEventID().getEventID();
-            long modificationNumber = oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponses().get(0).getQualifiedEventID().getModificationNumber();
+            String eventId = oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses.get(0).qualifiedEventID.eventID;
+            long modificationNumber = oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses.get(0).qualifiedEventID.modificationNumber;
             /*ArrayList<EiEvent> events = (ArrayList<EiEvent>) entityManager.createQuery("SELECT event FROM EiEvent event WHERE event.eventDescriptor.eventID = :event AND event.eventDescriptor.modificationNumber = :modNumber")
                     .setParameter("event", eventId)
                     .setParameter("modNumber", modificationNumber)
@@ -221,7 +224,7 @@ public class EiEventService{
         
         EiResponse eiResponse = new EiResponse(); 
         if(!oadrRequestEvent.eiRequestEvent.requestID.equals("")){
-            eiResponse.setRequestID(oadrRequestEvent.eiRequestEvent.requestID());
+            eiResponse.setRequestID(oadrRequestEvent.eiRequestEvent.requestID);
         }
         else{
             eiResponse
@@ -265,7 +268,7 @@ public class EiEventService{
             //Collections.sort(oadrEvents, new OadrEventComparator());
             //oadrEvents = listReduce(oadrEvents); //NOT NEEDED ANYMORE, DUPLICATE AND OVERLAPPING EVENTS SHOULD BE CONTAINED
             if(oadrRequestEvent.getEiRequestEvent().getReplyLimit() != null){
-                oadrEvents = removeEventsOverLimit(oadrEvents, oadrRequestEvent.getEiRequestEvent().getReplyLimit().intValue());
+                oadrEvents = removeEventsOverLimit(oadrEvents, oadrRequestEvent.eiRequestEvent.replyLimit.intValue());
             }
             oadrDistributeEvent.withOadrEvents(oadrEvents);
         }
@@ -290,12 +293,12 @@ public class EiEventService{
     public static ArrayList<OadrEvent> listReduce(List<OadrEvent> oadrEvents){
         Map<String, OadrEvent> eventMap = new HashMap<String, OadrEvent>();
         for(OadrEvent event : oadrEvents){
-            String marketContext = event.getEiEvent().getEventDescriptor().getEiMarketContext().getMarketContext().getValue();
-            XMLGregorianCalendar eventOneStartDt = event.getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime().getValue();
-            XMLGregorianCalendar eventOneEndDt = event.getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime().getValue();
+            String marketContext = event.eiEvent.eventDescriptor.eiMarketContext.marketContext.getValue();
+            XMLGregorianCalendar eventOneStartDt = event.eiEvent.eiActivePeriod.properties.dtstart.dateTime.getValue();
+            XMLGregorianCalendar eventOneEndDt = event.eiEvent.eiActivePeriod.properties.dtstart.dateTime.getValue();
             if(eventMap.containsKey(marketContext)){
-                eventOneEndDt.add(getDuration(event.getEiEvent()));XMLGregorianCalendar eventTwoDt = 
-                        eventMap.get(marketContext).getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime().getValue();
+                eventOneEndDt.add(getDuration(event.eiEvent));XMLGregorianCalendar eventTwoDt = 
+                        eventMap.get(marketContext).eiEvent.eiActivePeriod.properties.dtstart.dateTime.getValue();
                 int comparedDt = eventOneEndDt.compare(eventTwoDt);
                 if(comparedDt > 0){
                     if(eventOneStartDt.compare(eventTwoDt) != 1){
@@ -331,7 +334,7 @@ public class EiEventService{
         }
         for(VenStatus venStatus : venStatuses){
             venStatus.setTime(new Date());
-            venStatus.setVenID(requestEvent.getEiRequestEvent().getVenID());
+            venStatus.setVenID(requestEvent.eiRequestEvent.venID);
         
             //createNewEm();
             
@@ -341,7 +344,7 @@ public class EiEventService{
 			def customers = Ven.findAllWhere(venID: requestEvent.eiRequestEvent.venID)
 					
             for(Ven customer : customers){
-                venStatus.setProgram(customer.getProgramID());
+                venStatus.setProgram(customer.programID);
                 log.info("Above testing the EiEvent query");
                // List<EiEvent> events = (List<EiEvent>)entityManager.createQuery("SELECT event FROM EiEvent event WHERE event.eventDescriptor.eiMarketContext.marketContext.value = :market")
                //         .setParameter("market", venStatus.getProgram())
@@ -366,14 +369,16 @@ public class EiEventService{
     //@SuppressWarnings("unchecked")
     //@Transactional
     public static void persistFromCreatedEvent(OadrCreatedEvent createdEvent){
-        def venStatuses = VenStatus.findAllWhere(venID: createdEvent.getEiCreatedEvent().getVenID())
+        def venStatuses = VenStatus.findAllWhere(venID: createdEvent.eiCreatedEvent.venID)
 
-
+		log.error("now inside persistFromCreatedEvent")
         venStatuses.each { status ->
-            if(createdEvent.getEiCreatedEvent().getEventResponses() != null){
+            if(createdEvent.eiCreatedEvent.eventResponses != null){
 				
                 createdEvent.eiCreatedEvent.eventResponses.eventResponses.each { eventResponse ->
-                    status.setOptStatus(eventResponse.getOptType().toString());
+					log.error("now setting the new optType")
+					
+                    status.setOptStatus(eventResponse.optType.toString());
                 }
             }
             status.time = new Date();
@@ -412,7 +417,7 @@ public class EiEventService{
         } catch (DatatypeConfigurationException e) {
           e.printStackTrace();
         }
-        return df.newDuration(Event.minutesFromXCal(event.getEiActivePeriod().getProperties().getDuration().getDuration().getValue()) * 60000);
+        return df.newDuration(Event.minutesFromXCal(event.eiActivePeriod.properties.duration.duration.value) * 60000);
     }
     
 }

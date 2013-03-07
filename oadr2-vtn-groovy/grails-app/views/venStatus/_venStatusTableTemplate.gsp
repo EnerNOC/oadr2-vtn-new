@@ -18,11 +18,11 @@
 				<td>${venStatus.program}</td>
 				<td>
 				<g:if test="${venStatus.optStatus == "OPT_OUT"}">
-						<a disabled="disabled" class="btn danger">Opted Out</a>
+						<a disabled="disabled" class="btn btn-danger">Opted Out</a>
 			    </g:if>
 			    <g:else>
 			    	<g:if test="${venStatus.optStatus == "OPT_IN"}">
-							<a disabled="disabled" class="btn success">Opted In</a>
+							<a disabled="disabled" class="btn btn-success">Opted In</a>
 					</g:if>
 					<g:else>
 							<g:if test="${venStatus.optStatus == "Pending 1"}">
