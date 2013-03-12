@@ -46,7 +46,7 @@ public class EiEventController{
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         marshaller.marshal(eiResponse, outputStream);
         response.setContentType("application/xml");
-        render(outputStream.toByteArray());
+        render(	outputStream.toString());
     }
     
     

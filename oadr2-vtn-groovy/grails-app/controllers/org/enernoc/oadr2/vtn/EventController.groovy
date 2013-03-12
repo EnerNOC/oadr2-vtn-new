@@ -198,8 +198,9 @@ class EventController{
 	 }*/
 
 	def newEvent() {
-		params.priority = params.priority.toLong()
+		//params.priority = params.priority.toLong()
 		params.intervals = params.intervals.toLong()
+		
 		def event = new Event(params)
 		def program = Program.find("from Program as p where p.programName=?", [event.programName])
 		def errorMessage = ""
@@ -210,12 +211,6 @@ class EventController{
 		if(event.validate()) {
 			def eiEvent = buildEventFromForm(event)
 			Long duration = event.getMinutesDuration()
-			if (duration < 0L) {
-				flash.message="Fail"
-				program.discard()
-				errorMessage += "The start time must be before the end time </br>"
-				return chain(action:"events", model:[error: errorMessage])
-			} else {
 			event.duration = event.createXCalString(duration)
 			event.status = updateStatus(eiEvent, (int)event.intervals).value
 			program.save()
@@ -224,10 +219,10 @@ class EventController{
 			pushService.pushNewEvent(eiEvent, vens)
 			flash.message="Success, your event has been created"
 			//def vens = getVENs(event.eiEvent)
-			}
+			
 		} else {
 			flash.message="Fail"
-			event.errors?.allErrors?.each {
+			event.errors.allErrors.each {
 				errorMessage += messageSource.getMessage(it, null) +"</br>"
 			}
 			return chain(action:"events", model:[error: errorMessage])
@@ -392,13 +387,6 @@ class EventController{
 		}
 		if(event.validate()) {
 			Long duration = alteredEvent.getMinutesDuration();
-			if (duration < 0L) {
-				flash.message="Fail"
-				programOld.discard()
-				programNew.discard()
-				errorMessage += "The start time must be before the end time </br>"
-				return chain(action:"events", model:[error: errorMessage])
-			}
 			def eiEvent = buildEventFromForm(event)
 			event.duration = event.createXCalString(duration);
 			event.status = updateStatus(eiEvent, (int)event.intervals).value
