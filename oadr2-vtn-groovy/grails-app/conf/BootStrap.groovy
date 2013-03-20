@@ -1,7 +1,17 @@
 import org.enernoc.oadr2.vtn.*
+import org.jivesoftware.smack.XMPPException;
+import javax.xml.bind.JAXBException;
 
+
+/*BootStrap class with initially persisted data
+ * domain matches those of the test cases in the readme.txt
+ *@author Yang Xiang
+ * 
+ * 
+ */
 class BootStrap {
 
+	def xmppService
     def init = { servletContext ->
 		def pro1 = new Program(programName:"test-program-one", programURI:"test-uri-one")
 		def pro2 = new Program(programName:"test-program-two", programURI:"test-uri-two")
@@ -20,7 +30,9 @@ class BootStrap {
 		def Ven3 = new Ven(venID:"test-customer-three", programID:pro3.programName, venName:"test-name-three", clientURI:"test-client-uri-three")
 		pro3.addToVen(Ven3)
 		pro3.save();
-    }
+	//Starts Xmpp connection	
+			new XmppService()
+	}
     def destroy = {
     }
 }

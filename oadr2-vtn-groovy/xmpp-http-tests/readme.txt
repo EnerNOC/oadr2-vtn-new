@@ -47,7 +47,7 @@ Setup:
 		b. The user receiving the message in Openfire is to be named 'xmpp-vtn' and the password 'xmpp-pass'
 		c. ***IMPORTANT*** Modify the xmppCreated2.xml and xmppRequest2.xml to be the correct Session ID for the
 			to="" (ex. to="xmpp-vtn@msawant-mbp.local/vtn")
-		d. Connect to Psi and open the XML Console. From the xmppRequest1.xml file copy and paste the content into
+		d. Connect to Psi and open the XML Console. From the xmppRequest2.xml file copy and paste the content into
 			XML Input...
 		e. Wait for the response to refresh through AJAX or to refresh through the Refresh button in the top right
 		f. From the xmppCreated1.xml file copy and paste the content into the XML Input... in Psi

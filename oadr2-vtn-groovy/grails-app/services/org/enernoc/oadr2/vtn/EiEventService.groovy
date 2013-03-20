@@ -72,6 +72,7 @@ public class EiEventService{
      */
     public Object handleOadrPayload(Object o){
         if(o instanceof OadrRequestEvent){
+			log.error("this is an instance of oadrRequestEvent")
             return handleOadrRequest((OadrRequestEvent)o);
         }
         else if(o instanceof OadrCreatedEvent){
@@ -80,10 +81,14 @@ public class EiEventService{
             return handleOadrCreated((OadrCreatedEvent)o);
         }
         else if(o instanceof OadrResponse){
+			log.error("this is an instance of OadrResponse")
+			
             handleFromOadrResponse((OadrResponse)o);
             return null;
         }
         else{
+			log.error("runTimeException")
+			
             throw new RuntimeException("Object was not of correct class");
         }
     }    

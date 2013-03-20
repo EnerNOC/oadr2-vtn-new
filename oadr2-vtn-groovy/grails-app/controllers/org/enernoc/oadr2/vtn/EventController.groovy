@@ -65,7 +65,7 @@ class EventController{
 	private static final log = LogFactory.getLog(this)
 	def messageSource
 	def pushService
-	def XmppService
+	def xmppService
 	//  @Inject static XmppService xmppService;
 	//  @Inject static PushService pushService;
 	//static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("Events");
