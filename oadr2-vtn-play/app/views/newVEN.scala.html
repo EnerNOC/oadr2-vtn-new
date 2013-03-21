@@ -1,0 +1,59 @@
+@(userForm: Form[VEN], programs: Map[String, String])
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.render) } 
+
+@informationGroup(field: Field, className: String = "profile") = {
+
+}
+
+@main(Html("Create a VEN"), "") {
+	
+	@if(flash.size() > 0){
+       <div class="alert-message error">
+       	@for((key, value) <- flash){
+           	<strong>Error : </strong> @value<br />
+           }
+       </div> 
+    }
+	
+	@form(routes.VENs.newVEN()) {
+	
+        <fieldset>
+		    <!-- will eventually generate this ID -->
+		    <h3>VEN Information</h3>   
+				@select(
+                	userForm("ProgramId"), 
+                	options(programs), 
+	                '_label -> "Program", '_default -> "-- Choose a program --",
+	                '_showConstraints -> false
+	            )
+		    	@inputText(userForm("venName"), '_label -> "VEN Name")
+				@inputText(userForm("venID"), '_label -> "VEN ID")
+					
+				<div class="clearfix">
+					<label>Node Type</label>
+					<div class="input">
+						<input type="radio" name="group1" value="Pull" id="Pull" checked onclick="disableField()">Pull &nbsp&nbsp
+						<input type="radio" name="group1" value="Push" id="Push" onclick="enableField()">Push<br>
+					</div>
+				</div>
+				@inputText(userForm("clientURI"), '_label -> "Client URI", 'disabled -> "disabled")
+				
+	            <div class="actions">
+	            	<input type="submit" value="Create this VEN" class="btn primary"> or 
+	            	<a href="@routes.VENs.vens()" class="btn">Cancel</a>
+        		</div>
+		</fieldset>
+	}
+	
+	<script>
+		function enableField(){
+			document.getElementById("clientURI").disabled=false
+		}
+		function disableField(){
+			document.getElementById("clientURI").disabled=true
+		}
+	</script>
+}

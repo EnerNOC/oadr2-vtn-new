@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<smackProviders>
+	<iqProvider>
+		<elementName>oadrEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</iqProvider>	
+	<iqProvider>
+		<elementName>oadrDistributeEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</iqProvider>
+	<iqProvider>
+		<elementName>oadrCreatedEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</iqProvider>
+	<iqProvider>
+		<elementName>oadrRequestEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</iqProvider>
+	<iqProvider>
+		<elementName>oadrResponse</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</iqProvider>
+
+	<!-- For OADR payloads that occur in messages: -->
+	<extensionProvider>
+		<elementName>oadrDistributeEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</extensionProvider>
+	<extensionProvider>
+		<elementName>oadrRequestEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</extensionProvider>
+	<extensionProvider>
+		<elementName>oadrCreatedEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</extensionProvider>
+	<extensionProvider>
+		<elementName>oadrResponse</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</extensionProvider>
+	<extensionProvider>
+		<elementName>oadrEvent</elementName>
+		<namespace>http://openadr.org/oadr-2.0a/2012/07</namespace>
+		<className>xmpp.XMPPExtensionProvider</className>
+	</extensionProvider>
+</smackProviders>

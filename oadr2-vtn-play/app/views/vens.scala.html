@@ -1,0 +1,46 @@
+@(customerList: List[VEN])
+
+@import helper._
+
+@import helper.twitterBootstrap._
+
+@main(Html("VENs"), "VENs") {
+
+		@if(flash.containsKey("success")) {
+		        <div class="alert-message success">
+		            <strong>Success: </strong> @flash.get("success")
+		        </div>
+		}
+		@if(flash.containsKey("failure")){
+			<div class="alert-message error">
+				<strong>Error: </strong> @flash.get("failure")
+			</div>
+		}
+		    
+        <table class="zebra-striped">
+            <thead>
+                <tr>      
+                	<th>VEN Name</th>
+                	<th>VEN ID</th>
+                	<th>Client URI</th>
+                	<th>Program Name</th>
+                </tr>
+            </thead>
+            <tfoot>
+            </tfoot>
+            <tbody>
+            @for(customer <- customerList){ 
+            	<tr>
+            		<td>@customer.getVenName()</td>
+	            	<td>@customer.getVenID()</td>
+	            	<td>@customer.getClientURI()</td>
+	            	<td>@customer.getProgramId()</td>	            	
+					<td>@form(routes.VENs.deleteVEN(customer.getId())){
+							<input type="submit" value="Delete" class="btn danger" onClick="return confirmSubmit()">
+						}
+					</td>
+            	</tr>
+            }     	
+            </tbody>
+        </table>
+}

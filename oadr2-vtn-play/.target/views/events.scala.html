@@ -1,0 +1,34 @@
+@import helper._
+
+@import helper.twitterBootstrap._
+
+@main(Html("Events"), "Events") {
+
+		@if(flash.containsKey("success")) {
+		        <div class="alert-message success">
+		            <strong>Success: </strong> @flash.get("success")
+		        </div>
+		} 
+		
+		<div id=eventsTable></div>
+		
+        <script>
+	  		$(document).ready(function(){	
+				var loadOadrEvents = function(){
+					$.post('@routes.Events.renderAJAXTable()',
+							"",
+							function(data){
+								$('#eventsTable').empty();
+								$('<div class="refreshing"><img src=@routes.Assets.at("/images/loader.gif")></div>').appendTo('#eventsTable');
+								$('#eventsTable').append(data);
+								$(".refreshing").remove();
+					});
+				};   
+	  		
+		  		loadOadrEvents();
+	
+				setInterval(loadOadrEvents, 15000); 
+	  		});
+			
+		</script>
+}

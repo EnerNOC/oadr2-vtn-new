@@ -1,0 +1,45 @@
+@(program: String, programs: List[EiEvent])
+
+@import helper._
+
+@import helper.twitterBootstrap._
+@main(Html("OadrEvents"), "OadrEvents") {
+
+	<h3>Select Event:</h3>
+	<select name="program"">
+		@for(p <- programs){
+			@if(program == p.getEventDescriptor().getEventID()){
+				<option selected="selected" value="@routes.VENStatuses.venStatuses(p.getEventDescriptor().getEventID())">@p.getEventDescriptor().getEventID()</option>
+			}else{
+				<option value="@routes.VENStatuses.venStatuses(p.getEventDescriptor().getEventID())">@p.getEventDescriptor().getEventID()</option>		
+			}
+		}
+	</select>
+	<h3>VEN Status</h3>	
+	<div id=venStatusTable></div>	
+
+	<script>	
+		$(document).ready(function(){	
+			var loadOadrEvents = function(){
+				$.post('@routes.VENStatuses.renderAjaxTable(program)',
+						"",
+						function(data){
+							$('#venStatusTable').empty();
+							$('<div class="refreshing"><img src=@routes.Assets.at("/images/loader.gif")></div>').appendTo('#xmlOutput');
+							$('#venStatusTable').append(data);
+							$(".refreshing").remove();
+				});
+			};
+
+			$('#refresh').click(function(){
+				$(this).text("Loading Status...");
+				loadOadrEvents();
+				$(this).text("Refresh");
+			});
+
+			loadOadrEvents();
+						
+			setInterval(loadOadrEvents, 10000);
+		});	
+	</script>
+}

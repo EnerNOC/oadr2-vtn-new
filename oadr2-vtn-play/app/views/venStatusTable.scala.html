@@ -1,0 +1,47 @@
+@(statusList: List[VENStatus], program: String)
+
+@import helper._
+
+<table>
+	<thead>
+		<tr>
+			<th>VEN ID</th>
+			<th>Event ID</th>
+			<th>Program</th>
+			<th>Status</th>
+			<th>Last Response</th>
+			<th></th>
+		</tr>
+	<tfoot></tfoot>
+	<tbody>
+		@for(status <- statusList){
+			<tr>
+				<td>@status.getVenID()</td>
+				<td>@status.getEventID()</td>
+				<td>@status.getProgram()</td>
+				<td>
+					@if(status.getOptStatus == "OPT_OUT"){
+						<a disabled="disabled" class="btn danger">Opted Out</a>
+					}else{
+						@if(status.getOptStatus == "OPT_IN"){
+							<a disabled="disabled" class="btn success">Opted In</a>
+						}else{
+							@if(status.getOptStatus == "Pending 1"){
+								<a disabled="disabled" class="btn">Pending 1</a>
+							}else{
+								<a disabled="disabled" class="btn">Pending 2</a>
+							}
+						}
+					}
+				</td>
+				<td>@status.displayTime()</td>
+				<td>
+					@form(routes.VENStatuses.deleteStatus(program, status.getId())){
+						<input type="submit" value="Delete" class="btn danger" onClick="return confirmSubmit()">
+					}
+				</td>	
+			</tr>
+		}
+		
+	</tbody>
+</table>

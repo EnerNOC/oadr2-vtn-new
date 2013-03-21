@@ -1,0 +1,65 @@
+@(title: Html, nav: String = "")(content: Html)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>OADR Events</title>
+	    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")">
+	    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/datepicker.css")">	    
+	    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/timepicker.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/enoc-node-bullet.png")">
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-1.7.1.min.js")'></script>
+    </head>
+    <body>
+        
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="@routes.Programs.programs()">Programs</a>
+                    <a class="brand" href="@routes.VENs.vens()">VENs</a>
+                    <a class="brand" href="@routes.Events.events()">Events</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="content">                
+                <div class="page-header">
+                <b>@title</b>                
+                	@if(nav == "Events"){
+                    	<a href=@routes.Events.blankEvent() id="add" class="btn success")>Create Event</a>&nbsp
+                    }
+                    @if(nav == "Programs"){
+                    	<a href=@routes.Programs.blankProgram() id="add" class="btn success")>Create Program</a>
+                    }
+                    @if(nav == "VENs"){
+                    	<a href=@routes.VENs.blankVEN() id="add" class="btn success")>Create VEN</a>
+                    }
+                    @if(nav == "OadrEvents"){
+                    	<a id="refresh" class="btn">Refresh</a>
+                    }
+                </div>
+                <div class="row">
+                    <div class="span14">
+                        @content
+                    </div>
+                </div>                
+            </div>
+
+            <footer>
+                <p>
+                    <a href="http://www.enernoc.com">&copy EnerNOC, Inc.</a>
+                </p>
+            </footer>
+        </div>
+  
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-1.7.1.min.js")'></script>
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-datepicker.js")'></script>
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-timepicker.js")'></script>
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/iron-condor.js")'></script>
+		
+	</body>
+    
+</html>

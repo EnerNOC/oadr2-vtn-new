@@ -1,0 +1,90 @@
+@(id: Long, eiEventsForm: Form[Event], eiEvent: Event, programs: Map[String, String])
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.render) } 
+
+@main(Html("Edit event"), "" ){
+        
+    
+	@form(routes.Events.updateEvent(id), 'class -> "form-inline") {
+		
+		@if(flash.size() > 0){
+	        <div class="alert-message error">
+	        	@for((key, value) <- flash){
+	            	<strong>Error : </strong> @value<br />
+	            }
+	        </div> 
+	    }
+	
+        <fieldset>
+			<h3>Program</h3>
+			@select(
+                eiEventsForm("marketContext"), 
+                options(programs), 
+	                '_label -> "Status", '_default -> "-- Choose a program --",
+	                '_showConstraints -> false
+	            )
+		    <h3>Event Descriptor</h3>    
+				@inputText(eiEventsForm("eventID"), '_label -> "Event ID")
+				@inputText(eiEventsForm("priority"), '_label -> "Priority")
+			<h3>Active Period</h3>
+			@if(flash.containsKey("badEnd")){
+				<div class ="clearfix error">
+				@inputText(field = eiEventsForm("startDate"), args = '_label -> "Start Date", 'id ->"dp1")
+				@inputText(field = eiEventsForm("startTime"), args = '_label -> "Start Time", 'id ->"tp1")
+				@inputText(field = eiEventsForm("endDate"), args = '_label -> "End Date", 'id ->"dp2")		
+				@inputText(field = eiEventsForm("endTime"), args = '_label -> "End Time", 'id ->"tp2")
+				</div>
+			}	
+			@if(!flash.containsKey("badEnd")){
+				@if(flash.containsKey("startDate")){
+					<div class ="clearfix error">
+						@inputText(field = eiEventsForm("startDate"), args = '_label -> "Start Date", 'id ->"dp1")
+					</div>
+				}
+				@if(!flash.containsKey("startDate")){
+					@inputText(field = eiEventsForm("startDate"), args = '_label -> "Start Date", 'id ->"dp1")
+				}
+				
+				@if(flash.containsKey("startTime")){
+					<div class ="clearfix error">				
+						@inputText(field = eiEventsForm("startTime"), args = '_label -> "Start Time", 'id ->"tp1")
+					</div>
+				}
+				@if(!flash.containsKey("startTime")){				
+					@inputText(field = eiEventsForm("startTime"), args = '_label -> "Start Time", 'id ->"tp1")			
+				}
+
+				@if(flash.containsKey("endDate")){
+					<div class ="clearfix error">				
+					@inputText(field = eiEventsForm("endDate"), args = '_label -> "End Date", 'id ->"dp2")
+					</div>
+				}
+				@if(!flash.containsKey("endDate")){				
+					@inputText(field = eiEventsForm("endDate"), args = '_label -> "End Date", 'id ->"dp2")		
+				}
+				
+				@if(flash.containsKey("endTime")){
+					<div class ="clearfix error">				
+					@inputText(field = eiEventsForm("endTime"), args = '_label -> "End Time", 'id ->"tp2")
+					</div>
+				}
+				@if(!flash.containsKey("endTime")){				
+					@inputText(field = eiEventsForm("endTime"), args = '_label -> "End Time", 'id ->"tp2")		
+				}
+			}	
+				
+			<!--
+			<h3>Event Signal</h3>
+				@inputText(eiEventsForm("signalID"), '_label -> "Signal ID")
+			-->
+				
+		</fieldset>
+		
+        <div class="actions">
+            <input type="submit" value="Save this event" class="btn primary"> or 
+            <a href="@routes.Events.events()" class="btn">Cancel</a>     
+        </div>
+	}
+}

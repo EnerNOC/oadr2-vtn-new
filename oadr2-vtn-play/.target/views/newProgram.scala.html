@@ -1,0 +1,22 @@
+@(Program: Form[Program])
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.render) } 
+@main(Html("Create a Program"), "") {
+	
+	@form(routes.Programs.newProgram()) {
+	
+        <fieldset>
+		    <!-- will eventually generate this ID -->
+		    <h3>Market Context</h3>    
+				@inputText(Program("programName"), '_label -> "Program Name")
+				@inputText(Program("programURI"), '_label -> "URI")
+		</fieldset>
+		
+        <div class="actions">
+            <input type="submit" value="Create this program" class="btn primary"> or 
+            <a href="@routes.Programs.programs()" class="btn">Cancel</a>     
+        </div>
+	}
+}

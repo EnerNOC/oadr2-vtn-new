@@ -1,0 +1,63 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET	/						controllers.Programs.index()
+
+# Test
+#GET /test					controllers.VENStatuses.index()
+
+# Event List
+GET /events					controllers.Events.events()
+# Display Events
+POST /displayEventsTable		controllers.Events.renderAJAXTable()
+
+# New Event
+GET	/events/new					controllers.Events.blankEvent()
+POST	/events					controllers.Events.newEvent()
+
+# Edit Event
+GET /events/:id					controllers.Events.editEvent(id:Long)
+POST /events/:id				controllers.Events.updateEvent(id:Long)
+
+# Delete Event
+POST    /events/:id/delete		controllers.Events.deleteEvent(id:Long)
+
+# Cancel Event
+POST /program/:id/cancel		controllers.Events.cancelEvent(id:Long)
+
+# Program List
+GET /programs					controllers.Programs.programs()
+
+# New Program
+GET	/programs/new				controllers.Programs.blankProgram()
+POST	/programs				controllers.Programs.newProgram()
+
+# Delete Event
+POST    /program/:id/delete		controllers.Programs.deleteProgram(id:Long)
+
+# Handle Status
+GET /ven_statuses/:program			controllers.VENStatuses.venStatuses(program:String)
+
+# HTTP Service
+POST /OpenADR2/Simple/EiEvent		controllers.EiEvents.sendHttpResponse()
+
+# Display Page
+POST /ven_statuses/display			controllers.VENStatuses.renderAjaxTable(program:String)
+
+# Delete Status
+POST    /ven_statuses/:id/delete	controllers.VENStatuses.deleteStatus(program:String, id:Long)
+
+# VEN List
+GET /vens					controllers.VENs.vens()
+
+# New VEN
+GET /vens/new				controllers.VENs.blankVEN()
+POST /vens					controllers.VENs.newVEN()
+
+# Delete VEN
+POST	/vens/:id/delete	controllers.VENs.deleteVEN(id:Long)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

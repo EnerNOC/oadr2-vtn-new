@@ -1,0 +1,43 @@
+@(programs: List[Program])
+
+@import helper._
+
+@import helper.twitterBootstrap._
+
+@main(Html("Programs"), "Programs") {
+
+		@if(flash.containsKey("success")) {
+		        <div class="alert-message success">
+		            <strong>Success: </strong> @flash.get("success")
+		        </div>
+		}
+		@if(flash.containsKey("failure")){
+			<div class="alert-message error">
+				<strong>Error: </strong> @flash.get("failure")
+			</div>
+		}
+		    
+        <table class="zebra-striped">
+            <thead>
+                <tr>
+                	<th>Program Name</th>
+                	<th>Context URI</th>
+                	<th></th>    
+                </tr>
+            </thead>
+            <tfoot>
+            </tfoot>
+            <tbody>
+            @for(program <- programs){ 
+            	<tr>
+	            	<td>@program.getProgramName()</td>
+	            	<td>@program.getProgramURI()</td>	            	
+					<td>@form(routes.Programs.deleteProgram(program.getId())){
+							<input type="submit" value="Delete" class="btn danger" onClick="return confirmSubmit()">
+						}
+					</td>
+            	</tr>
+            }     	
+            </tbody>
+        </table>
+}
