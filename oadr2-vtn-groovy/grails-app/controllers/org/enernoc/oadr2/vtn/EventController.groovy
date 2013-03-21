@@ -171,7 +171,7 @@ class EventController{
 		def date = new Date()
 		def dateFormatted = g.formatDate(date:date, format:"MM-dd-yyyy")
 		def timeFormatted = g.formatDate(date:date, format:"hh:mm aa")
-		render(view:"newEvent", model:[ programList: programs, date: dateFormatted, time: timeFormatted])
+		[ programList: programs, date: dateFormatted, time: timeFormatted]
 	}
 
 	/**
@@ -198,11 +198,21 @@ class EventController{
 	 }*/
 
 	def newEvent() {
-		//params.priority = params.priority.toLong()
-		params.intervals = params.intervals.toLong()
-		
+
+		try {
+			params.intervals = params.intervals.toLong()
+		} catch(IllegalArgumentException) {
+			params.intervals = -1L
+		}
+		try {
+			params.priority = params.priority.toLong()
+		} catch(IllegalArgumentException) {
+			params.priority = -1L
+		}
+
 		def event = new Event(params)
 		def program = Program.find("from Program as p where p.programName=?", [event.programName])
+
 		def errorMessage = ""
 		//def testing = new EiEvent()
 		if (program != null) {
@@ -219,13 +229,13 @@ class EventController{
 			pushService.pushNewEvent(eiEvent, vens)
 			flash.message="Success, your event has been created"
 			//def vens = getVENs(event.eiEvent)
-			
+
 		} else {
 			flash.message="Fail"
 			event.errors.allErrors.each {
 				errorMessage += messageSource.getMessage(it, null) +"</br>"
 			}
-			return chain(action:"events", model:[error: errorMessage])
+			return chain(action:"blankEvent", model:[error: errorMessage])
 		}
 		//chain(action:"events", model:[error: errorMessage])
 		redirect(controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID])
@@ -360,36 +370,40 @@ class EventController{
 	 flash("success", "Event has been updated");
 	 return redirect(routes.Events.events());
 	 }*/
-
+	/*Update Event modified to fit a groovier framework
+	 * Updates the event with a given id with the new parameters input from the user
+	 */
 	def updateEvent(){
-		params.priority = params.priority.toLong()
-		params.intervals = params.intervals.toLong()
+		try {
+			params.intervals = params.intervals.toLong()
+		} catch(IllegalArgumentException) {
+			params.intervals = -1L
+		}
+		try {
+			params.priority = params.priority.toLong()
+		} catch(IllegalArgumentException) {
+			params.priority = -1L
+		}
 		def event = Event.get(params.id)
 		def programOld = Program.find("from Program as p where p.programName=?", [event.programName])
 		def alteredEvent = new Event(params)
 		def programNew = Program.find("from Program as p where p.programName=?", [alteredEvent.programName])
+		alteredEvent.id = event.id
 		def errorMessage = ""
-		event.programName = alteredEvent.programName
-		event.eventID = alteredEvent.eventID
-		event.priority = alteredEvent.priority
-		event.intervals = alteredEvent.intervals
-		event.startDate = alteredEvent.startDate
-		event.startTime = alteredEvent.startTime
-		event.endDate = alteredEvent.endDate
-		event.endTime = alteredEvent.endTime
-		
+
 		//def testing = new EiEvent()
 		if (programNew != null) {
 			programOld.removeFromEvent(event)
 			programOld.save()
-			programNew.addToEvent(event)
+			programNew.addToEvent(alteredEvent)
 
 		}
-		if(event.validate()) {
+		if(alteredEvent.validate()) {
 			Long duration = alteredEvent.getMinutesDuration();
-			def eiEvent = buildEventFromForm(event)
-			event.duration = event.createXCalString(duration);
-			event.status = updateStatus(eiEvent, (int)event.intervals).value
+			def eiEvent = buildEventFromForm(alteredEvent)
+			alteredEvent.duration = alteredEvent.createXCalString(duration);
+			alteredEvent.status = updateStatus(eiEvent, (int)alteredEvent.intervals).value
+			event.delete()
 			programNew.save()
 			//populateFromPush(newEvent);
 			//def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
@@ -399,9 +413,10 @@ class EventController{
 
 		} else {
 			flash.message="Fail"
-			event.errors?.allErrors?.each {
+			alteredEvent.errors?.allErrors?.each {
 				errorMessage += messageSource.getMessage(it, null) +"</br>"
 			}
+			return chain(action:"editEvent", model:[error: errorMessage], params: [id: params.id])
 		}
 		chain(action:"events", model:[error: errorMessage])
 
@@ -559,10 +574,10 @@ class EventController{
 			venStatus.time = new Date()
 			//JPA.em().persist(venStatus);
 			if (venStatus.validate()){
-			venStatus.save()
-			log.error(venStatus.time)
+				venStatus.save()
+				log.error(venStatus.time)
 			}
-			
+
 		}
 	}
 

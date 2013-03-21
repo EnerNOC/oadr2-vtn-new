@@ -506,26 +506,32 @@ class Event{
 	 return false;
 	 }*/
 
-	//compares if two events are conflicting by using events as oppose to eiEvents
+	/*compares if two events are conflicting by using events as oppose to eiEvents
+	 * modified to fit a groovier framework
+	 * @author Yang Xiang
+	 * 
+	 */
 	private boolean isConflicting() {
 		def SameProgramList = Event.findAllWhere(programName: programName)
 		def start = createDateTime(startDate, startTime).getValue().toGregorianCalendar().getTimeInMillis()
 		def end = createDateTime(endDate, endTime).getValue().toGregorianCalendar().getTimeInMillis()
 		boolean returnValue = true;
 		SameProgramList.each { e ->
-			if (e.status != "cancelled" || e.status != "completed") {
-				def eStart = createDateTime(e.startDate, e.startTime).getValue().toGregorianCalendar().getTimeInMillis()
-				def eEnd = createDateTime(e.endDate, e.endTime).getValue().toGregorianCalendar().getTimeInMillis()
-				if (start <= eEnd) {
-					if (start < eStart) {
-						if (end >= eStart) {
+			if (e.id != this.id) {
+				if (e.status != "cancelled" || e.status != "completed") {
+					def eStart = createDateTime(e.startDate, e.startTime).getValue().toGregorianCalendar().getTimeInMillis()
+					def eEnd = createDateTime(e.endDate, e.endTime).getValue().toGregorianCalendar().getTimeInMillis()
+					if (start <= eEnd) {
+						if (start < eStart) {
+							if (end >= eStart) {
+								returnValue = false;
+							}
+						} else {
 							returnValue = false;
 						}
-					} else {
-						returnValue = false;
 					}
-				}
 
+				}
 			}
 		}
 		return returnValue;

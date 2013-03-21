@@ -28,13 +28,12 @@ import org.apache.commons.logging.LogFactory;
 import org.enernoc.open.oadr2.xmpp.OADR2IQ;
 import org.enernoc.open.oadr2.xmpp.OADR2PacketExtension;
 
-
 /**
  * XMPPService is used to establish and hold the XMPPConnection
  * to be used for sending and creating events
  *
  * @author Jeff LaJoie
- *
+ *Converted from Play to Grails by Yang Xiang
  */
 public class XmppService {
 	private static final log = LogFactory.getLog(this)
@@ -127,7 +126,7 @@ public class XmppService {
 				if (extension instanceof PacketExtension) {
 				log.info("Listening to incoming packets2");
 				}
-				Object payload = eiEventService.handleOadrPayload(extension.getPayload());
+				Object payload = eiEventService.handleOadrPayload(extension.getPayload());//I don't event understand how this works
 				log.info("Listening to incoming packets3");
 				
 				if(payload != null){
@@ -196,7 +195,7 @@ public class XmppService {
 	 * @param o - the Object to be sent
 	 * @param jid - the Jid to receive the object
 	 */
-	public void sendObjectToJID(Object o, String jid){
+	def sendObjectToJID(Object o, String jid){
 		log.info("sendToJid");
 		print("sendToJid")
 		IQ iq = new OADR2IQ(new OADR2PacketExtension(o, marshaller));
@@ -212,7 +211,7 @@ public class XmppService {
 	 * @param jid - the Jid to receive the object
 	 * @param packetId - the packetId the packet must contain
 	 */
-	public void sendObjectToJID(Object o, String jid, String packetId){
+	def sendObjectToJID(Object o, String jid, String packetId){
 		System.out.println("sendToJid");
 
 		IQ iq = new OADR2IQ(new OADR2PacketExtension(o, marshaller));

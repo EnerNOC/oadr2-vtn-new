@@ -46,7 +46,7 @@ class VenController {
 	def blankVEN() {
 		//def programs = Program.listOrderByProgramName(order:"desc")
 		def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
-		render(view:"newVEN", model:[programsList: programs])
+		[programsList: programs]
 	}
 	/**
 	 * Creates a VEN in the table from the submitted form
@@ -86,6 +86,7 @@ class VenController {
 		ven.errors?.allErrors?.each {
 				errorMessage += messageSource.getMessage(it, null) +"</br>"
 			}
+		chain(action:"blankVEN", model: [error: errorMessage])	
 		}
 		chain(action:"vens", model: [error: errorMessage])
 	
