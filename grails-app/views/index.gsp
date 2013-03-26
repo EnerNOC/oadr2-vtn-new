@@ -2,11 +2,7 @@
 <html>
 	<head>
 		<meta name="layout" content="bootstrap"/>
-		<title>Groovy OADR</title>
-	<style>
-	
-	</style>
-	
+		<title>EnerNOC OpenADR 2.0 VTN</title>	
 	</head>
 
 	<body>
@@ -37,12 +33,13 @@
 			<section id="main" class="span9">
 
 				<div class="hero-unit">
-					<h1>OpenAdr 2.0 Groovy Style</h1>
-
-					<p>Grails scaffolding with a <a href="http://twitter.github.com/bootstrap" rel="external"><em>Twitter
-					Bootstrap</em></a> look &amp; feel?</p>
+					<h1>OpenAdr 2.0 EnerNOC</h1>
 					
-					<p>This is a groovy conversion of the play framework openadr-vtn first created by Jeff Lajoie.</p>
+					<p>This is an open source VTN for the 
+					<a href='http://openadr.org' target='_new'>OpenADR 2.0</a> energy management spec</p>
+
+					<p>Check out our <a href='http://open.enernoc.com/'>EnerNOC Open blog</a> and 
+					<a href='http://twitter.com/enernoc_open'>follow us on Twitter</a>.</p>
 				</div>
 					
 				<div class="row-fluid">
@@ -74,7 +71,7 @@ grails-app/views/_fields/default/_field.gsp</pre>
 					
 					<div class="span4">
 						<h2>Fork It</h2>
-						<p>You can download, fork &amp; raise issues on this project on <a href="https://github.com/robfletcher/twitter-bootstrap-scaffolding">GitHub</a>.</p>
+						<p>You can download, fork &amp; raise issues on this project on <a href="https://github.com/EnerNOC/oadr2-vtn">GitHub</a>.</p>
 					</div>
 
 				</div>

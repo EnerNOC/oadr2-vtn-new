@@ -1,5 +1,6 @@
 modules = {
     application {
+		resource url: 'css/custom.css'
         resource url:'js/application.js'
     }
 	formTime {
