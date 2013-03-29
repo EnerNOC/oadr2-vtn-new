@@ -9,8 +9,9 @@ class UrlMappings {
 		
 		"/OpenADR2/Simple/EiEvent"(controller : "EiEventController", action : "handle")
 
-		"/"(view:"/index")
-		"500"(view:'/error')
-		"404"(view:'/error')
+		"/"( view : "/index" )
+		
+		"404"( view : 'error' ) 
+		"500"( view : 'error' )
 	}
 }
