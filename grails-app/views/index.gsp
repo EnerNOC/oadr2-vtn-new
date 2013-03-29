@@ -33,7 +33,7 @@
 			<section id="main" class="span9">
 
 				<div class="hero-unit">
-					<h1>OpenAdr 2.0 EnerNOC</h1>
+					<h1>OpenAdr 2.0 by EnerNOC</h1>
 					
 					<p>This is an open source VTN for the 
 					<a href='http://openadr.org' target='_new'>OpenADR 2.0</a> energy management spec</p>
