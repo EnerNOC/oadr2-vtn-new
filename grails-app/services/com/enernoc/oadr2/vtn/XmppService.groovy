@@ -79,7 +79,7 @@ public class XmppService implements PacketListener {
 		if ( this.xmppPort <= 1 ) xmppPort = 5222
 		
 		this.connConfig = new ConnectionConfiguration(
-			this.xmppHost, this.xmppPort, this.xmppServiceName )
+			this.xmppHost, this.xmppPort, (String)this.xmppServiceName )
 		connConfig.compressionEnabled = true
 		connConfig.SASLAuthenticationEnabled = true
 		
