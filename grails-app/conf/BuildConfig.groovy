@@ -34,7 +34,9 @@ grails.project.dependency.resolution = {
     }
     dependencies {
 		compile 'com.enernoc.open.oadr2:oadr2-xmpp:0.2-SNAPSHOT',
-		        'org.apache.httpcomponents:fluent-hc:4.2.3'
+		        'org.apache.httpcomponents:fluent-hc:4.2.3',
+				'org.apache.httpcomponents:httpclient:4.2.3'
+				 
     }
 
     plugins {
