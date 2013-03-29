@@ -3,24 +3,26 @@ import com.enernoc.oadr2.vtn.XmppService
 import com.enernoc.oadr2.vtn.PushService
 
 beans = {
+	
+	def cfg = grailsApplication.config
 
 	xmppService(XmppService) { b ->
-		jid = 'tmnichols@gmail.com'
-		xmppPasswd = 'uikaggruhgjljnhn'
-		xmppResource = "vtn1"
-		xmppHost = 'talk.google.com'
-		xmppPort = 5222
-		xmppServiceName = 'gmail.com'
+		jid = cfg.xmppSvc.jid
+		xmppPasswd = cfg.xmppSvc.passwd
+		xmppResource = cfg.xmppSvc.resource
+		xmppHost = cfg.xmppSvc.host
+		xmppPort = cfg.xmppSvc.port
+		xmppServiceName = cfg.xmppSvc.serviceName
 		
 		b.autowire = 'byType'
 		b.initMethod = 'connect'
 		b.destroyMethod = 'disconnect'
 	}
 	
-	eiEventService(EiEventService) { bean ->
-		vtnID = grailsApplication.config.vtnID		
+	eiEventService(EiEventService) { b ->
+		vtnID = cfg.vtnID		
 	}
-	pushService(PushService) { bean ->
-		vtnID = grailsApplication.config.vtnID		
+	pushService(PushService) { b ->
+		vtnID = cfg.vtnID		
 	}
 }

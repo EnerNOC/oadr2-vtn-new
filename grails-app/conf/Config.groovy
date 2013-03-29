@@ -11,7 +11,16 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-vtnID = "ENOC test VTN 1"
+vtnID = "testVTN1"
+
+xmppSvc {
+	jid = '<your account here>@gmail.com'
+	passwd = '<your password here>'
+	resource = vtnID
+	host = 'talk.google.com'
+	port = 5222
+	serviceName = 'gmail.com'
+}
 
 //xmpp.debug = true
 
