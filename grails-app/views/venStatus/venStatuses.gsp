@@ -6,9 +6,10 @@
 	<h3>Select Event:</h3>
 	<select>
 		<g:each in="${eventList}" var="event">
-		
+
 			<option value="${event}">
-				<g:link controller="VenStatus" action="venStatuses" params="[eventID: event]" class="btn btn-inverse">
+				<g:link controller="VenStatus" action="venStatuses"
+					params="[eventID: event]" class="btn btn-inverse">
 					${event}
 				</g:link>
 			</option>

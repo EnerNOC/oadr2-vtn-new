@@ -11,16 +11,16 @@ import com.enernoc.open.oadr2.xmpp.JAXBManager
  * @author jlajoie
  */
 public class EiEventController {
-    
+
     JAXBManager jaxbManager
     {
         try {
             jaxbManager = new JAXBManager()
         } catch (JAXBException e) {
-			throw new RuntimeException("Error creating JAXB context", e)
+            throw new RuntimeException("Error creating JAXB context", e)
         }
     }
-    
+
     EiEventService eiEventService
 
     /**
@@ -33,10 +33,10 @@ public class EiEventController {
     def handle() throws JAXBException {
         Unmarshaller unmarshaller = jaxbManager.getContext().createUnmarshaller()
         Object payload = unmarshaller.unmarshal( request.inputStream )
-		// TODO handle unexpected errors gracefully, always return an XML response
+        // TODO handle unexpected errors gracefully, always return an XML response
         Object eiResponse = eiEventService.handleOadrPayload(payload)
         Marshaller marshaller = jaxbManager.createMarshaller()
         response.contentType = "application/xml"
         marshaller.marshal eiResponse, response.outputStream
-    }    
+    }
 }
