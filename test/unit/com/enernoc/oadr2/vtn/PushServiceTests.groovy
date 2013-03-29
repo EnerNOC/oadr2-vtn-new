@@ -4,7 +4,7 @@ package com.enernoc.oadr2.vtn
 
 import grails.test.mixin.*
 
-import org.enernoc.oadr2.vtn.PushService;
+import com.enernoc.oadr2.vtn.PushService
 import org.junit.*
 
 /**
