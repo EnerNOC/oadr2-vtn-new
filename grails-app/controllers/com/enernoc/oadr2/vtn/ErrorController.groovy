@@ -3,7 +3,11 @@ package com.enernoc.oadr2.vtn
 import grails.util.Environment
 
 class ErrorController {
- 
+
+    /**
+     * This attempts to detect the request type so e.g. we don't return an ugly HTML page 
+     * to a JSON or XML request.
+     */
 	def index() {
         def code = request.'javax.servlet.error.status_code'
         def msg = request.'javax.servlet.error.message'
