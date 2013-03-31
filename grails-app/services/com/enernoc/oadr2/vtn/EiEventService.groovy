@@ -90,7 +90,7 @@ public class EiEventService {
 			
 		return new OadrResponse()
 			.withEiResponse(new EiResponse()
-				.withRequestID(UUID.randomUUID())
+				.withRequestID(UUID.randomUUID().toString())
 				.withResponseCode(new ResponseCode(responseCode))
 				.withResponseDescription(desc))
 
@@ -145,17 +145,17 @@ public class EiEventService {
         if ( ! oadrRequestEvent.eiRequestEvent.requestID )
             eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID
         else
-			eiResponse.requestID = UUID.randomUUID()
+			eiResponse.requestID = UUID.randomUUID().toString()
 					    
         OadrDistributeEvent oadrDistributeEvent = new OadrDistributeEvent()
                 .withEiResponse(eiResponse)
-                .withRequestID(UUID.randomUUID())
+                .withRequestID(UUID.randomUUID().toString())
                 .withVtnID(this.vtnID) 
                 
 		// FIXME validate VEN ID against HTTP credentials
 		def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )				      
 		
-		limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
+		def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
 		// TODO filter by marketContext if given
 		def events = Event.findAll(max : limit) { programName == ven.programID }
 		         
@@ -183,7 +183,7 @@ public class EiEventService {
 			
 			if ( ! venStatus ) {
 				venStatus = ew VenStatus()
-				venStatus.venID venID
+				venStatus.venID = venID
                 venStatus.program = ven.programID
                 venStatus.optStatus = "Awaiting response"
 			}
@@ -242,7 +242,7 @@ public class EiEventService {
      */
     public Duration getDuration( EiEvent event ) {
         return this.df.newDuration(Event.minutesFromXCal(
-			event.eiActivePeriod.properties.duration.duration.value) * 60000);
+			event.eiActivePeriod.properties.duration.duration.value) * 60000)
     }
     
 	/**
@@ -311,7 +311,7 @@ public class EiEventService {
 						.withModificationNumber(event.modificationNumber) //changed to the set modification number
 						.withPriority(event.priority)
 						.withTestEvent("False")
-						.withVtnComment("No VTN Comment"))
+						.withVtnComment(""))
 					.withEiEventSignals(new EiEventSignals()
 						.withEiEventSignals(new EiEventSignal()
 							.withCurrentValue(new CurrentValue()

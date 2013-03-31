@@ -44,7 +44,7 @@ grails.mime.types = [
 	multipartForm: 'multipart/form-data',
 	rss:           'application/rss+xml',
 	text:          'text/plain',
-	xml:           ['text/xml', 'application/xml']
+//	xml:           ['text/xml', 'application/xml']
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000

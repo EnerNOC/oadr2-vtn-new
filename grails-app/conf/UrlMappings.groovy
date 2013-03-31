@@ -7,7 +7,9 @@ class UrlMappings {
 			}
 		}
 		
-		"/OpenADR2/Simple/EiEvent"(controller : "EiEventController", action : "handle")
+		"/OpenADR2/Simple/EiEvent"(controller : "eiEvent") {
+            action = [POST:"post"]
+        }
 
 		"/"( view : "/index" )
 		
