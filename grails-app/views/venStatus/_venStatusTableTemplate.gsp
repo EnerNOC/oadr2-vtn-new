@@ -13,18 +13,22 @@
 	<tbody>
 		<g:each in="${venStatusList}" var="venStatus">
 			<tr>
-				<td>${venStatus.venID}</td>
-				<td>${venStatus.eventID}</td>
-				<td>${venStatus.program}</td>
 				<td>
-				<g:if test="${venStatus.optStatus == "OPT_OUT"}">
+					${venStatus.venID}
+				</td>
+				<td>
+					${venStatus.eventID}
+				</td>
+				<td>
+					${venStatus.program}
+				</td>
+				<td><g:if test="${venStatus.optStatus == "OPT_OUT"}">
 						<a disabled="disabled" class="btn btn-danger">Opted Out</a>
-			    </g:if>
-			    <g:else>
-			    	<g:if test="${venStatus.optStatus == "OPT_IN"}">
+					</g:if> <g:else>
+						<g:if test="${venStatus.optStatus == "OPT_IN"}">
 							<a disabled="disabled" class="btn btn-success">Opted In</a>
-					</g:if>
-					<g:else>
+						</g:if>
+						<g:else>
 							<g:if test="${venStatus.optStatus == "Pending 1"}">
 								<a disabled="disabled" class="btn">Pending 1</a>
 							</g:if>
@@ -32,16 +36,16 @@
 								<a disabled="disabled" class="btn">Pending 2</a>
 							</g:else>
 						</g:else>
-					</g:else>
-				</td>
-				<td>${venStatus.displayTime()}</td>
+					</g:else></td>
 				<td>
-				     <g:form action="deleteStatus" params="[id : venStatus.id]">
-						<input type="submit" value="Delete" class="btn btn-danger" onClick="return confirmSubmit()">
-					</g:form>
-				</td>	
+					${venStatus.displayTime()}
+				</td>
+				<td><g:form action="deleteStatus" params="[id : venStatus.id]">
+						<input type="submit" value="Delete" class="btn btn-danger"
+							onClick="return confirmSubmit()">
+					</g:form></td>
 			</tr>
 		</g:each>
-		
+
 	</tbody>
 </table>

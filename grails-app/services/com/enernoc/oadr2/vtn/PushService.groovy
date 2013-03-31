@@ -22,19 +22,19 @@ import com.enernoc.open.oadr2.vtn.EventPushTask
  * @author Jeff LaJoie
  */
 public class PushService {
-    
-	static transactional = true;
-	
-	String vtnID // injected
-	
+
+    static transactional = true;
+
+    String vtnID // injected
+
     final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>()
     ThreadPoolExecutor threadPool = null
-    
+
     public PushService() {
-        this.threadPool = new ThreadPoolExecutor(2, 2, 10, TimeUnit.SECONDS, queue);    
+        this.threadPool = new ThreadPoolExecutor(2, 2, 10, TimeUnit.SECONDS, queue);
         threadPool.prestartAllCoreThreads();
     }
-    
+
     /**
      * Takes the event and VENs to send the event to and adds them to the already running 
      * thread pool of the PushService class
@@ -46,15 +46,15 @@ public class PushService {
     public void pushNewEvent( EiEvent e, List<Ven> vens ) throws JAXBException{
         vens.each { ven ->
             OadrDistributeEvent payload = new OadrDistributeEvent()
-            
+
             payload.withVtnId( this.vtnID )
-				.withRequestID( UUID.randomUUID() )
-				.withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
+                    .withRequestID( UUID.randomUUID() )
+                    .withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
                     .withResponseCode(new ResponseCode("200"))
                     .withResponseDescription("OK"))
-				.withOadrEvents(new OadrEvent().withEiEvent(e))
+                    .withOadrEvents(new OadrEvent().withEiEvent(e))
 
-           queue.add( new EventPushTask( v.getClientURI(), payload ) )
+            queue.add( new EventPushTask( v.getClientURI(), payload ) )
         }
     }
 

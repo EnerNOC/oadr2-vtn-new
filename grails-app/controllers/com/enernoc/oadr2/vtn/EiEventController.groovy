@@ -19,10 +19,10 @@ public class EiEventController {
         try {
             jaxbManager = new JAXBManager()
         } catch (JAXBException e) {
-			throw new RuntimeException("Error creating JAXB context", e)
+            throw new RuntimeException("Error creating JAXB context", e)
         }
     }
-    
+
     EiEventService eiEventService
 
     /**
@@ -48,7 +48,6 @@ public class EiEventController {
             
             Unmarshaller unmarshaller = jaxbManager.context.createUnmarshaller()
             Object payload = unmarshaller.unmarshal( request.reader )
-    		// TODO handle unexpected errors gracefully, always return an XML response
             def eiResponse = eiEventService.handleOadrPayload(payload)
             Marshaller marshaller = jaxbManager.createMarshaller()
             response.contentType = "application/xml"
