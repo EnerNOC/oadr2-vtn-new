@@ -74,23 +74,29 @@ public class XmppService implements PacketListener {
 			return
 		}
 		
-		if ( ! this.jid && ! this.xmppHost )
-			this.xmppHost = this.jid.split('@')[-1]
-		if ( this.xmppPort <= 1 ) xmppPort = 5222
-		
-		this.connConfig = new ConnectionConfiguration(
-			this.xmppHost, this.xmppPort, (String)this.xmppServiceName )
-		connConfig.compressionEnabled = true
-		connConfig.SASLAuthenticationEnabled = true
-		
-		this.xmppConn = new XMPPConnection(this.connConfig)
-		xmppConn.connect()
-		log.info "XMPP connected to ${xmppConn.host}"
-		
-		xmppConn.addPacketListener this, new OADR2PacketFilter()
-		
-		xmppConn.login this.jid, this.xmppPasswd, this.xmppResource
-		log.info "Logged in as ${xmppConn.user}"
+        try {
+    		if ( ! this.jid && ! this.xmppHost )
+    			this.xmppHost = this.jid.split('@')[-1]
+    		if ( this.xmppPort <= 1 ) xmppPort = 5222
+    		
+    		this.connConfig = new ConnectionConfiguration(
+    			this.xmppHost, this.xmppPort, (String)this.xmppServiceName )
+    		connConfig.compressionEnabled = true
+    		connConfig.SASLAuthenticationEnabled = true
+    		
+    		this.xmppConn = new XMPPConnection(this.connConfig)
+    		xmppConn.connect()
+    		log.info "XMPP connected to ${xmppConn.host}"
+    		
+    		xmppConn.addPacketListener this, new OADR2PacketFilter()
+    		
+    		xmppConn.login this.jid, this.xmppPasswd, this.xmppResource
+    		log.info "Logged in as ${xmppConn.user}"
+        }
+        catch ( Exception ex ) {
+            // don't abort if there's an XMPP error
+            log.error "XMPP conntion error", ex
+        }
 	}
 	
 	void disconnect() {
