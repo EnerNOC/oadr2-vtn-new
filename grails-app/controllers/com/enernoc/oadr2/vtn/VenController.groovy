@@ -68,7 +68,7 @@ class VenController {
         def ven = new Ven(params)
 
         def program = Program.find("from Program as p where p.programName=?", [params.programID])
-        def errorMessage = ""
+        def errorMessage = []
         if (program!=null) {
             program.addToVen(ven)
         }
@@ -78,10 +78,10 @@ class VenController {
             flash.message="Success"
         } else {
             flash.message="Fail"
-            ven.errors?.allErrors?.each {
-                errorMessage += messageSource.getMessage(it, null) +"</br>"
+            ven.errors.allErrors.each {
+                errorMessage << messageSource.getMessage(it, null)
             }
-            chain(action:"blankVEN", model: [error: errorMessage])
+            return chain(action:"blankVEN", model:[error: errorMessage])
         }
         chain(action:"vens", model: [error: errorMessage])
 

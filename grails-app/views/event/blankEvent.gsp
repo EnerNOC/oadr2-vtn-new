@@ -13,13 +13,16 @@
 </head>
 <body>
 
-	<g:if test="${flash.message == "Fail"}">
-		<div class="alert alert-error">
-			<p>
-				${error}
-			</p>
-		</div>
-	</g:if>
+    <g:if test="${flash.message == "Fail"}">
+        <div class="alert alert-error">
+            <p>
+                <g:each in="${error}">
+                    ${it}
+                    </br>
+                </g:each>
+            </p>
+        </div>
+    </g:if>
 
 	<h1>Create an Event</h1>
 	</br>

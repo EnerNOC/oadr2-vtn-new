@@ -24,7 +24,8 @@ class EventController {
     def messageSource
     def pushService
     def xmppService
-
+    def eiEventService
+    
     static ObjectFactory objectFactory = new ObjectFactory();
     static DatatypeFactory datatypeFactory;
     static{
@@ -70,10 +71,10 @@ class EventController {
             e.eiEvent.eventDescriptor.createdDateTime = new DateTime().withValue(xCalendar)
             if( e.eiEvent.getEventDescriptor().eventStatus != EventStatusEnumeratedType.CANCELLED )
                 e.eiEvent.getEventDescriptor().eventStatus =
-                        updateStatus(e, e.eiEvent.getEiEventSignals().getEiEventSignals().size())
+                        eiEventService.updateStatus(e, e.eiEvent.getEiEventSignals().getEiEventSignals().size())
             e.eiEvent.getEiEventSignals().getEiEventSignals() { eventSignal ->
                 eventSignal.currentValue = new CurrentValue().withPayloadFloat(
-                        new PayloadFloat().withValue(updateSignalPayload(e)))
+                        new PayloadFloat().withValue(eiEventService.updateSignalPayload(e)))
             }
         }
         render view: "eventsTable", model: [event: events]
@@ -119,15 +120,15 @@ class EventController {
         def event = new Event(params)
         def program = Program.find("from Program as p where p.programName=?", [event.programName])
 
-        def errorMessage = ""
+        def errorMessage = [];
         //def testing = new EiEvent()
         if (program != null) program.addToEvent(event)
 
         if ( event.validate() ) {
-            def eiEvent = eiEventService.buildEvent(event)
+            def eiEvent = eiEventService.buildEiEvent(event)
             Long duration = event.getMinutesDuration()
             event.duration = event.createXCalString(duration)
-            event.status = updateStatus(eiEvent, (int)event.intervals).value
+            event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
             program.save()
             populateFromPush(event);
             def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
@@ -139,7 +140,7 @@ class EventController {
         else {
             flash.message="Fail"
             event.errors.allErrors.each {
-                errorMessage += messageSource.getMessage(it, null) +"</br>"
+                errorMessage << messageSource.getMessage(it, null)
             }
             return chain(action:"blankEvent", model:[error: errorMessage])
         }
@@ -217,9 +218,9 @@ class EventController {
         }
         if ( alteredEvent.validate() ) {
             Long duration = alteredEvent.getMinutesDuration()
-            def eiEvent = eiEventService.buildEvent(alteredEvent)
+            def eiEvent = eiEventService.buildEiEvent(alteredEvent)
             alteredEvent.duration = alteredEvent.createXCalString(duration)
-            alteredEvent.status = updateStatus(eiEvent, (int)alteredEvent.intervals).value
+            alteredEvent.status = eiEventService.updateStatus(eiEvent, (int)alteredEvent.intervals).value
             event.delete()
             programNew.save()
             //populateFromPush(newEvent);
@@ -231,65 +232,12 @@ class EventController {
         }
         else {
             flash.message="Fail"
-            alteredEvent.errors?.allErrors?.each {
-                errorMessage += messageSource.getMessage(it, null) +"</br>"
+            alteredEvent.errors.allErrors.each {
+                errorMessage << messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errorMessage], params: [id: params.id])
+            return chain(action:"editEvent", model:[error: errorMessage])
         }
         chain action:"events", model:[error: errorMessage]
-    }
-
-    /**
-     * Updates the EventStatus based on the current time and time of the event
-     *
-     * @param event - the event to have the EventStatus updated
-     * @param intervals - the number of time intervals contained in the
-     * @return the EventStatusEnumeratedType the EventStatus should be set to
-     */
-    protected EventStatusEnumeratedType updateStatus( EiEvent event, int intervals ) {
-
-        Date currentDate = new Date()
-        GregorianCalendar calendar = new GregorianCalendar()
-        calendar.time = currentDate
-        XMLGregorianCalendar xCalendar = datatypeFactory.newXMLGregorianCalendar(calendar)
-        xCalendar.timezone = DatatypeConstants.FIELD_UNDEFINED
-
-        DateTime currentTime = new DateTime().withValue(xCalendar)
-        DateTime startTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
-        DateTime endTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
-
-        DateTime rampUpTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
-
-        rampUpTime.value.add(getDuration(event.getEiActivePeriod().getProperties().getXEiRampUp().getDuration().value));
-        Duration d = getDuration(event, intervals);
-        endTime.value.add(d);
-
-        if ( currentTime.value.compare( startTime.value) == -1) {
-            if( currentTime.value.compare(rampUpTime.value) == -1 )
-                return EventStatusEnumeratedType.FAR
-            else return EventStatusEnumeratedType.NEAR
-        }
-        else if ( currentTime.value.compare(startTime.value) > 0
-        && currentTime.value.compare(endTime.value) == -1 )
-            return EventStatusEnumeratedType.ACTIVE
-
-        else if ( currentTime.value.compare(endTime.value) > 0)
-            return EventStatusEnumeratedType.COMPLETED
-
-        else return EventStatusEnumeratedType.NONE
-    }
-
-
-    /**
-     * Updates the SignalPayloadFloat based on the EventStatus contained in the EiEvent
-     *
-     * @param event - Contains the EventStatus that determines the SignalPayload
-     * @return the SignalPayload as a float to be set in the construction of the EiEvent
-     */
-    protected float updateSignalPayload( EiEvent event ) {
-        if(event.getEventDescriptor().getEventStatus().equals(EventStatusEnumeratedType.ACTIVE))
-            return 1;
-        return 0;
     }
 
     /**
@@ -325,42 +273,6 @@ class EventController {
         }
     }
 
-    /**
-     * Converts an event to a duration based on the event and number of intervals
-     *
-     * @param event - Duration that needs to be converted from String to Duration
-     * @param intervals - number of intervals to be serviced
-     * @return Duration from the event multiplied by the number of intervals
-     */
-    static Duration getDuration( EiEvent event, int intervals ) {
-        Duration duration = datatypeFactory.newDuration(
-                Event.minutesFromXCal(event.eiActivePeriod.properties.duration.duration.value) * 60000)
-        if ( intervals ) duration = duration.multiply(intervals)
-        return intervals
-    }
 
-    static Duration getDuration( EiEvent event ) {
-        return getDuration( event, 0 )
-    }
-
-    /**
-     * Converts an event string of DurationValue to a Duration
-     *
-     * @param duration - Duration that needs to be converted from String to Duration
-     * @return Duration from the event
-     */
-    static Duration getDuration( String duration ) {
-        return datatypeFactory.newDuration( duration )
-    }
-
-    /**
-     * Formats a duration to be acceptable by the schema validation
-     *
-     * @param duration - the duration to be modified with the .000 truncated
-     * @return String with an acceptable duration value, minus the .000 precision
-     */
-    static String formatDuration( Duration duration ) {
-        return duration.toString().replaceAll(".000", "")
-    }
 }
 

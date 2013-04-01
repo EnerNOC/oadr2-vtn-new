@@ -15,5 +15,7 @@ class UrlMappings {
 		
 		"404"( controller : 'error' ) 
 		"500"( controller : 'error' )
+        "/debug"(view:"/debug")
+        
 	}
 }
