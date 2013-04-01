@@ -240,8 +240,6 @@ class EventController {
         chain action:"events", model:[error: errorMessage]
     }
 
-
-
     /**
      * Passes the VENs and event to the prepareVENs method
      *
@@ -274,8 +272,6 @@ class EventController {
             else log.warn "Validation error for venStatus {}", venStatus
         }
     }
-
-
 
 
 }
