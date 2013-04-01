@@ -17,6 +17,7 @@ import com.enernoc.open.oadr2.model.EiEventSignal
 import com.enernoc.open.oadr2.model.EiEventSignals
 import com.enernoc.open.oadr2.model.EiResponse
 import com.enernoc.open.oadr2.model.EiTarget
+import com.enernoc.open.oadr2.model.EventStatusEnumeratedType
 import com.enernoc.open.oadr2.model.EventDescriptor
 import com.enernoc.open.oadr2.model.Interval
 import com.enernoc.open.oadr2.model.Intervals
@@ -25,7 +26,9 @@ import com.enernoc.open.oadr2.model.OadrCreatedEvent
 import com.enernoc.open.oadr2.model.OadrDistributeEvent
 import com.enernoc.open.oadr2.model.OadrRequestEvent
 import com.enernoc.open.oadr2.model.OadrResponse
+import com.enernoc.open.oadr2.model.ObjectFactory;
 import com.enernoc.open.oadr2.model.PayloadFloat
+import com.enernoc.open.oadr2.model.Properties
 import com.enernoc.open.oadr2.model.ResponseCode
 import com.enernoc.open.oadr2.model.ResponseRequiredType
 import com.enernoc.open.oadr2.model.SignalPayload
@@ -160,7 +163,7 @@ public class EiEventService {
 
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
-                    .withEiEvent(EventController.buildEvent(e))
+                    .withEiEvent(buildEiEvent(e))
                     .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
         }
         persistFromRequestEvent oadrRequestEvent, events
@@ -252,28 +255,37 @@ public class EiEventService {
      */
     public EiEvent buildEiEvent( Event event ) {
         Date currentDate = new Date();
-        GregorianCalendar calendar = new GregorianCalendar();
+        GregorianCalendar calendar = new GregorianCalendar()
+        def objectFactory = new ObjectFactory();
         calendar.setTime(currentDate);
-        XMLGregorianCalendar xCalendar = datatypeFactory.newXMLGregorianCalendar(calendar);
+        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar);
         xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
 
         JAXBElement<SignalPayload> signalPayload = objectFactory.createSignalPayload(
                 new SignalPayload(new PayloadFloat(1)));
 
         String contextName = event.programName;
-        Intervals intervals = new Intervals();
         def intervalList = []
         EiEvent newEvent = event.toEiEvent();
 
-        event.intervals.each { evt, i ->
+        /*event.intervals.each { evt, i ->
             intervalList.add(new Interval()
                 .withDuration(new DurationPropType()
                     .withDuration(new DurationValue()
                         .withValue(formatDuration(getDuration(newEvent)))))
                     .withUid(new Uid().withText("" + i))
                     .withStreamPayloadBase(signalPayload));
+        }*/
+        for(int i=0; i < event.getIntervals(); i++){
+            intervalList.add(new Interval()
+                .withDuration(new DurationPropType()
+                    .withDuration(new DurationValue()
+                        .withValue(formatDuration(getDuration(newEvent)))))
+                .withUid(new Uid()
+                    .withText("" + i))
+                .withStreamPayloadBase(signalPayload));
         }
-        intervals.setIntervals(intervalList);
+        Intervals intervals = new Intervals(intervalList);
         newEvent.withEiActivePeriod(new EiActivePeriod()
                     .withProperties(new Properties()
                         .withDtstart(new Dtstart()
@@ -323,4 +335,93 @@ public class EiEventService {
                     .withSignalType(SignalTypeEnumeratedType.LEVEL)));
         return newEvent;
     }
+    
+    /**
+     * Formats a duration to be acceptable by the schema validation
+     *
+     * @param duration - the duration to be modified with the .000 truncated
+     * @return String with an acceptable duration value, minus the .000 precision
+     */
+    static String formatDuration( Duration duration ) {
+        return duration.toString().replaceAll(".000", "")
+    }
+    
+    /**
+     * Updates the SignalPayloadFloat based on the EventStatus contained in the EiEvent
+     *
+     * @param event - Contains the EventStatus that determines the SignalPayload
+     * @return the SignalPayload as a float to be set in the construction of the EiEvent
+     */
+    protected float updateSignalPayload( EiEvent event ) {
+        if(event.getEventDescriptor().getEventStatus().equals(EventStatusEnumeratedType.ACTIVE))
+            return 1;
+        return 0;
+    }
+    
+    /**
+     * Converts an event to a duration based on the event and number of intervals
+     *
+     * @param event - Duration that needs to be converted from String to Duration
+     * @param intervals - number of intervals to be serviced
+     * @return Duration from the event multiplied by the number of intervals
+     */
+    protected Duration getDuration( EiEvent event, int intervals ) {
+        Duration duration = df.newDuration(
+                Event.minutesFromXCal(event.eiActivePeriod.properties.duration.duration.value) * 60000)
+        if ( intervals ) duration = duration.multiply(intervals)
+        return duration
+    }
+
+
+    /**
+     * Converts an event string of DurationValue to a Duration
+     *
+     * @param duration - Duration that needs to be converted from String to Duration
+     * @return Duration from the event
+     */
+    protected Duration getDuration( String duration ) {
+        return df.newDuration( duration )
+    }
+    
+    /**
+     * Updates the EventStatus based on the current time and time of the event
+     *
+     * @param event - the event to have the EventStatus updated
+     * @param intervals - the number of time intervals contained in the
+     * @return the EventStatusEnumeratedType the EventStatus should be set to
+     */
+    protected EventStatusEnumeratedType updateStatus( EiEvent event, int intervals ) {
+
+        Date currentDate = new Date()
+        GregorianCalendar calendar = new GregorianCalendar()
+        calendar.time = currentDate
+        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
+        xCalendar.timezone = DatatypeConstants.FIELD_UNDEFINED
+
+        DateTime currentTime = new DateTime().withValue(xCalendar)
+        DateTime startTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
+        DateTime endTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
+
+        DateTime rampUpTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
+
+        rampUpTime.value.add(getDuration(event.getEiActivePeriod().getProperties().getXEiRampUp().getDuration().value));
+        Duration d = getDuration(event, intervals);
+        endTime.value.add(d);
+
+        if ( currentTime.value.compare( startTime.value) == -1) {
+            if( currentTime.value.compare(rampUpTime.value) == -1 )
+                return EventStatusEnumeratedType.FAR
+            else return EventStatusEnumeratedType.NEAR
+        }
+        else if ( currentTime.value.compare(startTime.value) > 0
+        && currentTime.value.compare(endTime.value) == -1 )
+            return EventStatusEnumeratedType.ACTIVE
+
+        else if ( currentTime.value.compare(endTime.value) > 0)
+            return EventStatusEnumeratedType.COMPLETED
+
+        else return EventStatusEnumeratedType.NONE
+    }
+
+    
 }

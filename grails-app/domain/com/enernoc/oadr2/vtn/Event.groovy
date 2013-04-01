@@ -23,6 +23,7 @@ import com.enernoc.open.oadr2.model.EventDescriptor
 import com.enernoc.open.oadr2.model.Interval
 import com.enernoc.open.oadr2.model.Intervals
 import com.enernoc.open.oadr2.model.MarketContext
+import com.enernoc.open.oadr2.model.Properties
 import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
 
 
