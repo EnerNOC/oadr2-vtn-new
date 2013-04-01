@@ -39,24 +39,13 @@
 					2</a>
 
 				<div class="nav-collapse">
-					<ul class="nav">
-						<li
-							class="${request.forwardURI == createLink(uri: '/') ? 'active' : ''}">
-							<a href="${createLink(uri: '/')}">Home</a>
-						</li>
-						<li
-							class="${request.forwardURI == createLink(uri: '/program/programs') ? 'active' : ''}">
-							<a href="${createLink(uri: '/program/programs')}">Programs</a>
-						</li>
-						<li
-							class="${request.forwardURI == createLink(uri: '/ven/vens') ? 'active' : ''}">
-							<a href="${createLink(uri: '/ven/vens')}">VENs</a>
-						</li>
-						<li
-							class="${request.forwardURI == createLink(uri: '/event/events') ? 'active' : ''}">
-							<a href="${createLink(uri: '/event/events')}">Events</a>
-						</li>
-					</ul>
+                    <ul class="nav">
+                        <li> <a href="${createLink(uri: '/')}">Home</a></li>
+                        <li><g:link controller="Program">Program</g:link></li>
+                        <li><g:link controller="Ven">VEN</g:link></li>
+                        <li><g:link controller="Event">Event</g:link></li>
+                        <li><a href="${createLink(uri:'/debug') }">Debug</a></li>
+                    </ul>
 				</div>
 			</div>
 		</div>
