@@ -35,12 +35,12 @@
 				<td>
 					${event.programName}
 				</td>
-				<td><g:link action="editEvent" params="[id: event.id]"
+				<td><g:link controller="Event" action="editEvent" params="[id: event.id]"
 						class="btn">
 							Edit</g:link></td>
-				<td><g:link action="deleteEvent" params="[id: event.id]"
+				<td><g:link controller="Event" action="deleteEvent" params="[id: event.id]"
 						class="btn btn-danger">Delete</g:link></td>
-				<td><g:link action="cancelEvent" params="[id: event.id]"
+				<td><g:link controller="Event" action="cancelEvent" params="[id: event.id]"
 						class="btn btn-inverse">Cancel</g:link>
 			</tr>
 		</g:each>

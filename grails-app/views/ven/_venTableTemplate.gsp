@@ -25,7 +25,7 @@
 				<td>
 					${ven.programID}
 				</td>
-				<td><g:form action="deleteVEN" params="[id : ven.id]">
+				<td><g:form controller="Ven" action="deleteVEN" params="[id : ven.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"
 							onClick="return confirmSubmit()">
 					</g:form></td>

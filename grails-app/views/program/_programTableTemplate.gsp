@@ -17,7 +17,7 @@
 				<td>
 					${program.programURI}
 				</td>
-				<td><g:form action="deleteProgram" params="[id : program.id]">
+				<td><g:form controller="Program" action="deleteProgram" params="[id : program.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"
 							onClick="return confirmSubmit()">
 					</g:form></td>
