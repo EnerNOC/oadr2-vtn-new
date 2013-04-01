@@ -47,14 +47,14 @@ public class PushService {
         vens.each { ven ->
             OadrDistributeEvent payload = new OadrDistributeEvent()
 
-            payload.withVtnId( this.vtnID )
-                    .withRequestID( UUID.randomUUID() )
+            payload.withVtnID( this.vtnID )
+                    .withRequestID( (String)UUID.randomUUID() )
                     .withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
                     .withResponseCode(new ResponseCode("200"))
                     .withResponseDescription("OK"))
                     .withOadrEvents(new OadrEvent().withEiEvent(e))
 
-            queue.add( new EventPushTask( v.getClientURI(), payload ) )
+            queue.add( new EventPushTask( ven.getClientURI(), payload ) )
         }
     }
 
