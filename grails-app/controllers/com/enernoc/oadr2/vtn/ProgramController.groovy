@@ -68,16 +68,16 @@ class ProgramController {
 
     def newProgram() {
         def program = new Program(params)
-        def errorMessage = ""
+        def errorMessage = []
         if (program.validate()) {
             program.save()
             flash.message = "Success"
         } else {
-            flash.message = "Fail"
+            flash.message="Fail"
             program.errors.allErrors.each {
-                errorMessage += messageSource.getMessage(it, null) + "</br>"
+                errorMessage << messageSource.getMessage(it, null)
             }
-            return chain(action:"blankProgram", model: [error: errorMessage])
+            return chain(action:"blankProgram", model:[error: errorMessage])
         }
         chain(action:"programs", model: [error: errorMessage])
     }

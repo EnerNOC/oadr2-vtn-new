@@ -119,7 +119,7 @@ class EventController {
         def event = new Event(params)
         def program = Program.find("from Program as p where p.programName=?", [event.programName])
 
-        def errorMessage = ""
+        def errorMessage = [];
         //def testing = new EiEvent()
         if (program != null) program.addToEvent(event)
 
@@ -139,7 +139,7 @@ class EventController {
         else {
             flash.message="Fail"
             event.errors.allErrors.each {
-                errorMessage += messageSource.getMessage(it, null) +"</br>"
+                errorMessage << messageSource.getMessage(it, null)
             }
             return chain(action:"blankEvent", model:[error: errorMessage])
         }
@@ -231,10 +231,10 @@ class EventController {
         }
         else {
             flash.message="Fail"
-            alteredEvent.errors?.allErrors?.each {
-                errorMessage += messageSource.getMessage(it, null) +"</br>"
+            alteredEvent.errors.allErrors.each {
+                errorMessage << messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errorMessage], params: [id: params.id])
+            return chain(action:"editEvent", model:[error: errorMessage])
         }
         chain action:"events", model:[error: errorMessage]
     }
