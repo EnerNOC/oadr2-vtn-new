@@ -122,7 +122,6 @@ class VenController {
      * 
      */
     def updateVEN() {
-        render("fk u")
         def oldVen = Ven.get( params.id )
         def newVen = new Ven(params)
 
