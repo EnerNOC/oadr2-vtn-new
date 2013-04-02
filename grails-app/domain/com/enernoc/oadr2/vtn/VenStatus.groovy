@@ -14,22 +14,22 @@ class VenStatus {
 
 
     //@Column(name = "EVENTID")
-    String eventID;
+    String eventID
 
     //@Column(name = "VENID")
-    String venID;
+    String venID
 
     //@Column(name = "OPTSTATUS")
-    String optStatus;
+    String optStatus
 
     //@Column(name = "PROGRAM")
-    String program;
+    String program
 
     //	@Column(name = "TIME")
-    Date time;
+    Date time
 
     //@Column(name = "REQUESTID")
-    String requestID;
+    String requestID
 
     static constraints = {
         requestID(nullable: true)
@@ -40,7 +40,7 @@ class VenStatus {
         "\nEvent ID: " + this.eventID +
         "\nProgram: " + this.program +
         "\nStatus: " + this.optStatus +
-        "\nTime: " + this.time.toString());
+        "\nTime: " + this.time.toString())
     }
 
     /**
@@ -49,7 +49,8 @@ class VenStatus {
      * @return a String of a readable DateTime
      */
     public String displayTime(){
-        return(time.format("MM/dd/yyyy @ h:mm aa"));	}
+        return(time.format("MM/dd/yyyy @ h:mm aa"))
+    }
 
 }
 

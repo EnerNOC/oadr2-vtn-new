@@ -9,7 +9,7 @@ class ProgramController {
      */
     def messageSource
     def index() {
-        return redirect(action: "programs");
+        return redirect(action: "programs")
     }
 
     /**
@@ -26,12 +26,12 @@ class ProgramController {
          *
          class ProgramFormComparator implements Comparator<Program>{
          public int compare(Program programOne, Program programTwo){
-         return programOne.getProgramName().compareTo(programTwo.getProgramName());
+         return programOne.getProgramName().compareTo(programTwo.getProgramName())
          }
          }
-         List<Program> programs = JPA.em().createQuery("FROM Program").getResultList();
-         Collections.sort(programs, new ProgramFormComparator());
-         return ok(views.html.programs.render(programs));*/
+         List<Program> programs = JPA.em().createQuery("FROM Program").getResultList()
+         Collections.sort(programs, new ProgramFormComparator())
+         return ok(views.html.programs.render(programs))*/
         def results = Program.listOrderByProgramName(order:"desc")
         [programList: results]
     }
@@ -41,7 +41,7 @@ class ProgramController {
      *
      * @return a rendering of the Program creation form with all fields blank
      public static Result blankProgram(){
-     return ok(views.html.newProgram.render(form(Program.class)));
+     return ok(views.html.newProgram.render(form(Program.class)))
      }*/
 
     def blankProgram() {
@@ -54,16 +54,16 @@ class ProgramController {
      * @return a redirect to the default display page with the Program added
      @Transactional
      public static Result newProgram(){
-     Form<Program> filledForm = form(Program.class).bindFromRequest();
+     Form<Program> filledForm = form(Program.class).bindFromRequest()
      if(filledForm.hasErrors()){
-     return badRequest();
+     return badRequest()
      }
      else{
-     Program newProgram = filledForm.get();
-     JPA.em().persist(newProgram);
-     flash("success", "Program as been created");
+     Program newProgram = filledForm.get()
+     JPA.em().persist(newProgram)
+     flash("success", "Program as been created")
      }
-     return redirect(routes.Programs.programs());
+     return redirect(routes.Programs.programs())
      }*/
 
     def newProgram() {
@@ -88,10 +88,10 @@ class ProgramController {
      */
     /*@Transactional
      public static Result deleteProgram(Long id){
-     Program program = JPA.em().find(Program.class, id);
-     flash("success", "Program has been deleted");
-     JPA.em().remove(program);
-     return redirect(routes.Programs.programs());
+     Program program = JPA.em().find(Program.class, id)
+     flash("success", "Program has been deleted")
+     JPA.em().remove(program)
+     return redirect(routes.Programs.programs())
      }*/
 
     def deleteProgram() {

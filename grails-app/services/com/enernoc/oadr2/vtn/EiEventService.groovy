@@ -26,7 +26,7 @@ import com.enernoc.open.oadr2.model.OadrCreatedEvent
 import com.enernoc.open.oadr2.model.OadrDistributeEvent
 import com.enernoc.open.oadr2.model.OadrRequestEvent
 import com.enernoc.open.oadr2.model.OadrResponse
-import com.enernoc.open.oadr2.model.ObjectFactory;
+import com.enernoc.open.oadr2.model.ObjectFactory
 import com.enernoc.open.oadr2.model.PayloadFloat
 import com.enernoc.open.oadr2.model.Properties
 import com.enernoc.open.oadr2.model.ResponseCode
@@ -74,7 +74,7 @@ public class EiEventService {
         else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
             handleOadrResponse( (OadrResponse)o )
-            return null;
+            return null
         }
         else {
             log.error "Unknown type: ${o?.class}"
@@ -244,7 +244,7 @@ public class EiEventService {
      */
     public Duration getDuration( EiEvent event ) {
         return this.df.newDuration(Event.minutesFromXCal(
-        event.eiActivePeriod.properties.duration.duration.value) * 60000);
+        event.eiActivePeriod.properties.duration.duration.value) * 60000)
     }
 
     /**
@@ -254,19 +254,19 @@ public class EiEventService {
      * @return the EiEvent built from the Event wrapper
      */
     public EiEvent buildEiEvent( Event event ) {
-        Date currentDate = new Date();
+        Date currentDate = new Date()
         GregorianCalendar calendar = new GregorianCalendar()
-        def objectFactory = new ObjectFactory();
-        calendar.setTime(currentDate);
-        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar);
-        xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
+        def objectFactory = new ObjectFactory()
+        calendar.setTime(currentDate)
+        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
+        xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED)
 
         JAXBElement<SignalPayload> signalPayload = objectFactory.createSignalPayload(
-                new SignalPayload(new PayloadFloat(1)));
+                new SignalPayload(new PayloadFloat(1)))
 
-        String contextName = event.programName;
+        String contextName = event.programName
         def intervalList = []
-        EiEvent newEvent = event.toEiEvent();
+        EiEvent newEvent = event.toEiEvent()
 
         /*event.intervals.each { evt, i ->
             intervalList.add(new Interval()
@@ -274,26 +274,26 @@ public class EiEventService {
                     .withDuration(new DurationValue()
                         .withValue(formatDuration(getDuration(newEvent)))))
                     .withUid(new Uid().withText("" + i))
-                    .withStreamPayloadBase(signalPayload));
+                    .withStreamPayloadBase(signalPayload))
         }*/
-        for(int i=0; i < event.getIntervals(); i++){
+        event.intervals.eachWithIndex { evt, i->
             intervalList.add(new Interval()
-                .withDuration(new DurationPropType()
+                    .withDuration(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue(formatDuration(getDuration(newEvent)))))
-                .withUid(new Uid()
+                    .withValue(formatDuration(getDuration(newEvent)))))
+                    .withUid(new Uid()
                     .withText("" + i))
-                .withStreamPayloadBase(signalPayload));
+                    .withStreamPayloadBase(signalPayload))
         }
-        Intervals intervals = new Intervals(intervalList);
+        Intervals intervals = new Intervals(intervalList)
         newEvent.withEiActivePeriod(new EiActivePeriod()
                     .withProperties(new Properties()
                         .withDtstart(new Dtstart()
                             .withDateTime(new DateTime()
-                                .withValue(newEvent.getEiActivePeriod().getProperties().getDtstart().getDateTime().getValue().normalize())))
+                                .withValue(newEvent.eiActivePeriod.properties.dtstart.dateTime.value.normalize())))
                         .withDuration(new DurationPropType()
                             .withDuration(new DurationValue()
-                                .withValue(formatDuration(getDuration(newEvent, (int)event.getIntervals())))))
+                                .withValue(formatDuration(getDuration(newEvent, (int)event.intervals)))))
                         .withTolerance(new Tolerance()
                             .withTolerate(new Tolerate()
                                 .withStartafter(new DurationValue()
@@ -332,8 +332,8 @@ public class EiEventService {
                                 .withIntervals(intervalList))
                             .withSignalID("TH_SIGNAL_ID")
                             .withSignalName("simple")
-                    .withSignalType(SignalTypeEnumeratedType.LEVEL)));
-        return newEvent;
+                    .withSignalType(SignalTypeEnumeratedType.LEVEL)))
+        return newEvent
     }
     
     /**
@@ -353,9 +353,10 @@ public class EiEventService {
      * @return the SignalPayload as a float to be set in the construction of the EiEvent
      */
     protected float updateSignalPayload( EiEvent event ) {
-        if(event.getEventDescriptor().getEventStatus().equals(EventStatusEnumeratedType.ACTIVE))
-            return 1;
-        return 0;
+        if(event.eventDescriptor.eventStatus.equals(EventStatusEnumeratedType.ACTIVE)) {
+            return 1
+        }
+        return 0
     }
     
     /**
@@ -399,14 +400,15 @@ public class EiEventService {
         xCalendar.timezone = DatatypeConstants.FIELD_UNDEFINED
 
         DateTime currentTime = new DateTime().withValue(xCalendar)
-        DateTime startTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
-        DateTime endTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
+        def startDttm = event.eiActivePeriod.properties.dtstart.dateTime.value.normalize()
+        DateTime startTime = new DateTime().withValue(startDttm)
+        DateTime endTime = new DateTime().withValue(startDttm)
 
-        DateTime rampUpTime = new DateTime().withValue(event.getEiActivePeriod().getProperties().getDtstart().getDateTime().value.normalize());
+        DateTime rampUpTime = new DateTime().withValue(startDttm)
 
-        rampUpTime.value.add(getDuration(event.getEiActivePeriod().getProperties().getXEiRampUp().getDuration().value));
-        Duration d = getDuration(event, intervals);
-        endTime.value.add(d);
+        rampUpTime.value.add(getDuration(event.eiActivePeriod.properties.getXEiRampUp().duration.value))
+        Duration d = getDuration(event, intervals)
+        endTime.value.add(d)
 
         if ( currentTime.value.compare( startTime.value) == -1) {
             if( currentTime.value.compare(rampUpTime.value) == -1 )

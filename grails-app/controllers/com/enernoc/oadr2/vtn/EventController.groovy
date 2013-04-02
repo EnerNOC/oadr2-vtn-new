@@ -26,13 +26,13 @@ class EventController {
     def xmppService
     def eiEventService
     
-    static ObjectFactory objectFactory = new ObjectFactory();
-    static DatatypeFactory datatypeFactory;
+    static ObjectFactory objectFactory = new ObjectFactory()
+    static DatatypeFactory datatypeFactory
     static{
         try {
-            datatypeFactory = DatatypeFactory.newInstance();
+            datatypeFactory = DatatypeFactory.newInstance()
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -69,10 +69,10 @@ class EventController {
         events.each { e ->
             def eiEvent = eiEventService.buildEvent(e)
             e.eiEvent.eventDescriptor.createdDateTime = new DateTime().withValue(xCalendar)
-            if( e.eiEvent.getEventDescriptor().eventStatus != EventStatusEnumeratedType.CANCELLED )
-                e.eiEvent.getEventDescriptor().eventStatus =
-                        eiEventService.updateStatus(e, e.eiEvent.getEiEventSignals().getEiEventSignals().size())
-            e.eiEvent.getEiEventSignals().getEiEventSignals() { eventSignal ->
+            if( e.eiEvent.eventDescriptor.eventStatus != EventStatusEnumeratedType.CANCELLED )
+                e.eiEvent.eEventDescriptor.eventStatus =
+                        eiEventService.updateStatus(e, e.eiEvent.eiEventSignals.eiEventSignals.size())
+            e.eiEvent.eiEventSignals.EiEventSignals { eventSignal ->
                 eventSignal.currentValue = new CurrentValue().withPayloadFloat(
                         new PayloadFloat().withValue(eiEventService.updateSignalPayload(e)))
             }
@@ -86,10 +86,10 @@ class EventController {
      * @return the rendered page to create an event, with all fields vacant
      */
     def blankEvent() {
-        //Event newForm = new Event();
+        //Event newForm = new Event()
         def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
         // def programs = ["one", "two", "three"]
-        // return ok(views.html.newEvent.render(form(Event.class).fill(newForm), newForm, makeProgramMap()));
+        // return ok(views.html.newEvent.render(form(Event.class).fill(newForm), newForm, makeProgramMap()))
         def date = new Date()
         def dateFormatted = g.formatDate(date:date, format:"MM-dd-yyyy")
         def timeFormatted = g.formatDate(date:date, format:"hh:mm aa")
@@ -120,7 +120,7 @@ class EventController {
         def event = new Event(params)
         def program = Program.find("from Program as p where p.programName=?", [event.programName])
 
-        def errorMessage = [];
+        def errorMessage = []
         //def testing = new EiEvent()
         if (program != null) program.addToEvent(event)
 
@@ -130,8 +130,8 @@ class EventController {
             event.duration = event.createXCalString(duration)
             event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
             program.save()
-            populateFromPush(event);
-            def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
+            populateFromPush(event)
+            def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been created"
             //def vens = getVENs(event.eiEvent)
@@ -156,7 +156,7 @@ class EventController {
      */
     def cancelEvent() {
         def event = Event.get(params.id)
-        //Event event = Event.get(params.id);
+        //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.status = "cancelled"
         redirect action: "events"
@@ -171,7 +171,7 @@ class EventController {
     def deleteEvent() {
         def event = Event.get(params.id)
         event.delete()
-        //flash("success", "Event has been deleted");
+        //flash("success", "Event has been deleted")
         redirect actions: "events"
     }
 
@@ -223,8 +223,8 @@ class EventController {
             alteredEvent.status = eiEventService.updateStatus(eiEvent, (int)alteredEvent.intervals).value
             event.delete()
             programNew.save()
-            //populateFromPush(newEvent);
-            //def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
+            //populateFromPush(newEvent)
+            //def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
             //pushService.pushNewEvent(event.eiEvent, vens)
             flash.message="Success, your event has been updated"
             //def vens = getVENs(event.eiEvent)
@@ -246,7 +246,7 @@ class EventController {
      * @param event - event to be used for getVENs and prepareVENs
      */
     protected void populateFromPush( Event event ) {
-        def customers = Ven.findAll("from Ven as v where v.programID=?", [event.programName]);
+        def customers = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
         prepareVENs customers, event
     }
 
@@ -258,7 +258,7 @@ class EventController {
      */
     protected void prepareVENs ( List<Ven> vens, Event event ) {
         vens.each { v ->
-            def venStatus = new VenStatus();
+            def venStatus = new VenStatus()
             venStatus.optStatus = "Pending 1"
             venStatus.requestID = v.clientURI
             venStatus.eventID = event.eventID

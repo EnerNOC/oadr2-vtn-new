@@ -2,10 +2,10 @@ package com.enernoc.oadr2.vtn
 
 class Ven {
 
-    String venID;
-    String programID;
-    String venName;
-    String clientURI;
+    String venID
+    String programID
+    String venName
+    String clientURI
 
     static belongsTo = [program: Program]
 

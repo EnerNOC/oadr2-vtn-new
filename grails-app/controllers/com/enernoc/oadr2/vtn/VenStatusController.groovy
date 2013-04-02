@@ -1,14 +1,14 @@
 package com.enernoc.oadr2.vtn
 
 
-//import play.db.jpa.JPA;
-//import play.db.jpa.Transactional;
-//import play.mvc.Controller;
-//import play.mvc.Result;
-//import service.XmppService;
-//import service.oadr.EiEventService;
+//import play.db.jpa.JPA
+//import play.db.jpa.Transactional
+//import play.mvc.Controller
+//import play.mvc.Result
+//import service.XmppService
+//import service.oadr.EiEventService
 
-//import com.google.inject.Inject;
+//import com.google.inject.Inject
 
 /**
  * Controller to handle the XMPP and HTTP services as well as the VENStatuses
@@ -18,8 +18,8 @@ package com.enernoc.oadr2.vtn
  */
 public class VenStatusController {
 
-    //@Inject static EiEventService eiEventService;
-    //@Inject static XmppService xmppService;
+    //@Inject static EiEventService eiEventService
+    //@Inject static XmppService xmppService
 
     /**
      * Base method called to access the default page for the VENStatuses controller
@@ -27,7 +27,7 @@ public class VenStatusController {
      * @return a redirect to the venStatuses() call as to render the default page
      */
     def index() {
-        return redirect(action: "venStatuses");
+        return redirect(action: "venStatuses")
     }
 
     /**
@@ -51,15 +51,15 @@ public class VenStatusController {
      //@SuppressWarnings("unchecked")
      //@Transactional
      public static Result renderAjaxTable(String program){
-     def listStatusObjects;
+     def listStatusObjects
      if(program != null){
      listStatusObjects = JPA.em().createQuery("SELECT status " +
      "FROM VENStatus status WHERE status.eventID = :event")
      .setParameter("event", program)
-     .getResultList();
+     .getResultList()
      }
      else{
-     // listStatusObjects = JPA.em().createQuery("FROM VENStatus").getResultList();
+     // listStatusObjects = JPA.em().createQuery("FROM VENStatus").getResultList()
      listStatusObjects = VenStatus.listOrderByTime(order:"desc")
      }	    
      /**
@@ -67,11 +67,11 @@ public class VenStatusController {
      * 
      * @author Jeff LaJoie
      *
-     Collections.sort(listStatusObjects, new StatusObjectComparator());		
-     return ok(views.html.venStatusTable.render(listStatusObjects, program));
+     Collections.sort(listStatusObjects, new StatusObjectComparator())		
+     return ok(views.html.venStatusTable.render(listStatusObjects, program))
      }
      def renderAjaxTable(String program){
-     def listStatusObjects;
+     def listStatusObjects
      if(program != null){
      listStatusObjects = VenStatus.findAll("from VenStatus as v where v.author=?", [program])
      }

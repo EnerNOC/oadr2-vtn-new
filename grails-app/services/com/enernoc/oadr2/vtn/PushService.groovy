@@ -23,7 +23,7 @@ import com.enernoc.open.oadr2.vtn.EventPushTask
  */
 public class PushService {
 
-    static transactional = true;
+    static transactional = true
 
     String vtnID // injected
 
@@ -31,8 +31,8 @@ public class PushService {
     ThreadPoolExecutor threadPool = null
 
     public PushService() {
-        this.threadPool = new ThreadPoolExecutor(2, 2, 10, TimeUnit.SECONDS, queue);
-        threadPool.prestartAllCoreThreads();
+        this.threadPool = new ThreadPoolExecutor(2, 2, 10, TimeUnit.SECONDS, queue)
+        threadPool.prestartAllCoreThreads()
     }
 
     /**
@@ -48,13 +48,13 @@ public class PushService {
             OadrDistributeEvent payload = new OadrDistributeEvent()
 
             payload.withVtnID( this.vtnID )
-                    .withRequestID( (String)UUID.randomUUID() )
+                    .withRequestID( UUID.randomUUID().toString() )
                     .withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
                         .withResponseCode(new ResponseCode("200"))
                         .withResponseDescription("OK"))
                     .withOadrEvents(new OadrEvent().withEiEvent(e))
 
-            queue.add( new EventPushTask( ven.getClientURI(), payload ) )
+            queue.add( new EventPushTask( ven.clientURI, payload ) )
         }
     }
 

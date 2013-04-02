@@ -1,4 +1,4 @@
-package com.enernoc.oadr2.vtn;
+package com.enernoc.oadr2.vtn
 
 import javax.xml.bind.JAXBException
 import javax.xml.bind.Marshaller
