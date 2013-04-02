@@ -208,7 +208,7 @@ class EventController {
         def alteredEvent = new Event(params)
         def programNew = Program.find("from Program as p where p.programName=?", [alteredEvent.programName])
         alteredEvent.id = event.id
-        def errorMessage = ""
+        def errorMessage = []
 
         //def testing = new EiEvent()
         if ( programNew != null ) {
@@ -235,7 +235,7 @@ class EventController {
             alteredEvent.errors.allErrors.each {
                 errorMessage << messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errorMessage])
+            return chain(action:"editEvent", model:[error: errorMessage], params:[id: params.id])
         }
         chain action:"events", model:[error: errorMessage]
     }

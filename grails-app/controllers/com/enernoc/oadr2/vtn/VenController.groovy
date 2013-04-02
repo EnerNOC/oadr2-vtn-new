@@ -107,15 +107,45 @@ class VenController {
     }
 
     /**
-     * Specific validation errors for customized validation to be added to the Flash scope
-     *
-     * @param errors - the Map containing the errors and their key
-     public static void addFlashError(Map<String, List<ValidationError>> errors){
-     for(String key : errors.keySet()){
-     List<ValidationError> currentError = errors.get(key)
-     for(ValidationError error : currentError){
-     flash(key, error.message())
-     }
-     }
-     }*/
+     * Edits a VEN from the table with the given param id
+     *     
+     */
+    def editVEN() {
+        def currentVen = Ven.get(params.id)
+        def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        [currentVen: currentVen, programsList: programs]
+    }
+    
+    /**
+     * Updates a VEN from editVEN
+     * If errors exist revert back to editVEN() or else chains to vens()
+     * 
+     */
+    def updateVEN() {
+        render("fk u")
+        def oldVen = Ven.get( params.id )
+        def newVen = new Ven(params)
+
+        def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
+        def oldProgram = Program.find("from Program as p where p.programName=?", [oldVen.programID])
+        
+        def errorMessage = []
+        if (newProgram!=null) {
+            newProgram.addToVen(newVen)
+        }
+        if (newVen.validate()) {
+            oldProgram.removeFromVen(oldVen)
+            oldProgram.save()
+            oldVen.delete()
+            newProgram.save()            
+            flash.message="Success"
+        } else {
+            flash.message="Fail"
+            newVen.errors.allErrors.each {
+                errorMessage << messageSource.getMessage(it, null)
+            }
+            return chain(action:"editVEN", model: [error: errorMessage], params: [id : params.id])
+        }
+        chain(action:"vens", model: [error: errorMessage])
+    }
 }
