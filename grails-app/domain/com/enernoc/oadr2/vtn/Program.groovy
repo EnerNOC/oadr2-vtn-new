@@ -2,9 +2,9 @@ package com.enernoc.oadr2.vtn
 
 class Program {
     //@Required(message = "Must enter a valid Program Name")
-    String programName;
+    String programName
     //@Required(message = "Must enter a valid Program URI")
-    String programURI;
+    String programURI
 
     static hasMany = [ven:Ven, event:Event]
 

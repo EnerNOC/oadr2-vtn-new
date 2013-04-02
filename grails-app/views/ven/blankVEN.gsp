@@ -1,21 +1,18 @@
 <html>
 <head>
 <meta name="layout" content="bootstrap" />
-<link rel="stylesheet"
-	href="${resource(dir: 'js', file: 'bootstrap-datepicker.js')}"
-	type="text/javascript">
 </head>
 <body>
-    <g:if test="${flash.message == "Fail"}">
-        <div class="alert alert-error">
-            <p>
-                <g:each in="${error}">
-                    ${it}
-                    </br>
-                </g:each>
-            </p>
-        </div>
-    </g:if>
+	<g:if test="${flash.message == "Fail"}">
+		<div class="alert alert-error">
+			<p>
+				<g:each in="${error}">
+					${it}
+					</br>
+				</g:each>
+			</p>
+		</div>
+	</g:if>
 	<h3>Create a VEN</h3>
 	<g:form action="newVEN">
 		<label>Program: </label>
@@ -27,8 +24,18 @@
 		<label>VEN ID: </label>
 		<input type="text" name="venID" />
 		</br>
+
+		<div class="clearfix">
+			<label>Node Type</label>
+			<div class="input">
+				<input type="radio" name="group1" value="Pull" id="Pull"
+					onclick="inputDisable()">Pull &nbsp&nbsp <input
+					type="radio" name="group1" value="Push" id="Push" checked
+					onclick="inputEnable()">Push <br></br>
+			</div>
+		</div>
 		<label>Client URI: </label>
-		<input type="text" name="clientURI" />
+		<input id="clientURI" type="text" name="clientURI" />
 		</br>
 		<div class="actions">
 			<input type="submit" value="Create this VEN" class="btn primary">
@@ -38,6 +45,15 @@
             </g:link>
 		</div>
 	</g:form>
+
+	<g:javascript>          
+        function inputEnable() {        
+            document.getElementById("clientURI").removeAttribute("disabled");            
+        }          
+        function inputDisable() {        
+            document.getElementById("clientURI").setAttribute("disabled");
+        }
+    </g:javascript>
 
 </body>
 
