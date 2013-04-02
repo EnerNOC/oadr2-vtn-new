@@ -33,19 +33,40 @@
 			<div class="container">
 
 				<a class="btn btn-navbar" data-toggle="collapse"
-					data-target=".nav-collapse"> <span class="icon-bar"></span> <span
-					class="icon-bar"></span> <span class="icon-bar"></span>
-				</a> <a class="brand" href="${createLink(uri: '/')}">EnerNOC OpenADR
-					2</a>
+					data-target=".nav-collapse">
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</a> 
+				<a class="brand" href="${createLink(uri: '/')}">EnerNOC OpenADR 2</a>
 
 				<div class="nav-collapse">
-                    <ul class="nav">
-                        <li> <a href="${createLink(uri: '/')}">Home</a></li>
-                        <li><g:link controller="Program">Program</g:link></li>
-                        <li><g:link controller="Ven">VEN</g:link></li>
-                        <li><g:link controller="Event">Event</g:link></li>
-                        <li><a href="${createLink(uri:'/debug') }">Debug</a></li>
-                    </ul>
+					<ul class="nav">
+						<li
+							class="${request.forwardURI == createLink(uri: '/') ? 'active' : ''}">
+							<a href="${createLink(uri: '/')}">Home</a>
+						</li>
+						<li
+							class="${request.forwardURI == createLink(controller: 'Program') ? 'active' : ''}">
+							<a href="${createLink(controller: 'Program')}">Programs</a>
+						</li>
+						<li
+							class="${request.forwardURI == createLink(controller: 'Ven') ? 'active' : ''}">
+							<a href="${createLink(controller: 'Ven')}">VENs</a>
+						</li>
+						<li
+							class="${request.forwardURI == createLink(controller: 'Event') ? 'active' : ''}">
+							<a href="${createLink(controller: 'Event')}">Events</a>
+						</li>
+            <li
+              class="${request.forwardURI == createLink(controller: 'OADRTest') ? 'active' : ''}">
+              <a href="${createLink(controller: 'OADRTest')}">Test</a>
+            </li>
+            <li
+              class="${request.forwardURI == createLink(controller: 'Debug') ? 'active' : ''}">
+              <a href="${createLink(controller: 'Debug')}">Debug</a>
+            </li>
+					</ul>
 				</div>
 			</div>
 		</div>
@@ -56,8 +77,8 @@
 		<g:layoutBody />
 
 		<hr />
-		<footer>
-			<p>&copy; EnerNOC, Inc</p>
+		<footer class='muted small'>
+			<p>&copy; <a href='http://open.enernoc.com'>open.enernoc.com</a></p>
 		</footer>
 	</div>
 
