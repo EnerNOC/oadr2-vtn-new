@@ -124,10 +124,9 @@ class VenController {
     def updateVEN() {
         def oldVen = Ven.get( params.id )
         def newVen = new Ven(params)
-
+        newVen.id = oldVen.id
         def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
         def oldProgram = Program.find("from Program as p where p.programName=?", [oldVen.programID])
-        
         def errorMessage = []
         if (newProgram!=null) {
             newProgram.addToVen(newVen)
