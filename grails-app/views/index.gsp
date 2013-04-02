@@ -2,19 +2,20 @@
 <html>
 <head>
 <meta name="layout" content="bootstrap" />
-<title>Groovy OADR</title>
-<style>
-</style>
+<title>Groovy OpenADR 2.0 VTN</title>
 </head>
 <body>
 	<div class="indent">
 		<section class="span12">
-			<h1><img src="${resource(dir:'images', file:'enernoc_logo.png' ) }" alt="EnerNOC Logo" height="60" width="60"/> OpenAdr 2.0 Groovy Style</h1>
+			<h1>
+			 <img src="${resource(dir:'images', file:'enernoc_logo.png' ) }" alt="EnerNOC" style="height:60px;width:60px"/>
+			   OpenADR 2.0 Console
+			</h1>
 			<div class="row-fluid">
 				<div class="span6">
 					<h3><g:link controller="Program" action="programs">Programs</g:link></h3>
 					<%!import com.enernoc.oadr2.vtn.Program %>
-					<% def programList = Program.list()%>
+					<% def programList = Program.list() %>
 					<g:render template="/program/programTableTemplate"
 						model="[programList:programList]" />
 				</div>
