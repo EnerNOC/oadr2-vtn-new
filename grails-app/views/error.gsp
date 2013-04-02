@@ -5,13 +5,16 @@
 <meta name="layout" content="bootstrap" />
 </head>
 <body>
+  <g:if test="${exception != null}">
+    <g:renderException exception="${exception}" />
+  </g:if>
+  <g:else>
 	<h1>
-		Error:
-		${request.'javax.servlet.error.status_code'}
+		Error: ${request.'javax.servlet.error.status_code'}
 	</h1>
 	<strong>
 		${request.'javax.servlet.error.message'.encodeAsHTML()}
 	</strong>
-	<g:renderException exception="${exception}" />
+  </g:else>
 </body>
 </html>
