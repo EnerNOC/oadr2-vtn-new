@@ -5,8 +5,8 @@
 			<th>Event ID</th>
 			<th>Priority</th>
 			<th>Status</th>
-			<th>Start Time</th>
-			<th>Duration</th>
+			<th>Start</th>
+			<th>End</th>
 			<th>Market Context</th>
 		</tr>
 	</thead>
@@ -29,7 +29,7 @@
 				  <g:formatDate format='MM/dd/yyyy hh:mm aa' date='${event.startDate}' />
 				</td>
 				<td>
-					${event.duration}
+          <g:formatDate format='MM/dd/yyyy hh:mm aa' date='${event.endDate}' />
 				</td>
 				<td>
 					${event.marketContext.programName}
