@@ -159,7 +159,7 @@ public class EiEventService {
 
         limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO filter by marketContext if given
-        def events = Event.findAll(max : limit) { programName == ven.programID }
+        def events = Event.findAll(max : limit) { marketContext.id == ven.program.id }
 
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
@@ -187,7 +187,7 @@ public class EiEventService {
                 venStatus = ew VenStatus()
                 venStatus.venID venID
                 venStatus.program = ven.programID
-                venStatus.optStatus = "Awaiting response"
+                venStatus.optStatus = "Pending response"
             }
 
             venStatus.time = new Date()
@@ -205,6 +205,8 @@ public class EiEventService {
             String eventId = response.qualifiedEventID.eventID
             long modificationNumber = response.qualifiedEventID.modificationNumber
         }
+        // FIXME query for status per event in the eventResponses element,
+        // set venStatus for each event
         def venStatuses = VenStatus.findAllWhere( venID: createdEvent.eiCreatedEvent.venID )
 
         venStatuses.each { status ->
@@ -230,7 +232,7 @@ public class EiEventService {
         def status = VenStatus.findByRequestID( response.eiResponse.requestID )
         if ( status ) {
             status.time = new Date()
-            status.optStatus = "Pending 2"
+            status.optStatus = response.eiResponse.optType
             status.save()
         }
         else log.warn "No status found for response $response"
@@ -243,8 +245,8 @@ public class EiEventService {
      * @return a Duration based on the EiEvent DurationValue
      */
     public Duration getDuration( EiEvent event ) {
-        return this.df.newDuration(Event.minutesFromXCal(
-        event.eiActivePeriod.properties.duration.duration.value) * 60000)
+        return this.df.newDuration(
+            event.eiActivePeriod.properties.duration.duration.value)
     }
 
     /**
@@ -259,12 +261,11 @@ public class EiEventService {
         def objectFactory = new ObjectFactory()
         calendar.setTime(currentDate)
         XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
-        xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED)
+        xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED) // FIXME
 
         JAXBElement<SignalPayload> signalPayload = objectFactory.createSignalPayload(
                 new SignalPayload(new PayloadFloat(1)))
 
-        String contextName = event.programName
         def intervalList = []
         EiEvent newEvent = event.toEiEvent()
 
@@ -316,7 +317,7 @@ public class EiEventService {
                         .withCreatedDateTime(new DateTime().withValue(xCalendar))
                         .withEiMarketContext(new EiMarketContext()
                             .withMarketContext(new MarketContext()
-                                .withValue(contextName)))
+                                .withValue(event.marketContext.programURI)))
                         .withEventID(event.eventID)
                         .withEventStatus(updateStatus(newEvent, (int)event.intervals))
                         .withModificationNumber(event.modificationNumber) //changed to the set modification number
@@ -367,8 +368,7 @@ public class EiEventService {
      * @return Duration from the event multiplied by the number of intervals
      */
     protected Duration getDuration( EiEvent event, int intervals ) {
-        Duration duration = df.newDuration(
-                Event.minutesFromXCal(event.eiActivePeriod.properties.duration.duration.value) * 60000)
+        Duration duration = df.newDuration(event.eiActivePeriod.properties.duration.duration.value)
         if ( intervals ) duration = duration.multiply(intervals)
         return duration
     }
@@ -397,16 +397,16 @@ public class EiEventService {
         GregorianCalendar calendar = new GregorianCalendar()
         calendar.time = currentDate
         XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
-        xCalendar.timezone = DatatypeConstants.FIELD_UNDEFINED
+        xCalendar.timezone = 0 // GMT
 
-        DateTime currentTime = new DateTime().withValue(xCalendar)
+        DateTime currentTime = new DateTime(xCalendar)
         def startDttm = event.eiActivePeriod.properties.dtstart.dateTime.value.normalize()
-        DateTime startTime = new DateTime().withValue(startDttm)
-        DateTime endTime = new DateTime().withValue(startDttm)
+        DateTime startTime = new DateTime(startDttm)
+        DateTime endTime = new DateTime(startDttm) // FIXME
 
         DateTime rampUpTime = new DateTime().withValue(startDttm)
 
-        rampUpTime.value.add(getDuration(event.eiActivePeriod.properties.getXEiRampUp().duration.value))
+        rampUpTime.value.add(getDuration(event.eiActivePeriod.properties.XEiRampUp.duration.value))
         Duration d = getDuration(event, intervals)
         endTime.value.add(d)
 

@@ -26,14 +26,13 @@
 					${event.status}
 				</td>
 				<td>
-					${event.startDate} @ </br>
-					${event.startTime}
+				  <g:formatDate format='MM/dd/yyyy hh:mm aa' date='${event.startDate}' />
 				</td>
 				<td>
 					${event.duration}
 				</td>
 				<td>
-					${event.programName}
+					${event.marketContext.programName}
 				</td>
 				<td><g:link controller="Event" action="editEvent" params="[id: event.id]"
 						class="btn">

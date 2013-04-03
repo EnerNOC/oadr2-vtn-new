@@ -28,11 +28,11 @@ class EventController {
     
     static ObjectFactory objectFactory = new ObjectFactory()
     static DatatypeFactory datatypeFactory
-    static{
+    static {
         try {
             datatypeFactory = DatatypeFactory.newInstance()
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace()
+            throw new RuntimeException("Error creating DatatypeFactory!",e)
         }
     }
 
@@ -63,22 +63,10 @@ class EventController {
         Date currentDate = new Date()
         GregorianCalendar calendar = new GregorianCalendar()
         calendar.time = currentDate
-        XMLGregorianCalendar xCalendar = datatypeFactory.newXMLGregorianCalendar(calendar)
-        xCalendar.timezone = DatatypeConstants.FIELD_UNDEFINED
         def events = Event.list()
-        events.each { e ->
-            def eiEvent = eiEventService.buildEvent(e)
-            e.eiEvent.eventDescriptor.createdDateTime = new DateTime().withValue(xCalendar)
-            if( e.eiEvent.eventDescriptor.eventStatus != EventStatusEnumeratedType.CANCELLED )
-                e.eiEvent.eEventDescriptor.eventStatus =
-                        eiEventService.updateStatus(e, e.eiEvent.eiEventSignals.eiEventSignals.size())
-            e.eiEvent.eiEventSignals.EiEventSignals { eventSignal ->
-                eventSignal.currentValue = new CurrentValue().withPayloadFloat(
-                        new PayloadFloat().withValue(eiEventService.updateSignalPayload(e)))
-            }
-        }
         render view: "eventsTable", model: [event: events]
     }
+    
     /**
      * The default page render for new events to be created based on
      * the file at views.html.newEvent
@@ -86,12 +74,10 @@ class EventController {
      * @return the rendered page to create an event, with all fields vacant
      */
     def blankEvent() {
-        //Event newForm = new Event()
-        def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
-        // def programs = ["one", "two", "three"]
-        // return ok(views.html.newEvent.render(form(Event.class).fill(newForm), newForm, makeProgramMap()))
+        // TODO 'distinct' should not be necessary (program name should be enforced unique)
+        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
         def date = new Date()
-        def dateFormatted = g.formatDate(date:date, format:"MM-dd-yyyy")
+        def dateFormatted = g.formatDate(date:date, format:"MM/dd/yyyy")
         def timeFormatted = g.formatDate(date:date, format:"hh:mm aa")
         [ programList: programs, date: dateFormatted, time: timeFormatted]
     }
@@ -103,7 +89,6 @@ class EventController {
      * @throws JAXBException
      */
     def newEvent() {
-
         try {
             params.intervals = params.intervals.toLong()
         }
@@ -116,38 +101,43 @@ class EventController {
         catch ( IllegalArgumentException ) {
             params.priority = -1L
         }
+        
+        params.startDate = parseDttm( params.startDate, params.startTime )
+        params.endDate = parseDttm( params.endDate, params.endTime )
 
         def event = new Event(params)
-        def program = Program.find("from Program as p where p.programName=?", [event.programName])
+        // TODO should use ID, not program name
+        def program = Program.find("from Program as p where p.programName=?", [params.programName])
 
-        def errorMessage = []
-        //def testing = new EiEvent()
-        if (program != null) program.addToEvent(event)
+//        if (program != null) program.addToEvent(event)
+        event.marketContext = program
 
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            Long duration = event.getMinutesDuration()
-            event.duration = event.createXCalString(duration)
             event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
-            program.save()
+//            program.save()
             populateFromPush(event)
-            def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
+            def vens = Ven.findAll("from Ven as v where v.program.id=?", [event.marketContext.id])
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been created"
-            //def vens = getVENs(event.eiEvent)
-
         }
         else {
             flash.message="Fail"
-            event.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            def errors = event.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"blankEvent", model:[error: errorMessage])
+            // TODO return invalid event, not a blank event
+            return chain(action:"blankEvent", model:[error: errors])
         }
-        //chain(action:"events", model:[error: errorMessage])
+
         redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
 
     }
+    
+    static parseDttm( String date, String time) {
+        return Date.parse( "MM/dd/yyy hh:mm aa", "$date $time")
+    }
+    
     /**
      * On the Event display page will take the EventStatus of the event and set it to CANCELLED
      *
@@ -177,7 +167,7 @@ class EventController {
 
     def editEvent() {
         def currentEvent = Event.get(params.id)
-        def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
 
         [currentEvent: currentEvent, programList: programs]
     }
@@ -204,11 +194,10 @@ class EventController {
             params.priority = -1L
         }
         def event = Event.get(params.id)
-        def programOld = Program.find("from Program as p where p.programName=?", [event.programName])
+        def programOld = Program.find("from Program where programName=?", [event.programName])
         def alteredEvent = new Event(params)
-        def programNew = Program.find("from Program as p where p.programName=?", [alteredEvent.programName])
+        def programNew = Program.find("from Program where programName=?", [alteredEvent.programName])
         alteredEvent.id = event.id
-        def errorMessage = ""
 
         //def testing = new EiEvent()
         if ( programNew != null ) {
@@ -232,12 +221,12 @@ class EventController {
         }
         else {
             flash.message="Fail"
-            alteredEvent.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            def errors = alteredEvent.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errorMessage])
+            return chain(action:"editEvent", model:[error: errors])
         }
-        chain action:"events", model:[error: errorMessage]
+        chain action:"events", model:[error: null]
     }
 
     /**
@@ -246,7 +235,7 @@ class EventController {
      * @param event - event to be used for getVENs and prepareVENs
      */
     protected void populateFromPush( Event event ) {
-        def customers = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
+        def customers = Ven.findAll(program: event.marketContext)
         prepareVENs customers, event
     }
 
@@ -258,8 +247,10 @@ class EventController {
      */
     protected void prepareVENs ( List<Ven> vens, Event event ) {
         vens.each { v ->
+            // TODO create a method called VenStatus.create( ven, event ) that 
+            // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = "Pending 1"
+            venStatus.optStatus = "Pending"
             venStatus.requestID = v.clientURI
             venStatus.eventID = event.eventID
             venStatus.program = v.programID
@@ -267,12 +258,10 @@ class EventController {
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
                 venStatus.save()
-                log.debug venStatus.time
+                log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
+            // TODO raise exception if VenStatus couldn't be created!
             else log.warn "Validation error for venStatus {}", venStatus
         }
     }
-
-
 }
-
