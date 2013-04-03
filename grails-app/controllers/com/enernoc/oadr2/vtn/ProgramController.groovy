@@ -100,5 +100,47 @@ class ProgramController {
         redirect(action:"programs")
         //render(params.id)
     }
+    
+    /**
+     * Edits the program with the given id
+     * 
+     */
+    def editProgram() {
+        def currentProgram = Program.get( params.id )
+        [currentProgram: currentProgram]
+    }
+    
+    /**
+     * Updates the program from editProgram() with new user input
+     * If fails return to editProgram() else programs()
+     * 
+     */
+    def updateProgram() {
+        def oldProgram = Program.get( params.id )
+        def newProgram = new Program(params)
+        newProgram.id = oldProgram.id
+        def errorMessage = []
+        if (newProgram.validate()) {
+            oldProgram.ven.each { v ->
+                oldProgram.removeFromVen(v)
+                newProgram.addToVen(v)
+                v.programID = newProgram.programName
+            }
+            oldProgram.event.each { e ->
+                oldProgram.removeFromEvent(e)
+                newProgram.addToEvent(e)
+                e.programName = newProgram.programName
+            }
+            newProgram.save()
+            oldProgram.delete()
+            flash.message = "Success"
+        } else {
+            flash.message="Fail"
+            program.errors.allErrors.each {
+                errorMessage << messageSource.getMessage(it, null)
+            }
+            return chain(action:"blankProgram", model:[error: errorMessage])
+        }
+        chain(action:"programs", model: [error: errorMessage])    }
 
 }

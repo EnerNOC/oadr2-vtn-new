@@ -21,6 +21,11 @@
 						<input type="submit" value="Delete" class="btn btn-danger"
 							onClick="return confirmSubmit()">
 					</g:form></td>
+				<td><g:form controller="Program" action="editProgram"
+						params="[id : program.id]">
+						<input type="submit" value="Edit" class="btn"
+							onClick="return confirmSubmit()">
+					</g:form></td>
 			</tr>
 		</g:each>
 	</tbody>
