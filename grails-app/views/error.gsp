@@ -3,6 +3,9 @@
 <head>
 <title>EnerNOC OpenADR 2.0 VTN :: Error</title>
 <meta name="layout" content="bootstrap" />
+<style type='text/css'>
+code.line { display:block }
+</style>
 </head>
 <body>
   <g:if test="${exception != null}">
