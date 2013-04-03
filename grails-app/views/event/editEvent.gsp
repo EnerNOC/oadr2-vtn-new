@@ -28,7 +28,7 @@
 			<h3>Program</h3>
 			<label>Program: </label>
 			<g:select name="programName" from="${programList}"
-				value="${currentEvent.programName}" />
+				value="${currentEvent.marketContext.programName}" disabled='disabled' />
 			<h3>Event Descriptor</h3>
 			<label>Event ID: </label>
 			<input type="text" value="${currentEvent.eventID}" name="eventID" />
@@ -39,22 +39,23 @@
 			<g:textField value="${currentEvent.intervals}" name="intervals" />
 			
 			<label>State Date: </label>
-			<g:textField name="startDate" value="${currentEvent.startDate}"
-				class="dp" />
+			<g:textField name="startDate" class="dp"
+			   value="${g.formatDate(format:'MM/dd/yyyy', date:currentEvent.startDate)}" />
 			<div class="input-append bootstrap-timepicker">
 				<label>Start Time: </label>
-				<g:textField name="startTime" value="${currentEvent.startTime}"
-					class="input-small" id="tp" />
+				<g:textField name="startTime" class="input-small" id="tp"  
+				  value="${g.formatDate(format:'hh:mm aa', date:currentEvent.startDate)}" />
 				<span class="add-on"><i class="icon-time"></i></span>
 			</div>
 			
 			<label>End Date: </label>
-			<g:textField name="endDate" value="${currentEvent.endDate}"
-				class="dp" />
+			<g:textField name="endDate" class="dp" 
+			 value="${g.formatDate(format:'MM/dd/yyyy', date:currentEvent.endDate)}"
+				 />
 			<div class="input-append bootstrap-timepicker">
 				<label>End Time: </label>
-				<g:textField name="endTime" value="${currentEvent.endTime}"
-					class="input-small" id="tp1" />
+				<g:textField name="endTime" class="input-small" id="tp1"
+				  value="${g.formatDate(format:'hh:mm aa', date:currentEvent.endDate)}" />
 				<span class="add-on"><i class="icon-time"></i></span>
 			</div>
 			<g:hiddenField name="id" value="${currentEvent.id}" />
