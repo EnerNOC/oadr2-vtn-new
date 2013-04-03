@@ -11,7 +11,7 @@ class UrlMappings {
             action = [POST:"post"]
         }
 
-		"/"( view : "/index" )
+		"/"( controller : "home" )
 		
 		"404"( controller : 'error' ) 
 		"500"( controller : 'error' )
