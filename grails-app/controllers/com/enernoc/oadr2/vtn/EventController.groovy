@@ -117,8 +117,9 @@ class EventController {
             event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
 //            program.save()
             populateFromPush(event)
-            def vens = Ven.findAll("from Ven as v where v.program.id=?", [event.marketContext.id])
+            def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
+            event.save()
             flash.message="Success, your event has been created"
         }
         else {
@@ -173,13 +174,6 @@ class EventController {
     }
 
     /**
-     * Called when the Save this event button is pressed on the Edit event form
-     *
-     * @param id - database ID of the Event to be modified
-     * @return a redirect to the Events page which should show the list of Events with the modified event
-     *
-     }*/
-    /*Update Event modified to fit a groovier framework
      * Updates the event with a given id with the new parameters input from the user
      */
     def updateEvent() {
@@ -194,30 +188,18 @@ class EventController {
             params.priority = -1L
         }
         def event = Event.get(params.id)
-        def programOld = Program.find("from Program where programName=?", [event.programName])
-        def alteredEvent = new Event(params)
-        def programNew = Program.find("from Program where programName=?", [alteredEvent.programName])
-        alteredEvent.id = event.id
+        // FIXME it should not be possible to change the program for an event!
+        event.properties = params
 
-        //def testing = new EiEvent()
-        if ( programNew != null ) {
-            programOld.removeFromEvent(event)
-            programOld.save()
-            programNew.addToEvent(alteredEvent)
-        }
-        if ( alteredEvent.validate() ) {
-            Long duration = alteredEvent.getMinutesDuration()
-            def eiEvent = eiEventService.buildEiEvent(alteredEvent)
-            alteredEvent.duration = alteredEvent.createXCalString(duration)
-            alteredEvent.status = eiEventService.updateStatus(eiEvent, (int)alteredEvent.intervals).value
-            event.delete()
-            programNew.save()
-            //populateFromPush(newEvent)
-            //def vens = Ven.findAll("from Ven as v where v.programID=?", [event.programName])
-            //pushService.pushNewEvent(event.eiEvent, vens)
+        if ( event.validate() ) {
+            def eiEvent = eiEventService.buildEiEvent(event)
+            event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
+            event.modificationNumber +=1 // TODO this could be done with a save hook
+            event.save()
+            //populateFromPush(event)
+            def vens = Ven.findAll { event.marketContext in program }
+            pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
-            //def vens = getVENs(event.eiEvent)
-
         }
         else {
             flash.message="Fail"
@@ -252,6 +234,7 @@ class EventController {
             def venStatus = new VenStatus()
             venStatus.optStatus = "Pending"
             venStatus.requestID = v.clientURI
+            // FIXME make this a 'belongsTo' relationship
             venStatus.eventID = event.eventID
             venStatus.program = v.programID
             venStatus.venID = v.venID
