@@ -4,11 +4,10 @@
 <r:require module="formTime" />
 <g:javascript>
   $(function() {
-    		$('.dp').datepicker();
-    		$('#tp').timepicker();
-         	$('#tp1').timepicker();
+    $('.dp').datepicker();
+    $('#tp').timepicker();
+    $('#tp1').timepicker();
   });
-
   </g:javascript>
 </head>
 <body>
@@ -22,10 +21,7 @@
             </p>
         </div>
     </g:if>
-	<h1>
-		Edit Event:
-		${currentEvent.eventID}
-	</h1>
+	<h1>Edit Event: ${currentEvent.eventID}</h1>
 	</br>
 	<fieldset>
 		<g:form action="updateEvent">
@@ -41,16 +37,17 @@
 			<h3>Active Period</h3>
 			<label>Intervals: </label>
 			<g:textField value="${currentEvent.intervals}" name="intervals" />
+			
 			<label>State Date: </label>
 			<g:textField name="startDate" value="${currentEvent.startDate}"
 				class="dp" />
-
 			<div class="input-append bootstrap-timepicker">
 				<label>Start Time: </label>
 				<g:textField name="startTime" value="${currentEvent.startTime}"
 					class="input-small" id="tp" />
 				<span class="add-on"><i class="icon-time"></i></span>
 			</div>
+			
 			<label>End Date: </label>
 			<g:textField name="endDate" value="${currentEvent.endDate}"
 				class="dp" />
@@ -70,8 +67,6 @@
 		</g:form>
 
 	</fieldset>
-
-
 
 </body>
 </html>
