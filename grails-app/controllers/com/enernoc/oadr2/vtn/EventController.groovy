@@ -224,7 +224,7 @@ class EventController {
             def errors = alteredEvent.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errors])
+            return chain(action:"editEvent", model:[error: errors], params:[id: params.id])
         }
         chain action:"events", model:[error: null]
     }

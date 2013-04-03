@@ -5,7 +5,7 @@
 			<th>VEN Name</th>
 			<th>VEN ID</th>
 			<th>Client URI</th>
-			<th>Program Name</th>
+			<th>Program</th>
 		</tr>
 	</thead>
 	<tfoot>
@@ -27,6 +27,11 @@
 				</td>
 				<td><g:form controller="Ven" action="deleteVEN" params="[id : ven.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"
+							onClick="return confirmSubmit()">
+					</g:form></td>
+				<td><g:form controller="Ven" action="editVEN"
+						params="[id : ven.id]">
+						<input type="submit" value="Edit" class="btn"
 							onClick="return confirmSubmit()">
 					</g:form></td>
 			</tr>
