@@ -103,11 +103,9 @@
 				</div>
 			</div>
 			<div class="control-group">
-				<div class="controls">
-					<div class="actions">
-						<input type="submit" value="Update!" class="btn btn-primary">
-						<g:link action: " events " class="btn">Cancel</g:link>
-					</div>
+				<div class="controls form-buttons">
+					<input type="submit" value="Update!" class="btn btn-primary">
+					<g:link action: " events " class="btn">Cancel</g:link>
 				</div>
 			</div>
 		</g:form>

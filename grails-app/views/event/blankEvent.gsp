@@ -99,7 +99,7 @@
 				</div>
 			</div>
 			<div class="control-group">
-				<div class="controls">
+				<div class="controls form-buttons">
 					<input type="submit" value="Create!" class="btn btn-primary" />
 					<g:link action="events" class="btn">Cancel</g:link>
 				</div>

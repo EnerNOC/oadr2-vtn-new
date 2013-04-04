@@ -1,7 +1,9 @@
-.footer p {
-	color: #ccc
-	font-size: 0.5em;
+footer.small {
+	font-size: 0.8em;
 }
 
 .nav-body { margin-top:70px }
 
+.form-buttons .btn {
+	margin-right: 10px
+}

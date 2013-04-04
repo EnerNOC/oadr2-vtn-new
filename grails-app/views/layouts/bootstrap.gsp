@@ -17,6 +17,7 @@
 		<![endif]-->
 
 <r:require modules="bootstrap, application" />
+<r:require modules="application" />
 
 <link rel="apple-touch-icon"
 	href="${resource(dir: 'images', file: 'apple-touch-icon.png')}" />
