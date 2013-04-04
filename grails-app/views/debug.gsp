@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="layout" content="bootstrap" />
-<title>OADR2 Debug</title>
+<title>EnerNOC OpenADR2 :: About</title>
 <style>
 </style>
 
@@ -39,11 +39,12 @@
 			<section id="main" class="span9">
 
 				<div class="hero-unit">
-					<h1>OpenAdr 2.0 Groovy Style</h1>
+					<h1>EnerNOC OpenADR 2.0 VTN</h1>
 					</br>
-					<p>
-						Grails version of the Oadr2-vtn originally built on the Play
-						Framework located <a
+					<p>This is an open source implementation of the 
+					  <a href='http://openadr.org'>OpenADR</a> 2.0 VTN (server.)  This 
+					  app is the second revision built on the Grails framework.
+						The first version was built on the Play Framework located <a
 							href="https://github.com/EnerNOC/oadr2-vtn.git">here.</a>
 					</p>
 				</div>
@@ -64,28 +65,20 @@
 
 					<div class="span4">
 						<h2>Install It</h2>
-						<p>To install this look &amp; feel into your Grails app you
-							will need to:</p>
-						<p>
-							Add the following plugins to your <em>BuildConfig.groovy</em>:
-						</p>
-
-						<p>Copy the following files to your project:</p>
-						<pre>src/templates/scaffolding/*
-web-app/css/scaffolding.css
-grails-app/conf/ScaffoldingResources.groovy
-grails-app/taglib/**/*
-grails-app/views/index.gsp
-grails-app/views/layouts/bootstrap.gsp
-grails-app/views/_fields/default/_field.gsp</pre>
+						<p>To install this project you'll need to:</p>
+						<p>Download and install <a href='http://www.grails.org/download'>Grails v2.2.1</a>
+						On Mac, we recommend using <a href='http://mxcl.github.com/homebrew/'>Homebrew</a>, 
+						then <code>brew install grails</code></p>
 					</div>
 
 					<div class="span4">
-						<h2>Fork It</h2>
+						<h2>Fork the code</h2>
 						<p>
 							You can download, fork &amp; raise issues on this project on <a
-								href="http://github.enernoc.net/yxiang/oadr2-vtn-groovy">GitHub</a>.
+								href="http://github.enernoc.net/tnichols/oadr2-vtn-groovy">GitHub</a>.
 						</p>
+						<p>To start:</p>
+						<pre>git clone git://github.enernoc.net/tnichols/oadr2-vtn-groovy.git</pre>
 					</div>
 
 				</div>
