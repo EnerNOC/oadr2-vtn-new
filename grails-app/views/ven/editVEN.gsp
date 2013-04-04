@@ -14,39 +14,61 @@
         </div>
     </g:if>
     <h3>Edit VEN: ${ currentVen.venID }</h3>
-    <g:form action="updateVEN">
-        <label>Program: </label>
-        <g:select name="programID" from="${programsList}" value="${ currentVen.programID }"/>
-        <label>VEN Name: </label>
-        <input type="text" name="venName" value="${ currentVen.venName }"/>
-        </br>
-        <label>VEN ID: </label>
-        <input type="text" name="venID" value="${ currentVen.venID }"/>
-        </br>
-
-        <div class="clearfix">
-            <label>Node Type</label>
-            <div class="input">
-                <input type="radio" name="group1" value="Pull" id="Pull"
-                    onclick="inputDisable()">Pull &nbsp&nbsp <input
-                    type="radio" name="group1" value="Push" id="Push" checked
-                    onclick="inputEnable()">Push <br></br>
+    <g:form action="updateVEN" class="form-horizontal">
+        <div class="control-group">
+            <label class="control-label" for="selectProgram">Program: </label>
+            <div class="controls">
+                <g:select name="programID" from="${programsList}"
+                    value="${ currentVen.programID }" id="selectProgram" />
             </div>
         </div>
-        <label>Client URI: </label>
-		<input id="clientURI" type="text" name="clientURI"
-			value="${ currentVen.clientURI }" />
-		</br>
+        <div class="control-group">
+            <label class="control-label" for="inputVenName">VEN Name: </label>
+            <div class="controls">
+                <input type="text" name="venName" value="${ currentVen.venName }"
+                    id="inputVenName" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputVenID">VEN ID: </label>
+            <div class="controls">
+                <input type="text" name="venID" value="${ currentVen.venID }" id="inputVenID" />
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="radio"> 
+                <input type="radio" name="group1"
+                    value="Pull" id="Pull" onclick="inputDisable()">Node Pull
+                </label> 
+                <label class="radio"> 
+                <input type="radio" name="group1"
+                    value="Push" id="Push" checked onclick="inputEnable()">Node
+                    Push
+                </label>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputClientURI">Client URI:
+            </label>
+            <div class="controls">
+                <input id="clientURI" type="text" name="clientURI"
+                    value="${ currentVen.clientURI }" id="inputClientURI" />
+            </div>
+        </div>
 		<g:hiddenField name="id" value="${currentVen.id}" />
-		<div class="actions">
-            <input type="submit" value="Update this VEN" class="btn primary">
-			or
-			<g:link action="vens" class="btn">
+		<div class="control-group">
+            <div class="controls">
+                <div class="actions">
+                    <input type="submit" value="Update this VEN" class="btn primary">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <g:link action="vens" class="btn">
             Cancel
             </g:link>
-		</div>
-	</g:form>
-
+                </div>
+            </div>
+        </div>
+    </g:form>
     <g:javascript>          
         function inputEnable() {        
             document.getElementById("clientURI").removeAttribute("disabled");            
