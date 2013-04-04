@@ -4,12 +4,11 @@
 <r:require module="formTime" />
 <g:javascript>
   $(function() {
-    		$('.dp').datepicker();
-    		$('#tp').timepicker();
-         	$('#tp1').timepicker();
+ 	  $('.dp').datepicker();
+    $('.tp').timepicker();
+    $('.tp1').timepicker();
   });
-
-  </g:javascript>
+</g:javascript>
 </head>
 <body>
   <h1>Create an Event</h1>
@@ -31,47 +30,81 @@
   </g:elseif>
 
 	<fieldset>
-		<g:form action="newEvent">
+		<g:form action="newEvent" class="form-horizontal">
 			<h3>Program</h3>
-			<label>Program: </label>
-			<g:select name="programName" from="${programList}"
-				noSelection="[null:'- Choose a Program -']" />
+			<div class="control-group">
+				<label class="control-label" for="selectProgram">Program: </label>
+				<div class="controls">
+					<g:select name="programName" from="${programList}"
+						noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
+				</div>
+			</div>
 			<h3>Event Descriptor</h3>
-			<label>Event ID: </label>
-			<input type="text" name="eventID" />
-			<label>Priority</label>
-			<input type="text" value="0" name="priority" />
+			<div class="control-group">
+				<label class="control-label" for="inputEvent">Event ID: </label>
+				<div class="controls">
+					<input type="text" name="eventID" id="inputEvent"
+						placeholder="Event ID" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputPriority">Priority</label>
+				<div class="controls">
+					<input type="text" name="priority" placeholder="0"
+						id="inputPriority" />
+				</div>
+			</div>
 			<h3>Active Period</h3>
-			<label>Intervals: </label>
-			<g:textField value="1" name="intervals" />
-			<label>State Date: </label>
-			<g:textField name="startDate" value="${date}" class="dp" />
-
-			<div class="input-append bootstrap-timepicker">
-				<label>Start Time: </label>
-				<g:textField name="startTime" value="${time}" class="input-small"
-					id="tp" />
-				<span class="add-on"><i class="icon-time"></i></span>
+			<div class="control-group">
+				<label class="control-label" for="inputInterval">Intervals:
+				</label>
+				<div class="controls">
+					<g:textField name="intervals" placeholder="1" id="inputInterval" />
+				</div>
 			</div>
-			<label>End Date: </label>
-			<g:textField name="endDate" value="${date}" class="dp" />
-			<div class="input-append bootstrap-timepicker">
-				<label>End Time: </label>
-				<g:textField name="endTime" value="${time}" class="input-small"
-					id="tp1" />
-				<span class="add-on"><i class="icon-time"></i></span>
+			<div class="control-group">
+				<label class="control-label" for="inputStartDate">State
+					Date: </label>
+				<div class="controls">
+					<g:textField name="startDate" value="${date}" class="dp" id="inputStartDate" />
+				</div>
 			</div>
-			<div class="actions">
-				<input type="submit" value="Create this event" class="btn primary">
-				or
-				<g:link action:"events" class="btn">Cancel</g:link>
+			<div class="control-group">
+					<label class="control-label" for="inputStartTime">
+					  Start Time: </label>
+				<div class="controls">
+					<div class="input-append bootstrap-timepicker">
+						<g:textField name="startTime" value="${time}" class="tp"
+							id="inputStartTime" />
+						<span class="add-on"><i class="icon-time"></i></span>
+					</div>
+				</div>
 			</div>
-
+			<div class="control-group">
+				<label class="control-label" for="inputEndDate">End Date:
+				</label>
+				<div class="controls">
+					<g:textField name="endDate" value="${date}" class="dp"
+						id="inputEndDate" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputEndTime">End Time: </label>
+				<div class="controls">
+					<div class="input-append bootstrap-timepicker">
+						<g:textField name="endTime" value="${time}" id="inputEndTime"
+							class="tp1" />
+						<span class="add-on"><i class="icon-time"></i></span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<input type="submit" value="Create!" class="btn btn-primary" />
+					<g:link action="events" class="btn">Cancel</g:link>
+				</div>
+			</div>
 		</g:form>
-
 	</fieldset>
-
-
-
 </body>
 </html>
