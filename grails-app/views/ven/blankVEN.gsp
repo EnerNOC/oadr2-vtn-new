@@ -18,15 +18,13 @@
 		<div class="control-group">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
-				<g:select name="programID" from="${programsList}"
-					noSelection="[null:'- Choose a Program -']" id="selectProgram" />
+				<g:select name="programID" from="${programsList}" noSelection="[null:'- Choose a Program -']" id="selectProgram" />
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="inputVenName">VEN Name: </label>
 			<div class="controls">
-				<input type="text" name="venName" placeholder="My Name"
-					id="inputVenName" />
+				<input type="text" name="venName" placeholder="My Name" id="inputVenName" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -37,46 +35,35 @@
 		</div>
 		<div class="control-group">
 			<div class="controls">
-				<label class="radio"> 
-				<input type="radio" name="group1"
-					value="Pull" id="Pull" onclick="inputDisable()">Node Pull
+				<label class="radio"> <input type="radio" name="group1" value="Pull" id="Pull" onclick="inputDisable()">
+					Node Pull
 				</label> 
-				<label class="radio"> 
-				<input type="radio" name="group1"
-					value="Push" id="Push" checked onclick="inputEnable()">Node
-					Push
+				<label class="radio"> <input type="radio" name="group1" value="Push" id="Push" checked onclick="inputEnable()">
+				  Node Push
 				</label>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="inputClientURI">Client URI:
-			</label>
+			<label class="control-label" for="inputClientURI">Client URI:</label>
 			<div class="controls">
 				<input id="clientURI" type="text" name="clientURI"
 					placeholder="My Client" id="inputClientURI" />
 			</div>
 		</div>
 		<div class="control-group">
-			<div class="controls">
-				<div class="actions">
-					<input type="submit" value="Create this VEN" class="btn primary">
-					&nbsp;&nbsp;&nbsp;&nbsp;
-					<g:link action="vens" class="btn">
-            Cancel
-            </g:link>
-				</div>
+			<div class="controls form-buttons">
+				<input type="submit" value="Create!" class="btn btn-primary">
+				<g:link action="vens" class="btn">Cancel</g:link>
 			</div>
 		</div>
 	</g:form>
-	<g:javascript>          
-        function inputEnable() {        
-            document.getElementById("clientURI").removeAttribute("disabled");            
-        }          
-        function inputDisable() {        
-            document.getElementById("clientURI").setAttribute("disabled");
-        }
-    </g:javascript>
-
+  <g:javascript>          
+	  function inputEnable() {        
+	    document.getElementById("clientURI").removeAttribute("disabled");            
+	  }          
+	  function inputDisable() {        
+	    document.getElementById("clientURI").setAttribute("disabled");
+	  }
+  </g:javascript>
 </body>
-
 </html>
