@@ -5,8 +5,8 @@
 <g:javascript>
   $(function() {
     $('.dp').datepicker();
-    $('#tp').timepicker();
-    $('#tp1').timepicker();
+    $('.tp').timepicker();
+    $('.tp1').timepicker();
   });
 </g:javascript>
 </head>
@@ -35,48 +35,39 @@
 			<div class="control-group">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programName" from="${programList}"
-						value="${ currentEvent.programName }" id="selectProgram" />
+					<g:select name="programName" from="${programList}" value="${ currentEvent.marketContext.programName }" id="selectProgram" />
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="inputEvent">Event ID: </label>
 				<div class="controls">
-					<input type="text" name="eventID" id="inputEvent"
-						value="${ currentEvent.eventID }" />
+					<input type="text" name="eventID" id="inputEvent" value="${ currentEvent.eventID }" />
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="inputPriority">Priority</label>
+				<label class="control-label" for="inputPriority">Priority: </label>
 				<div class="controls">
-					<input type="text" name="priority" value="${ currentEvent.priority }"
-						id="inputPriority" />
+					<input type="text" name="priority" value="${ currentEvent.priority }" id="inputPriority" />
 				</div>
 			</div>
 			<h3>Active Period</h3>
 			<div class="control-group">
-				<label class="control-label" for="inputInterval">Intervals:
-				</label>
+				<label class="control-label" for="inputInterval">Intervals: </label>
 				<div class="controls">
-					<g:textField name="intervals" value="${ currentEvent.intervals }"
-						id="inputInterval" />
+					<g:textField name="intervals" value="${ currentEvent.intervals }" id="inputInterval" />
+        </div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputStartDate">Start Date: </label>
+				<div class="controls">
+					<g:textField name="startDate" value="${ g.formatDate(date:currentEvent.startDate, format:"MM/dd/yyyy") }" class="dp" id="inputStartDate" />
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="inputStartDate">State
-					Date:
-				</label>
-				<div class="controls">
-					<g:textField name="startDate" value="${ currentEvent.startDate }"
-						class="dp" id="inputStartDate" />
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" for="inputStartTime">Start Time:</label>
+				<label class="control-label" for="inputStartTime">Start Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="startTime" value="${ currentEvent.startTime }"
-							class="tp" id="inputStartTime" />
+						<g:textField name="startTime" value="${ g.formatDate(date:currentEvent.startDate, format:"hh:mm aa") }" class="tp" id="inputStartTime" />
 						<span class="add-on">
 							<i class="icon-time"></i>
 						</span>
@@ -84,28 +75,27 @@
 				</div>
 			</div>
 			<div class="control-group">
-				<label class="control-label" for="inputEndDate">End Date:</label>
+				<label class="control-label" for="inputEndDate">End Date: </label>
 				<div class="controls">
-					<g:textField name="endDate" value="${ currentEvent.endDate }"
-						class="dp" id="inputEndDate" />
+					<g:textField name="endDate" value="${ g.formatDate(date:currentEvent.endDate, format:"MM/dd/yyyy") }" class="dp" id="inputEndDate" />
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="inputEndTime">End Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="endTime" value="${ currentEvent.endTime }"
-							id="inputEndTime" class="tp1" />
+						<g:textField name="endTime" value="${ g.formatDate(date:currentEvent.endDate, format:"hh:mm aa") }" id="inputEndTime" class="tp1" />
 						<span class="add-on">
 							<i class="icon-time"></i>
 						</span>
 					</div>
 				</div>
 			</div>
+      <g:hiddenField name="id" value="${currentEvent.id}" />
 			<div class="control-group">
 				<div class="controls form-buttons">
 					<input type="submit" value="Update!" class="btn btn-primary">
-					<g:link action: " events " class="btn">Cancel</g:link>
+					<g:link action=" events " class="btn">Cancel</g:link>
 				</div>
 			</div>
 		</g:form>
