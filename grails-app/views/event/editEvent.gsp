@@ -23,50 +23,84 @@
     </g:if>
 	<h1>Edit Event: ${currentEvent.eventID}</h1>
 	</br>
-	<fieldset>
-		<g:form action="updateEvent">
-			<h3>Program</h3>
-			<label>Program: </label>
-			<g:select name="programName" from="${programList}"
-				value="${currentEvent.programName}" />
-			<h3>Event Descriptor</h3>
-			<label>Event ID: </label>
-			<input type="text" value="${currentEvent.eventID}" name="eventID" />
-			<label>Priority</label>
-			<input type="text" value="${currentEvent.priority}" name="priority" />
-			<h3>Active Period</h3>
-			<label>Intervals: </label>
-			<g:textField value="${currentEvent.intervals}" name="intervals" />
-			
-			<label>State Date: </label>
-			<g:textField name="startDate" value="${currentEvent.startDate}"
-				class="dp" />
-			<div class="input-append bootstrap-timepicker">
-				<label>Start Time: </label>
-				<g:textField name="startTime" value="${currentEvent.startTime}"
-					class="input-small" id="tp" />
-				<span class="add-on"><i class="icon-time"></i></span>
-			</div>
-			
-			<label>End Date: </label>
-			<g:textField name="endDate" value="${currentEvent.endDate}"
-				class="dp" />
-			<div class="input-append bootstrap-timepicker">
-				<label>End Time: </label>
-				<g:textField name="endTime" value="${currentEvent.endTime}"
-					class="input-small" id="tp1" />
-				<span class="add-on"><i class="icon-time"></i></span>
-			</div>
-			<g:hiddenField name="id" value="${currentEvent.id}" />
-			<div class="actions">
-				<g:actionSubmit value="Update Event" class="btn primary" />
-				or
-				<g:link action:"events" class="btn">Cancel</g:link>
-			</div>
-
-		</g:form>
-
-	</fieldset>
-
+    <fieldset>
+        <g:form action="updateEvent" class="form-horizontal">
+            <h3>Event Descriptor</h3>
+            <div class="control-group">
+                <label class="control-label" for="selectProgram">Program: </label>
+                <div class="controls">
+                    <g:select name="programName" from="${programList}"
+                        value="${ currentEvent.programName }" id="selectProgram"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="inputEvent">Event ID: </label>
+                <div class="controls">
+                    <input type="text" name="eventID" id="inputEvent"
+                        value="${ currentEvent.eventID }" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="inputPriority">Priority</label>
+                <div class="controls">
+                    <input type="text" name="priority" value="${ currentEvent.priority }"
+                        id="inputPriority" />
+                </div>
+            </div>
+            <h3>Active Period</h3>
+            <div class="control-group">
+                <label class="control-label" for="inputInterval">Intervals:
+                </label>
+                <div class="controls">
+                    <g:textField name="intervals" value="${ currentEvent.intervals }" id="inputInterval" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="inputStartDate">State
+                    Date: </label>
+                <div class="controls">
+                    <g:textField name="startDate" value="${ currentEvent.startDate }" class="dp" id="inputStartDate" />
+                </div>
+            </div>
+            <div class="control-group">
+                    <label class="control-label" for="inputStartTime">Start
+                        Time: </label>
+                <div class="controls">
+                    <div class="input-append bootstrap-timepicker">
+                        <g:textField name="startTime" value="${ currentEvent.startTime }" class="tp"
+                            id="inputStartTime" />
+                        <span class="add-on"><i class="icon-time"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="inputEndDate">End Date:
+                </label>
+                <div class="controls">
+                    <g:textField name="endDate" value="${ currentEvent.endDate }" class="dp"
+                        id="inputEndDate" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="inputEndTime">End Time: </label>
+                <div class="controls">
+                    <div class="input-append bootstrap-timepicker">
+                        <g:textField name="endTime" value="${ currentEvent.endTime }" id="inputEndTime"
+                            class="tp1" />
+                        <span class="add-on"><i class="icon-time"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <div class="actions">
+                        <input type="submit" value="Update this event" class="btn primary">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <g:link action:"events" class="btn">Cancel</g:link>
+                    </div>
+                </div>
+            </div>
+        </g:form>
+    </fieldset>
 </body>
 </html>
