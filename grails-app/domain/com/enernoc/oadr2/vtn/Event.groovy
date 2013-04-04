@@ -37,7 +37,7 @@ class Event{
     long priority
     Date startDate
     Date endDate
-    String status = "new"
+    boolean cancelled
     long intervals = 1
     long modificationNumber = 0L
 
@@ -48,10 +48,10 @@ class Event{
             obj.endDate != null && val < obj.endDate 
         })
         endDate(blank: false, validator : { val, obj ->
-            obj.startDate != null && val > obj.startDate
+            obj.startDate != null && val > obj.startDate \
+                && val > new Date() // don't allow events in the past
         })
         intervals(min: 1L)
-        status(nullable: false)
         modificationNumber(min: 0L)
     }
     
@@ -65,10 +65,18 @@ class Event{
         eiEvent = event
         this.eventID = event.eventDescriptor.eventID
         this.priority = event.eventDescriptor.priority
-        this.status = event.eventDescriptor.eventStatus.value()
         this.startDate = event.eiActivePeriod.properties.dtstart.dateTime.value
         def duration = event.eiActivePeriod.properties.duration.duration.value
         this.endDate = this.startDate + duration
+    }
+    
+    public String getStatus() {
+        if ( this.cancelled ) return "Cancelled"
+        def now = new Date()
+        if ( this.endDate < now ) return "Completed"
+        if ( this.startDate < now ) return "Active"
+        return "Pending"
+        // TODO determine if "far" or "near"
     }
     
     protected DatatypeFactory getDtf() {
@@ -131,8 +139,7 @@ class Event{
             marketContext == this.marketContext
             endDate > this.startDate
             startDate < this.endDate
-            status != "cancelled"
-            status != "completed" }.list()
+            cancelled != true }.list()
         return activePrograms.size() > 0
     }
 

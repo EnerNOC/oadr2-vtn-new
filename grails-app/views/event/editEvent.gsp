@@ -11,18 +11,24 @@
   </g:javascript>
 </head>
 <body>
-    <g:if test="${flash.message == "Fail"}">
-        <div class="alert alert-error">
-            <p>
-                <g:each in="${error}">
-                    ${it}
-                    </br>
-                </g:each>
-            </p>
-        </div>
-    </g:if>
-	<h1>Edit Event: ${currentEvent.eventID}</h1>
-	</br>
+  <h1>Edit Event: ${currentEvent.eventID}</h1>
+  
+  <g:if test="${error}">
+    <div class="alert alert-error">
+      <g:if test="${flash.message}">
+        <p>${flash.message}</p>
+      </g:if>
+      <p>
+        <g:each in="${error}">
+          ${it}<br/>
+        </g:each>
+      </p>
+    </div>
+  </g:if>
+  <g:elseif test="${flash.message}">
+    <div class="alert">${flash.message}</div>
+  </g:elseif>
+    
 	<fieldset>
 		<g:form action="updateEvent">
 			<h3>Program</h3>

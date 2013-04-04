@@ -114,7 +114,6 @@ class EventController {
 
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
 //            program.save()
             populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
@@ -123,8 +122,9 @@ class EventController {
             flash.message="Success, your event has been created"
         }
         else {
-            flash.message="Fail"
+            flash.message="Please fix the errors below"
             def errors = event.errors.allErrors.collect {
+                log.debug "Event creation validation error: $it"
                 messageSource.getMessage(it, null)
             }
             // TODO return invalid event, not a blank event
@@ -149,7 +149,7 @@ class EventController {
         def event = Event.get(params.id)
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
-        event.status = "cancelled"
+        event.cancelled = true
         redirect action: "events"
     }
 
@@ -187,13 +187,16 @@ class EventController {
         } catch(IllegalArgumentException) {
             params.priority = -1L
         }
+        params.startDate = parseDttm( params.startDate, params.startTime )
+        params.endDate = parseDttm( params.endDate, params.endTime )
+        
+        params.remove 'programName'
         def event = Event.get(params.id)
         // FIXME it should not be possible to change the program for an event!
         event.properties = params
 
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            event.status = eiEventService.updateStatus(eiEvent, (int)event.intervals).value
             event.modificationNumber +=1 // TODO this could be done with a save hook
             event.save()
             //populateFromPush(event)
@@ -202,8 +205,9 @@ class EventController {
             flash.message="Success, your event has been updated"
         }
         else {
-            flash.message="Fail"
-            def errors = alteredEvent.errors.allErrors.collect {
+            flash.message="Please fix the errors below"
+            def errors = event.errors.allErrors.collect {
+                log.debug "Event update validation error: $it"
                 messageSource.getMessage(it, null)
             }
             return chain(action:"editEvent", model:[error: errors], params:[id: params.id])
@@ -232,7 +236,7 @@ class EventController {
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = "Pending"
+            venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
             venStatus.eventID = event.eventID
