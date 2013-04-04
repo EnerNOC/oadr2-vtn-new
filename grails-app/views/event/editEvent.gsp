@@ -11,7 +11,6 @@
 </g:javascript>
 </head>
 <body>
-  <h1>Edit Event: ${currentEvent.eventID}</h1>
   
   <g:if test="${error}">
     <div class="alert alert-error">
@@ -29,6 +28,7 @@
     <div class="alert">${flash.message}</div>
   </g:elseif>
 
+  <h1>Edit Event: ${currentEvent.eventID}</h1>
 	<fieldset>
 		<g:form action="updateEvent" class="form-horizontal">
 			<h3>Event Descriptor</h3>

@@ -3,6 +3,7 @@
 <meta name="layout" content="bootstrap" />
 </head>
 <body>
+
 	<g:if test="${flash.message == "Fail"}">
 		<div class="alert alert-error">
 			<p>
@@ -13,6 +14,7 @@
 			</p>
 		</div>
 	</g:if>
+	
 	<h3>Create a VEN</h3>
 	<g:form action="newVEN" class="form-horizontal">
 		<div class="control-group">
@@ -46,8 +48,7 @@
 		<div class="control-group">
 			<label class="control-label" for="inputClientURI">Client URI:</label>
 			<div class="controls">
-				<input id="clientURI" type="text" name="clientURI"
-					placeholder="My Client" id="inputClientURI" />
+				<input id="clientURI" type="text" name="clientURI" placeholder="My Client" id="inputClientURI" />
 			</div>
 		</div>
 		<div class="control-group">

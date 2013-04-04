@@ -3,6 +3,7 @@
 <meta name="layout" content="bootstrap" />
 </head>
 <body>
+
 	<g:if test="${flash.message == "Fail"}">
 		<div class="alert alert-error">
 			<p>
@@ -13,6 +14,7 @@
 			</p>
 		</div>
 	</g:if>
+	
 	<h3>Edit VEN: ${ currentVen.venID }</h3>
 	<g:form action="updateVEN" class="form-horizontal">
 		<div class="control-group">
