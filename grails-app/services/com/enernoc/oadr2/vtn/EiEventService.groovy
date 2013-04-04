@@ -109,14 +109,14 @@ public class EiEventService {
      * @return a response code as a string
      */
     def verifyOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        venID = oadrCreatedEvent.eiCreatedEvent.venID
-        response = "200"
-        desc = "OK"
-        oadrCreatedEvent.eiCreatedEvent.eventResponses?.eventResponses?.each { response ->
+        def venID = oadrCreatedEvent.eiCreatedEvent.venID
+        def response = "200"
+        def desc = "OK"
+        oadrCreatedEvent.eiCreatedEvent.eventResponses?.eventResponses?.each { evtResponse ->
             if ( response != "200" ) return // skip remaining elements if there's already an error.
 
-            String eventId = response.qualifiedEventID.eventID
-            long modificationNumber = response.qualifiedEventID.modificationNumber
+            String eventId = evtResponse.qualifiedEventID.eventID
+            long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
 
             def event = Event.findWhere( eventID: eventId, venID: venID )
             def ven = VenStatus.findWhere( venID: venID )
@@ -158,8 +158,11 @@ public class EiEventService {
         def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )
 
         limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
-        // TODO filter by marketContext if given
-        def events = Event.findAll(max : limit) { marketContext.id == ven.program.id }
+        // TODO order according to date, priority & status
+        def events = Event.findAll(max : limit) { 
+            marketContext.id == ven.program.id
+            endDate > new Date() // include only events that have not ended
+        }
 
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
