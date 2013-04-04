@@ -14,22 +14,33 @@
         </div>
     </g:if>
 	<h3>Market Context</h3>
-	<g:form action="newProgram">
-		<label>Program Name: </label>
-		<input type="text" name="programName" />
-		</br>
-		<label>URI: </label>
-		<input type="text" name="programURI" />
-		</br>
-		<div class="actions">
-			<input type="submit" value="Create this program" class="btn primary">
-			or
-			<g:link action="programs" class="btn">
+	<g:form action="newProgram" class="form-horizontal">
+		<div class="control-group">
+			<label class="control-label" for="inputProgramName">Program
+				Name: </label>
+			<div class="controls">
+				<input type="text" name="programName" placeholder="My Name"
+					id="inputProgramName" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="inputProgramURI">URI: </label>
+			<div class="controls">
+				<input type="text" name="programURI" placeholder="My URI"
+					id="inputProgramURI" />
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="controls">
+				<div class="actions">
+					<input type="submit" value="Create this program"
+						class="btn primary"> &nbsp;&nbsp;&nbsp;&nbsp;
+					<g:link action="programs" class="btn">
             Cancel
             </g:link>
+				</div>
+			</div>
 		</div>
 	</g:form>
-
 </body>
-
 </html>
