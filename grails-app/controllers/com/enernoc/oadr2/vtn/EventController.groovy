@@ -128,7 +128,7 @@ class EventController {
                 messageSource.getMessage(it, null)
             }
             // TODO return invalid event, not a blank event
-            return chain(action:"blankEvent", model:[error: errors])
+            return chain(action:"blankEvent", model:[errors: errors])
         }
 
         redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
@@ -210,7 +210,7 @@ class EventController {
                 log.debug "Event update validation error: $it"
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[error: errors], params:[id: params.id])
+            return chain(action:"editEvent", model:[errors: errors], params:[id: params.id])
         }
         chain action:"events", model:[error: null]
     }

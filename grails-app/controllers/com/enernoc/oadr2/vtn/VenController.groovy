@@ -66,24 +66,22 @@ class VenController {
 
     def newVEN() {
         def ven = new Ven(params)
-
         def program = Program.find("from Program as p where p.programName=?", [params.programID])
-        def errorMessage = []
         if (program!=null) {
             program.addToVen(ven)
         }
         if (ven.validate()) {
             program.save()
             //	ven.save()
-            flash.message="Success"
+            flash.message="Success, your VEN has been created"
         } else {
-            flash.message="Fail"
-            ven.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            flash.message="Please fix the errors below: "
+            def errors = ven.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"blankVEN", model:[error: errorMessage])
+            return chain(action:"blankVEN", model:[errors: errors])
         }
-        chain(action:"vens", model: [error: errorMessage])
+        redirect(action:"vens")
 
     }
 
@@ -127,7 +125,6 @@ class VenController {
         newVen.id = oldVen.id
         def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
         def oldProgram = Program.find("from Program as p where p.programName=?", [oldVen.programID])
-        def errorMessage = []
         if (newProgram!=null) {
             newProgram.addToVen(newVen)
         }
@@ -136,14 +133,14 @@ class VenController {
             oldProgram.save()
             oldVen.delete()
             newProgram.save()            
-            flash.message="Success"
+            flash.message="Success, your VEN has been updated"
         } else {
-            flash.message="Fail"
-            newVen.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            flash.message="Please fix the errors below: "
+            def errors = newVen.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"editVEN", model: [error: errorMessage], params: [id : params.id])
+            return chain(action:"editVEN", model: [errors: errors], params: [id : params.id])
         }
-        chain(action:"vens", model: [error: errorMessage])
+        redirect(action:"vens")
     }
 }
