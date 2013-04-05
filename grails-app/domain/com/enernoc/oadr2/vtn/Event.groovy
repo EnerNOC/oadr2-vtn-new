@@ -43,7 +43,7 @@ class Event{
 
     static constraints = {
         eventID(blank: false, unique: true)
-        priority(blank: false, min: 0L)
+        priority(min: 0L)
         startDate(blank: false, validator : { val, obj ->
             obj.endDate != null && val < obj.endDate 
         })
