@@ -4,16 +4,21 @@
 </head>
 <body>
 
-	<g:if test="${flash.message == "Fail"}">
-		<div class="alert alert-error">
-			<p>
-				<g:each in="${error}">
-					${it}
-					</br>
-				</g:each>
-			</p>
-		</div>
-	</g:if>
+  <g:if test="${errors}">
+    <div class="alert alert-error">
+      <g:if test="${flash.message}">
+        <p>${flash.message}</p>
+      </g:if>
+      <p>
+        <g:each in="${errors}">
+          ${it}<br/>
+        </g:each>
+      </p>
+    </div>
+  </g:if>
+  <g:elseif test="${flash.message}">
+    <div class="alert">${flash.message}</div>
+  </g:elseif>
 	
 	<h3>Create a VEN</h3>
 	<g:form action="newVEN" class="form-horizontal">

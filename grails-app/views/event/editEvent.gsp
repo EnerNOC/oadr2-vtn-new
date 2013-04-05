@@ -12,13 +12,13 @@
 </head>
 <body>
   
-  <g:if test="${error}">
+  <g:if test="${errors}">
     <div class="alert alert-error">
       <g:if test="${flash.message}">
         <p>${flash.message}</p>
       </g:if>
       <p>
-        <g:each in="${error}">
+        <g:each in="${errors}">
           ${it}<br/>
         </g:each>
       </p>

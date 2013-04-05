@@ -45,7 +45,8 @@ class ProgramController {
      }*/
 
     def blankProgram() {
-        []
+        def placeholder="Key collision adding Map to CompositeMap if placeholder does not exist"
+        [placeholder: placeholder]
     }
 
     /**
@@ -68,18 +69,17 @@ class ProgramController {
 
     def newProgram() {
         def program = new Program(params)
-        def errorMessage = []
         if (program.validate()) {
             program.save()
-            flash.message = "Success"
+            flash.message = "Success, your Program has been created"
         } else {
-            flash.message="Fail"
-            program.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            flash.message="Please fix the errors below: "
+            def errors = program.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"blankProgram", model:[error: errorMessage])
+            return chain(action:"blankProgram", model:[errors: errors])
         }
-        chain(action:"programs", model: [error: errorMessage])
+        redirect(action:"programs")
     }
     /**
      *
@@ -119,7 +119,6 @@ class ProgramController {
         def oldProgram = Program.get( params.id )
         def newProgram = new Program(params)
         newProgram.id = oldProgram.id
-        def errorMessage = []
         if (newProgram.validate()) {
             oldProgram.ven.each { v ->
                 oldProgram.removeFromVen(v)
@@ -133,14 +132,15 @@ class ProgramController {
             }
             newProgram.save()
             oldProgram.delete()
-            flash.message = "Success"
+            flash.message = "Success, your Program has been updated"
         } else {
-            flash.message="Fail"
-            program.errors.allErrors.each {
-                errorMessage << messageSource.getMessage(it, null)
+            flash.message="Please fix the errors below: "
+            def errors = newProgram.errors.allErrors.collect {
+                messageSource.getMessage(it, null)
             }
-            return chain(action:"blankProgram", model:[error: errorMessage])
+            return chain(action:"blankProgram", model:[errors: errors])
         }
-        chain(action:"programs", model: [error: errorMessage])    }
+        redirect(action:"programs")    
+        }
 
 }
