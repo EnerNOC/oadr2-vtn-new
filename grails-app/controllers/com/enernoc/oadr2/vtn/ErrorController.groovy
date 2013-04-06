@@ -1,5 +1,7 @@
 package com.enernoc.oadr2.vtn
 
+import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException;
+
 import grails.util.Environment
 
 class ErrorController {
@@ -15,6 +17,7 @@ class ErrorController {
         
         def contentType = request.getHeader("Accept")
         contentType ?: request.getHeader("Content-Type") 
+        if ( request.xhr && contentType == '*/*' ) contentType = 'text/plain' 
         log.debug "Serving error for content type: $contentType"
         switch ( contentType ) {
             case "text/xml":
@@ -28,6 +31,8 @@ class ErrorController {
                 }
                 break
             case "text/plain":
+                if( request.exception.class == GrailsWrappedRuntimeException )
+                    request.exception = request.exception.cause
                 render contentType : "text/plain", 
                     text : "Error $code: $msg.  Exception: ${request.exception}"
                 break
