@@ -13,9 +13,9 @@ public class EiEventController {
     
 //    static allowedMethods = [post:'POST']
     
-    JAXBManager jaxbManager
+    static JAXBManager jaxbManager // this is threadsafe
     
-    { // default initializer
+    static { // default initializer
         try {
             jaxbManager = new JAXBManager()
         } catch (JAXBException e) {
