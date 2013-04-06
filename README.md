@@ -40,6 +40,14 @@ If you use Maven:
 For more info, see: http://grails.org/doc/latest/guide/commandLine.html#4.5%20Ant%20and%20Maven 
 
 
+### Database
+
+Edit `grails-app/conf/DataSrouce.groovy`.  By default when running with `grails run-app`, 
+it runs with an in-memory database that is wiped when the app shuts down.  If you want to 
+use a simple, file-based database that persists betwen shutdowns, you can remove the
+`mem:` from the `url` parameter and change `dbCreate='update'`.
+
+
 ### Testing Locally
 
 You can use `curl` to execute OpenADR requests on the server like so:
