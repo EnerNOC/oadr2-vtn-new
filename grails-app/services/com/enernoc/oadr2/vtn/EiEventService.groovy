@@ -157,7 +157,7 @@ public class EiEventService {
         // FIXME validate VEN ID against HTTP credentials
         def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )
 
-        limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
+        def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
         def events = Event.findAll(max : limit) { 
             marketContext.id == ven.program.id
