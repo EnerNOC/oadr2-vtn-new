@@ -24,8 +24,8 @@
 <link rel="apple-touch-icon" sizes="114x114"
 	href="${resource(dir: 'images', file: 'apple-touch-icon-114x114.png')}" />
 
-<g:layoutHead />
 <r:layoutResources />
+<g:layoutHead />
 </head>
 
 <body>
@@ -68,6 +68,11 @@
               <a href="${createLink(controller: 'Debug')}">Debug</a>
             </li>
 					</ul>
+				</div>
+				<div class="nav-collapse collapse pull-right">
+				  <ul class="nav">
+            <li><a id='spinner' style='display:none'>
+              <i class='icon-spin icon-spinner icon-large'></i></a></li>
 				</div>
 			</div>
 		</div>
