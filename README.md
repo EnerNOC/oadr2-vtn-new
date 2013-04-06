@@ -56,8 +56,35 @@ Using grails command line: `grails war`
 or with Maven: `mvn package`
 
 
+### Developer References
+
+If you want to extend this project, here are several resources that will be helpful:
+
+* [Grails Reference](http://grails.org/doc/2.2.1/guide/index.html)
+* [Groovy API](http://groovy.codehaus.org/api/)
+* [Groovy JDK](http://groovy.codehaus.org/groovy-jdk.html) (extensions to Java classes)
+* [Spring Framework Reference](http://static.springsource.org/spring/docs/3.1.x/javadoc-api/)
+* [Java EE API](http://docs.oracle.com/javaee/6/api/)
+* [Java SE API](http://docs.oracle.com/javase/7/docs/api/)
+
+
 ## TODO
 
 * OpenADR Debug page to post example XML from a web form and display the result
 * Filter on OpenADR services to handle certificate auth
 * Web app auth
+
+## Credits 
+
+Much of the original code is based on a Play 2.0 app written by our 2012 summer intern 
+[Jeff Lajoie](http://www.linkedin.com/pub/jeff-lajoie/5b/424/109).  It was then converted
+to Grails by one of our 2013 interns, Yang Xiang, with help from 
+[Thom Nichols](http://open.enernoc.com/profiles/thom.html).
+
+
+This project also relies on the following open source frameworks and libraries to help make it awesome:
+
+* [Twitter Bootstrap](http://twitter.github.io/bootstrap/index.html)
+* [JQuery](http://jquery.com/) 
+* [Font Awesome](http://fortawesome.github.com/Font-Awesome/)
+
