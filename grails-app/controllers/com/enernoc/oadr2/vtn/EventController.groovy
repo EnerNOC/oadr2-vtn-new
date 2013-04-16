@@ -190,11 +190,12 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
+        def program = Program.find("from Program as p where p.programName=?", [params.programName])
         params.remove 'programName'
         def event = Event.get(params.id)
         // FIXME it should not be possible to change the program for an event!
         event.properties = params
-
+        event.marketContext = program
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
