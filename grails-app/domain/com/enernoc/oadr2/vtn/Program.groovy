@@ -12,7 +12,7 @@ class Program {
         programName (blank: false, validator: {val, obj ->
             obj.uniqueProgramName()
         })
-        programURI (blank:false)
+        programURI (blank:false, url:true)
     }
     
     private boolean uniqueProgramName() {

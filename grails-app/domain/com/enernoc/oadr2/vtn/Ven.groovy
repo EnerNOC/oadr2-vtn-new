@@ -14,7 +14,7 @@ class Ven {
         venID(blank: false, validator: {val, obj ->
             obj.UniqueVenID()    
         })
-        clientURI(nullable: true)
+        clientURI(nullable: true, url:true)
 
         //select a program id from one of the available programs
 

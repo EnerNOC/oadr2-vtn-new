@@ -12,21 +12,21 @@ class BootStrap {
 
 	def xmppService
     def init = { servletContext ->
-		def pro1 = new Program(programName:"test-program-one", programURI:"test-uri-one")
-		def pro2 = new Program(programName:"test-program-two", programURI:"test-uri-two")
-		def pro3 = new Program(programName:"test-program-three", programURI:"test-uri-three")
+		def pro1 = new Program(programName:"test-program-one", programURI:"http://test-uri-one.com")
+		def pro2 = new Program(programName:"test-program-two", programURI:"http://test-uri-two.com")
+		def pro3 = new Program(programName:"test-program-three", programURI:"http://test-uri-three.com")
 		//pro1.save()
 		//pro2.save()
 	
-		def Ven1 = new Ven(venID:"test-customer-one", programID:pro1.programName, venName:"test-name-one", clientURI:"test-client-uri-one")
+		def Ven1 = new Ven(venID:"test-customer-one", programID:pro1.programName, venName:"test-name-one", clientURI:"http://test-client-uri-one.com")
 		pro1.addToVen(Ven1)
 		pro1.save();
 		
-		def Ven2 = new Ven(venID:"test-customer-two", programID:pro2.programName, venName:"test-name-two", clientURI:"test-client-uri-two")
+		def Ven2 = new Ven(venID:"test-customer-two", programID:pro2.programName, venName:"test-name-two", clientURI:"http://test-client-uri-two.com")
 		pro2.addToVen(Ven2)
 		pro2.save();
 		
-		def Ven3 = new Ven(venID:"test-customer-three", programID:pro3.programName, venName:"test-name-three", clientURI:"test-client-uri-three")
+		def Ven3 = new Ven(venID:"test-customer-three", programID:pro3.programName, venName:"test-name-three", clientURI:"http://test-client-uri-three.com")
 		pro3.addToVen(Ven3)
 		pro3.save();
 	}
