@@ -53,6 +53,9 @@ class Event{
         })
         intervals(min: 1L)
         modificationNumber(min: 0L)
+        marketContext(validator : { val,obj ->
+            obj.isConflicting()
+        })
     }
     
     /**
@@ -135,12 +138,16 @@ class Event{
      * 
      */
     private boolean isConflicting() {
-        def activePrograms = Event.where { 
+        //Event.where breaks if null exists, thus an indirect id to designate a value
+        def tempID = this.id
+        if (tempID == null) tempID = -1
+        def activePrograms = Event.where {
             marketContext == this.marketContext
             endDate > this.startDate
             startDate < this.endDate
-            cancelled != true }.list()
-        return activePrograms.size() > 0
+            id != tempID
+            cancelled != true }.findAll()
+        return activePrograms.size() == 0
     }
 
     /**
