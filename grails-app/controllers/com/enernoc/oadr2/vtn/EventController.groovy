@@ -222,7 +222,16 @@ class EventController {
      * @param event - event to be used for getVENs and prepareVENs
      */
     protected void populateFromPush( Event event ) {
-        def customers = Ven.findAll(program: event.marketContext)
+        //TODO find a more elegant to do do this process
+        def AllVens = Ven.findAll()
+        def customers = []
+        AllVens.each {v ->
+            print(v.venID)
+            if (v.program.contains( event.marketContext )) {
+                print("true")
+                customers << v
+            }
+        }
         prepareVENs customers, event
     }
 
