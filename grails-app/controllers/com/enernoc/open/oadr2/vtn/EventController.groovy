@@ -228,12 +228,12 @@ class EventController {
             venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
-            venStatus.eventID = event.eventID
-            venStatus.program = event.marketContext.programName
-            venStatus.venID = v.venID
+            event.addToVenStatus(venStatus)
+            v.addToVenStatus(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                venStatus.save()
+                v.save()
+                event.save()
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!

@@ -119,7 +119,7 @@ public class EiEventService {
             long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
 
             def event = Event.findWhere( eventID: eventId, venID: venID )
-            def ven = VenStatus.findWhere( venID: venID )
+            def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
 
             if ( ! event ) {
                 response = "404"
@@ -180,21 +180,21 @@ public class EiEventService {
      * @param requestEvent - The event to be used to form the persistence object
      */
     protected void persistFromRequestEvent( OadrRequestEvent requestEvent, List<Event> events ) {
-        def venID = requestEvent.eiRequestEvent.venID
-        def ven = Ven.findWhere( venID: venID )
+        def ven = Ven.findWhere( venID: requestEvent.eiRequestEvent.venID )
         events.each { event ->
             def venStatus = VenStatus.findWhere(
-                    venID: venID, eventID: event )
+                    ven: ven, event: event )
 
             if ( ! venStatus ) {
-                venStatus = ew VenStatus()
-                venStatus.venID venID
-                venStatus.program = ven.programID
+                venStatus = new VenStatus()
+                ven.addToVenStatus(venStatus)
+                event.addToVenStatus(venStatus)
                 venStatus.optStatus = "Pending response"
             }
 
             venStatus.time = new Date()
-            venStatus.save()
+            ven.save()
+            event.save()
         }
     }
 
@@ -210,7 +210,7 @@ public class EiEventService {
         }
         // FIXME query for status per event in the eventResponses element,
         // set venStatus for each event
-        def venStatuses = VenStatus.findAllWhere( venID: createdEvent.eiCreatedEvent.venID )
+        def venStatuses = VenStatus.where{ ven.venID == createdEvent.eiCreatedEvent.venID }.findAll()
 
         venStatuses.each { status ->
             if ( createdEvent.eiCreatedEvent.eventResponses ) {
