@@ -7,7 +7,7 @@
 	<select>
 		<g:each in="${eventList}" var="event">
 
-			<option value="${event}">
+			<option value="${currentEventID}">
 				<g:link controller="VenStatus" action="venStatuses"
 					params="[eventID: event]" class="btn btn-inverse">
 					${event}

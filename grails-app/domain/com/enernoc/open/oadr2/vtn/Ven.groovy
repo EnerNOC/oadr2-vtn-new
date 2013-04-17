@@ -8,7 +8,7 @@ class Ven {
     String clientURI
 
     static belongsTo = Program
-    static hasMany = [program: Program]
+    static hasMany = [program: Program, venStatus: VenStatus]
 
     static constraints = {
         venID blank: false, unique: true

@@ -56,8 +56,8 @@ class EventController {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
         def programs = Program.executeQuery("SELECT distinct programName FROM Program")
         def date = new Date()
-        def dateFormatted = g.formatDate(date:date, format:"MM/dd/yyyy")
-        def timeFormatted = g.formatDate(date:date, format:"hh:mm aa")
+        def dateFormatted = g.formatDate(date:date, format:"dd/MM/yyyy")
+        def timeFormatted = g.formatDate(date:date, format:"HH:mm")
         [ programList: programs, date: dateFormatted, time: timeFormatted]
     }
 
@@ -115,7 +115,7 @@ class EventController {
     }
     
     static parseDttm( String date, String time) {
-        return Date.parse( "MM/dd/yyy hh:mm aa", "$date $time")
+        return Date.parse( "dd/MM/yyyy HH:mm", "$date $time")
     }
     
     /**
@@ -228,12 +228,12 @@ class EventController {
             venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
-            venStatus.eventID = event.eventID
-            venStatus.program = event.marketContext.programName
-            venStatus.venID = v.venID
+            event.addToVenStatus(venStatus)
+            v.addToVenStatus(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                venStatus.save()
+                v.save()
+                event.save()
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!

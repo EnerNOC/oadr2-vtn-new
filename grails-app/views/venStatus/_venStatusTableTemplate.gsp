@@ -14,13 +14,13 @@
 		<g:each in="${venStatusList}" var="venStatus">
 			<tr>
 				<td>
-					${venStatus.venID}
+					${venStatus.ven.venID}
 				</td>
 				<td>
-					${venStatus.eventID}
+					${venStatus.event.eventID}
 				</td>
 				<td>
-					${venStatus.program}
+					${venStatus.event.marketContext.programName}
 				</td>
 				<td><g:if test="${venStatus.optStatus == "OPT_OUT"}">
 						<a disabled="disabled" class="btn btn-danger">Opted Out</a>

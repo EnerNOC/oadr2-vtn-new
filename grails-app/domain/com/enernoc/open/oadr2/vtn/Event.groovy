@@ -33,6 +33,7 @@ class Event {
     private DatatypeFactory _dtf
     
     static belongsTo = [marketContext: Program]
+    static hasMany = [venStatus: VenStatus]
     String eventID
     long priority
     Date startDate

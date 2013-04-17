@@ -27,7 +27,8 @@ public class VenStatusController {
      */
     def venStatuses() {
         //def eventList = Event.list()
-        def venStatuses = VenStatus.findAllWhere(eventID: params.eventID)
+        def event = Event.findWhere(eventID: params.eventID)
+        def venStatuses = event.venStatus
         def	eventList = Event.executeQuery("SELECT distinct e.eventID FROM Event e")
         [venStatusList: venStatuses, eventList: eventList, currentEventID: params.eventID]
     }

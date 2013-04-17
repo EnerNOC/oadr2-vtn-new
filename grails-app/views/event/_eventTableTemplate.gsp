@@ -26,10 +26,10 @@
 					${event.status}
 				</td>
 				<td>
-				  <g:formatDate format='MM/dd/yyyy hh:mm aa' date='${event.startDate}' />
+				  <g:formatDate format='dd/MM/yyyy HH:mm' date='${event.startDate}' />
 				</td>
 				<td>
-          <g:formatDate format='MM/dd/yyyy hh:mm aa' date='${event.endDate}' />
+          <g:formatDate format='dd/MM/yyyy HH:mm' date='${event.endDate}' />
 				</td>
 				<td>
 					${event.marketContext.programName}

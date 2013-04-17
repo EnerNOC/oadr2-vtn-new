@@ -4,9 +4,12 @@
 <r:require module="formTime" />
 <g:javascript>
   $(function() {
- 	  $('.dp').datepicker();
-    $('.tp').timepicker();
-    $('.tp1').timepicker();
+ 	  $('.dp').datepicker({
+ 	  format: "dd/mm/yyyy"
+ 	  });
+    $('.tp').timepicker({
+    showMeridian: false
+    });
   });
 </g:javascript>
 </head>
@@ -62,14 +65,14 @@
 			<div class="control-group">
 				<label class="control-label" for="inputStartDate">Start Date: </label>
 				<div class="controls">
-					<g:textField name="startDate" value="${date}" class="dp" id="inputStartDate" />
+					<g:textField name="startDate"  value="${date}" class="dp" id="inputStartDate"/>
 				</div>
 			</div>
 			<div class="control-group">
 					<label class="control-label" for="inputStartTime">Start Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="startTime" value="${time}" class="tp" id="inputStartTime" />
+						<g:textField name="startTime" value="${time}" class="tp" id="inputStartTime"/>
 						<span class="add-on"><i class="icon-time"></i></span>
 					</div>
 				</div>
@@ -84,7 +87,7 @@
 				<label class="control-label" for="inputEndTime">End Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="endTime" value="${time}" id="inputEndTime" class="tp1" />
+						<g:textField name="endTime" value="${time}" id="inputEndTime" class="tp" />
 						<span class="add-on"><i class="icon-time"></i></span>
 					</div>
 				</div>
