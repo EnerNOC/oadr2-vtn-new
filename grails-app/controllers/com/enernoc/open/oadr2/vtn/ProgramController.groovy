@@ -113,8 +113,11 @@ class ProgramController {
      * 
      */
     def editProgram() {
-        def currentProgram = Program.get( params.id )
-        [currentProgram: currentProgram]
+        def model = [:]
+        if ( ! flash.chainModel?.program ) 
+            model.program = Program.get( params.id )
+        // TODO 404 error if this program ID doesn't exist!
+        model
     }
     
     /**
@@ -140,14 +143,14 @@ class ProgramController {
             newProgram.save()
             oldProgram.delete()
             flash.message = "Success, your Program has been updated"
-        } else {
+        }
+        else {
             flash.message="Please fix the errors below: "
             def errors = newProgram.errors.allErrors.collect {
-                messageSource.getMessage(it, null)
+                messageSource.getMessage it, null
             }
-            return chain(action:"blankProgram", model:[errors: errors])
+            return chain(action:"editProgram", model:[errors: errors, program: newProgram])
         }
         redirect(action:"programs")    
-        }
-
+    }
 }

@@ -20,21 +20,21 @@
     <div class="alert">${flash.message}</div>
   </g:elseif>
 
-	<h3>Edit Program: ${ currentProgram.programName }</h3>
+	<h3>Edit Program: ${ program.programName }</h3>
 	<g:form action="updateProgram" class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:program, field:'programName', 'error')}">
 			<label class="control-label" for="inputProgramName">Program Name: </label>
 			<div class="controls">
-				<input type="text" name="programName" value="${ currentProgram.programName }" id="inputProgramName" />
+				<input type="text" name="programName" value="${ program.programName }" id="inputProgramName" />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:program, field:'programURI', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
-				<input type="text" name="programURI" value="${ currentProgram.programURI }" id="inputProgramURI" />
+				<input type="text" name="programURI" value="${ program.programURI }" id="inputProgramURI" />
 			</div>
 		</div>
-		<g:hiddenField name="id" value="${currentProgram.id}" />
+		<g:hiddenField name="id" value="${ program.id }" />
 		<div class="control-group">
 			<div class="controls form-buttons">
 			  <input type="submit" value="Update!" class="btn btn-primary"/>
