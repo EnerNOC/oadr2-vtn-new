@@ -12,7 +12,6 @@ package com.enernoc.oadr2.vtn
 
 class VenStatus {
 
-
     //@Column(name = "EVENTID")
     String eventID
 
@@ -32,15 +31,14 @@ class VenStatus {
     String requestID
 
     static constraints = {
-        requestID(nullable: true)
-        //select a program id from one of the available programs
+        requestID nullable: true
+        time nullable: false
+        optStatus inList: ['optIn', 'optOut']
     }
+    
     public String toString(){
-        return ("\nVEN ID: " + this.venID +
-        "\nEvent ID: " + this.eventID +
-        "\nProgram: " + this.program +
-        "\nStatus: " + this.optStatus +
-        "\nTime: " + this.time.toString())
+        "VEN Status \n  VEN ID: $venID\n  Event ID: $eventID\n  Program: $program" +
+        "\n  Status: $optStatus\n  Time: $time"
     }
 
     /**
@@ -49,9 +47,6 @@ class VenStatus {
      * @return a String of a readable DateTime
      */
     public String displayTime(){
-        return(time.format("MM/dd/yyyy @ h:mm aa"))
+        return time.format("MM/dd/yyyy @ h:mm aa")
     }
-
 }
-
-

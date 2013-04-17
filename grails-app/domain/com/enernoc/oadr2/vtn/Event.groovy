@@ -28,7 +28,7 @@ import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
  * @author Jeff LaJoie
  *
  */
-class Event{
+class Event {
 
     private DatatypeFactory _dtf
     
@@ -42,20 +42,20 @@ class Event{
     long modificationNumber = 0L
 
     static constraints = {
-        eventID(blank: false, unique: true)
-        priority(min: 0L)
-        startDate(validator : { val, obj ->
+        eventID blank: false, unique: true
+        priority min: 0L
+        startDate validator : { val, obj ->
             obj.endDate != null && val < obj.endDate 
-        })
-        endDate(validator : { val, obj ->
+        }
+        endDate validator : { val, obj ->
             obj.startDate != null && val > obj.startDate \
                 && val > new Date() // don't allow events in the past
-        })
-        intervals(min: 1L)
-        modificationNumber(min: 0L)
-        marketContext(validator : { val,obj ->
+        }
+        intervals min: 1L
+        modificationNumber min: 0L
+        marketContext validator : { val,obj ->
             obj.isConflicting()
-        })
+        }
     }
     
     /**
