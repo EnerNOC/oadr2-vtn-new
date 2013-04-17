@@ -45,6 +45,6 @@ class VenStatus {
      * @return a String of a readable DateTime
      */
     public String displayTime(){
-        return time.format("MM/dd/yyyy @ h:mm aa")
+        return time.format("dd/MM/yyyy HH:mm")
     }
 }

@@ -56,8 +56,8 @@ class EventController {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
         def programs = Program.executeQuery("SELECT distinct programName FROM Program")
         def date = new Date()
-        def dateFormatted = g.formatDate(date:date, format:"MM/dd/yyyy")
-        def timeFormatted = g.formatDate(date:date, format:"hh:mm aa")
+        def dateFormatted = g.formatDate(date:date, format:"dd/MM/yyyy")
+        def timeFormatted = g.formatDate(date:date, format:"HH:mm")
         [ programList: programs, date: dateFormatted, time: timeFormatted]
     }
 
@@ -115,7 +115,7 @@ class EventController {
     }
     
     static parseDttm( String date, String time) {
-        return Date.parse( "MM/dd/yyy hh:mm aa", "$date $time")
+        return Date.parse( "dd/MM/yyyy HH:mm", "$date $time")
     }
     
     /**
