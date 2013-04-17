@@ -1,18 +1,5 @@
 package com.enernoc.open.oadr2.vtn
 
-import javax.xml.datatype.DatatypeConfigurationException
-import javax.xml.datatype.DatatypeConstants
-import javax.xml.datatype.DatatypeFactory
-import javax.xml.datatype.Duration
-import javax.xml.datatype.XMLGregorianCalendar
-
-import com.enernoc.open.oadr2.model.CurrentValue
-import com.enernoc.open.oadr2.model.DateTime
-import com.enernoc.open.oadr2.model.EiEvent
-import com.enernoc.open.oadr2.model.EiEventSignal
-import com.enernoc.open.oadr2.model.EventStatusEnumeratedType
-import com.enernoc.open.oadr2.model.ObjectFactory
-import com.enernoc.open.oadr2.model.PayloadFloat
 
 /**
  * Events controller to manage all Event objects created
@@ -26,16 +13,8 @@ class EventController {
     def xmppService
     def eiEventService
     
-    static ObjectFactory objectFactory = new ObjectFactory()
-    static DatatypeFactory datatypeFactory
-    static {
-        try {
-            datatypeFactory = DatatypeFactory.newInstance()
-        } catch (DatatypeConfigurationException e) {
-            throw new RuntimeException("Error creating DatatypeFactory!",e)
-        }
-    }
-
+    static defaultAction = 'events'
+    
     /**
      * Base return for the default rendering of the Events page
      *
@@ -125,7 +104,7 @@ class EventController {
             flash.message="Please fix the errors below"
             def errors = event.errors.allErrors.collect {
                 log.debug "Event creation validation error: $it"
-                messageSource.getMessage(it, null)
+                messageSource.getMessage it, null
             }
             // TODO return invalid event, not a blank event
             return chain(action:"blankEvent", model:[errors: errors])

@@ -146,8 +146,8 @@ class Event {
             endDate > this.startDate
             startDate < this.endDate
             id != tempID
-            cancelled != true }.findAll()
-        return activePrograms.size() == 0
+            cancelled != true }.count()
+        return activePrograms == 0
     }
 
     /**

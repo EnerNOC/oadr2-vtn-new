@@ -1,15 +1,5 @@
 package com.enernoc.open.oadr2.vtn
 
-
-//import play.db.jpa.JPA
-//import play.db.jpa.Transactional
-//import play.mvc.Controller
-//import play.mvc.Result
-//import service.XmppService
-//import service.oadr.EiEventService
-
-//import com.google.inject.Inject
-
 /**
  * Controller to handle the XMPP and HTTP services as well as the VENStatuses
  * 
@@ -18,9 +8,8 @@ package com.enernoc.open.oadr2.vtn
  */
 public class VenStatusController {
 
-    //@Inject static EiEventService eiEventService
-    //@Inject static XmppService xmppService
-
+    static defaultAction = 'venStatuses'
+    
     /**
      * Base method called to access the default page for the VENStatuses controller
      *  

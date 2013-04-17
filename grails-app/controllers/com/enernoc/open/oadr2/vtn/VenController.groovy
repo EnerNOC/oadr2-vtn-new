@@ -4,6 +4,9 @@ package com.enernoc.open.oadr2.vtn
 
 class VenController {
     def messageSource
+    
+    static defaultAction = 'vens'
+    
     def index() {
         redirect(action:"vens")
     }

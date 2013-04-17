@@ -1,6 +1,5 @@
 package com.enernoc.open.oadr2.vtn
 
-import quicktime.std.movies.media.FlashDescription;
 
 
 class ProgramController {
