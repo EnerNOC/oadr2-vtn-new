@@ -1,6 +1,5 @@
-import com.enernoc.oadr2.vtn.Program
-import com.enernoc.oadr2.vtn.Ven
-import com.enernoc.oadr2.vtn.XmppService
+import com.enernoc.open.oadr2.vtn.Program
+import com.enernoc.open.oadr2.vtn.Ven
 
 
 /**
@@ -10,7 +9,6 @@ import com.enernoc.oadr2.vtn.XmppService
  */
 class BootStrap {
 
-	def xmppService
     def init = { servletContext ->
 		def pro1 = new Program(programName:"test-program-one", programURI:"http://test-uri-one.com")
 		def pro2 = new Program(programName:"test-program-two", programURI:"http://test-uri-two.com")

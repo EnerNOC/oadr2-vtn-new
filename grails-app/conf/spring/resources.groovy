@@ -1,6 +1,6 @@
-import com.enernoc.oadr2.vtn.EiEventService
-import com.enernoc.oadr2.vtn.XmppService
-import com.enernoc.oadr2.vtn.PushService
+import com.enernoc.open.oadr2.vtn.EiEventService
+import com.enernoc.open.oadr2.vtn.XmppService
+import com.enernoc.open.oadr2.vtn.PushService
 
 beans = {
 	
