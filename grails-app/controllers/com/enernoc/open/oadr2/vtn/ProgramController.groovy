@@ -1,7 +1,6 @@
 package com.enernoc.open.oadr2.vtn
 
 
-
 class ProgramController {
     def messageSource
     
@@ -103,9 +102,12 @@ class ProgramController {
 
     def deleteProgram() {
         def program = Program.get(params.id)
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
         program.delete()
-        redirect(action:"programs")
-        //render(params.id)
+        redirect action: "programs"
     }
     
     /**
@@ -114,9 +116,12 @@ class ProgramController {
      */
     def editProgram() {
         def model = [:]
-        if ( ! flash.chainModel?.program ) 
-            model.program = Program.get( params.id )
-        // TODO 404 error if this program ID doesn't exist!
+        def program = Program.get params.id
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
+        if ( ! flash.chainModel?.program ) model.program = program 
         model
     }
     
@@ -126,31 +131,27 @@ class ProgramController {
      * 
      */
     def updateProgram() {
-        def oldProgram = Program.get( params.id )
-        def newProgram = new Program(params)
-        newProgram.id = oldProgram.id
-        if (newProgram.validate()) {
-            oldProgram.ven.each { v ->
-                oldProgram.removeFromVen(v)
-                newProgram.addToVen(v)
-                v.programID = newProgram.programName
-            }
-            oldProgram.event.each { e ->
-                oldProgram.removeFromEvent(e)
-                newProgram.addToEvent(e)
-                e.programName = newProgram.programName
-            }
-            newProgram.save()
-            oldProgram.delete()
+        def program = Program.get params.id
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
+        
+        params.remove('id')
+        program.properties = params
+//        bindData program, params, exclude:['id']
+        if (program.validate() ) {
+            program.save()
             flash.message = "Success, your Program has been updated"
         }
         else {
             flash.message="Please fix the errors below: "
-            def errors = newProgram.errors.allErrors.collect {
+            def errors = program.errors.allErrors.collect {
                 messageSource.getMessage it, null
             }
-            return chain(action:"editProgram", model:[errors: errors, program: newProgram])
+            return chain( action:"editProgram", id: program.id, 
+                model:[errors: errors, program: program] )
         }
-        redirect(action:"programs")    
+        redirect action: "programs"
     }
 }
