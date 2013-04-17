@@ -10,7 +10,6 @@
     $('.tp').timepicker({
     showMeridian: false
     });
-    $('.tp1').timepicker();
   });
 </g:javascript>
 </head>
