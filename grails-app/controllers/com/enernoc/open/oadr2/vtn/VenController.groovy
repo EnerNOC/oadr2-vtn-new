@@ -120,23 +120,21 @@ class VenController {
      * 
      */
     def updateVEN() {
-        def oldVen = Ven.get( params.id )
-        def newVen = new Ven(params)
-        newVen.id = oldVen.id
+        def ven = Ven.get( params.id )
         def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
-        def oldProgram = Program.find("from Program as p where p.programName=?", [oldVen.programID])
+        def oldProgram = Program.find("from Program as p where p.programName=?", [ven.programID])        
+        oldProgram.removeFromVen(ven)
         if (newProgram!=null) {
-            newProgram.addToVen(newVen)
+            newProgram.addToVen(ven)
         }
-        if (newVen.validate()) {
-            oldProgram.removeFromVen(oldVen)
+        ven.properties = params
+        if (ven.validate()) {
             oldProgram.save()
-            oldVen.delete()
             newProgram.save()            
             flash.message="Success, your VEN has been updated"
         } else {
             flash.message="Please fix the errors below: "
-            def errors = newVen.errors.allErrors.collect {
+            def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
             }
             return chain(action:"editVEN", model: [errors: errors], params: [id : params.id])

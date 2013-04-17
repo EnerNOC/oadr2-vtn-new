@@ -250,7 +250,7 @@ class EventController {
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
             venStatus.eventID = event.eventID
-            venStatus.program = v.programID
+            venStatus.program = event.marketContext.programName
             venStatus.venID = v.venID
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
@@ -258,7 +258,7 @@ class EventController {
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!
-            else log.warn "Validation error for venStatus {}", venStatus
+            else log.warn "Validation error for venStatus ${venStatus}"
         }
     }
 }
