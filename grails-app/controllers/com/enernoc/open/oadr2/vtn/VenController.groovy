@@ -44,8 +44,11 @@ class VenController {
 
     def blankVEN() {
         //def programs = Program.listOrderByProgramName(order:"desc")
-        def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
-        [programsList: programs]
+        def model = [:]
+        model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        if ( ! flash.chainModel?.ven )
+            model.ven = new Ven() 
+        model
     }
     /**
      * Creates a VEN in the table from the submitted form
@@ -82,7 +85,7 @@ class VenController {
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"blankVEN", model:[errors: errors])
+            return chain(action:"blankVEN", model:[errors: errors, ven: ven])
         }
         redirect(action:"vens")
 
@@ -112,9 +115,11 @@ class VenController {
      *     
      */
     def editVEN() {
-        def currentVen = Ven.get(params.id)
-        def programs = Program.executeQuery("SELECT distinct b.programName FROM Program b")
-        [currentVen: currentVen, programsList: programs]
+        def model = [:]
+        model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        if ( ! flash.chainModel?.currentVen)
+            model.currentVen = Ven.get(params.id)
+        model
     }
     
     /**
@@ -140,7 +145,7 @@ class VenController {
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"editVEN", model: [errors: errors], params: [id : params.id])
+            return chain(action:"editVEN", model: [errors: errors, currentVen: ven])
         }
         redirect(action:"vens")
     }

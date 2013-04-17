@@ -13,5 +13,6 @@ class Ven {
     static constraints = {
         venID blank: false, unique: true
         clientURI nullable: true, url:true
+        program nullable: false
     }    
 }

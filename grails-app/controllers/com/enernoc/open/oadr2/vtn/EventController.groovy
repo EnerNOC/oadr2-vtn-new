@@ -54,11 +54,11 @@ class EventController {
      */
     def blankEvent() {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
-        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
-        def date = new Date()
-        def dateFormatted = g.formatDate(date:date, format:"dd/MM/yyyy")
-        def timeFormatted = g.formatDate(date:date, format:"HH:mm")
-        [ programList: programs, date: dateFormatted, time: timeFormatted]
+        def model = [:]        
+        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
+        if( ! flash.chainModel?.event )
+            model.event = new Event(startDate: new Date(), endDate:new Date())
+        model
     }
 
     /**
@@ -107,7 +107,7 @@ class EventController {
                 messageSource.getMessage it, null
             }
             // TODO return invalid event, not a blank event
-            return chain(action:"blankEvent", model:[errors: errors])
+            return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
         redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
@@ -146,10 +146,11 @@ class EventController {
     }
 
     def editEvent() {
-        def currentEvent = Event.get(params.id)
-        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
-
-        [currentEvent: currentEvent, programList: programs]
+        def model = [:]
+        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
+        if ( ! flash.chainModel?.currentEvent )
+            model.currentEvent = Event.get(params.id)
+        model
     }
 
     /**
@@ -190,7 +191,7 @@ class EventController {
                 log.debug "Event update validation error: $it"
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[errors: errors], params:[id: params.id])
+            return chain(action:"editEvent", model:[errors: errors, currentEvent: event])
         }
         chain action:"events", model:[error: null]
     }

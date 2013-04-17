@@ -22,22 +22,22 @@
 	
 	<h3>Create a VEN</h3>
 	<g:form action="newVEN" class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:ven,field:'program', 'error')}">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
-				<g:select name="programID" from="${programsList}" noSelection="[null:'- Choose a Program -']" id="selectProgram" />
+				<g:select name="programID" from="${programsList}" value="${ven.programID}" noSelection="[null:'- Choose a Program -']" id="selectProgram" />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:ven,field:'venName', 'error')}">
 			<label class="control-label" for="inputVenName">VEN Name: </label>
 			<div class="controls">
-				<input type="text" name="venName" placeholder="My Name" id="inputVenName" />
+				<input type="text" name="venName" value="${ven.venName}" placeholder="My Name" id="inputVenName"/>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:ven,field:'venID', 'error')}">
 			<label class="control-label" for="inputVenID">VEN ID: </label>
 			<div class="controls">
-				<input type="text" name="venID" placeholder="My ID" id="inputVenID" />
+				<input type="text" name="venID" value="${ven.venID}" placeholder="My ID" id="inputVenID" />
 			</div>
 		</div>
 		<div class="control-group">
@@ -50,10 +50,10 @@
 				</label>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:ven,field:'clientURI', 'error')}">
 			<label class="control-label" for="inputClientURI">Client URI:</label>
 			<div class="controls">
-				<input id="clientURI" type="text" name="clientURI" placeholder="My Client" id="inputClientURI" />
+				<input id="clientURI" type="text" name="clientURI" value="${ven.clientURI}" placeholder="My Client" id="inputClientURI" />
 			</div>
 		</div>
 		<div class="control-group">

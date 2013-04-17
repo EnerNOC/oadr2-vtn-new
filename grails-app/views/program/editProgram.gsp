@@ -22,13 +22,13 @@
 
 	<h3>Edit Program: ${ currentProgram.programName }</h3>
 	<g:form action="updateProgram" class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentProgram,field:'programName', 'error')}">
 			<label class="control-label" for="inputProgramName">Program Name: </label>
 			<div class="controls">
 				<input type="text" name="programName" value="${ currentProgram.programName }" id="inputProgramName" />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentProgram,field:'programURI', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
 				<input type="text" name="programURI" value="${ currentProgram.programURI }" id="inputProgramURI" />

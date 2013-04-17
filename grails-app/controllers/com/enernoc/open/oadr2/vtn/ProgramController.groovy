@@ -51,7 +51,7 @@ class ProgramController {
     def blankProgram() {
         def model = [:]
         if ( ! flash.chainModel?.program ) 
-            model.program = new Program(programName:"New program",programURI:"http://openadr.org")
+            model.program = new Program()
         model
     }
 
@@ -113,8 +113,10 @@ class ProgramController {
      * 
      */
     def editProgram() {
-        def currentProgram = Program.get( params.id )
-        [currentProgram: currentProgram]
+        def model =[:]
+        if ( ! flash.chainModel?.currentProgram )
+            model.currentProgram = Program.get( params.id )
+        model
     }
     
     /**
@@ -123,29 +125,21 @@ class ProgramController {
      * 
      */
     def updateProgram() {
-        def oldProgram = Program.get( params.id )
-        def newProgram = new Program(params)
-        newProgram.id = oldProgram.id
-        if (newProgram.validate()) {
-            oldProgram.ven.each { v ->
-                oldProgram.removeFromVen(v)
-                newProgram.addToVen(v)
-                v.programID = newProgram.programName
+        def program = Program.get( params.id )
+        program.properties = params
+        if (program.validate()) {
+            //TODO Once ven.programID is remove this loop will be removed
+            program.ven.each {v->
+                v.venID = program.programName
             }
-            oldProgram.event.each { e ->
-                oldProgram.removeFromEvent(e)
-                newProgram.addToEvent(e)
-                e.programName = newProgram.programName
-            }
-            newProgram.save()
-            oldProgram.delete()
+            program.save()
             flash.message = "Success, your Program has been updated"
         } else {
             flash.message="Please fix the errors below: "
-            def errors = newProgram.errors.allErrors.collect {
+            def errors = program.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"blankProgram", model:[errors: errors])
+            return chain(action:"editProgram", model:[errors: errors, currentProgram: program])
         }
         redirect(action:"programs")    
         }
