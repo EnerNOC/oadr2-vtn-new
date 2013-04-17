@@ -1,13 +1,18 @@
 package com.enernoc.open.oadr2.vtn
 
+import quicktime.std.movies.media.FlashDescription;
+
 
 class ProgramController {
+    def messageSource
+    
+    static defaultAction = 'programs'
+    
     /**
      * Base method called to access the default page for the Programs controller
      *
      * @return a redirect to the programs() call as to render the default page
      */
-    def messageSource
     def index() {
         return redirect(action: "programs")
     }
@@ -45,8 +50,10 @@ class ProgramController {
      }*/
 
     def blankProgram() {
-        def placeholder="Key collision adding Map to CompositeMap if placeholder does not exist"
-        [placeholder: placeholder]
+        def model = [:]
+        if ( ! flash.chainModel?.program ) 
+            model.program = new Program(programName:"New program",programURI:"http://openadr.org")
+        model
     }
 
     /**
@@ -69,17 +76,18 @@ class ProgramController {
 
     def newProgram() {
         def program = new Program(params)
-        if (program.validate()) {
+        if ( program.validate() ) {
             program.save()
             flash.message = "Success, your Program has been created"
-        } else {
+        } 
+        else {
             flash.message="Please fix the errors below: "
             def errors = program.errors.allErrors.collect {
-                messageSource.getMessage(it, null)
+                messageSource.getMessage it, null
             }
-            return chain(action:"blankProgram", model:[errors: errors])
+            return chain(action:"blankProgram", model:[errors: errors, program: program])
         }
-        redirect(action:"programs")
+        redirect action: "programs"
     }
     /**
      *

@@ -21,17 +21,20 @@
   </g:elseif>
 	
 	<h3>Market Context</h3>
-	<g:form action="newProgram" class="form-horizontal">
-		<div class="control-group">
+	<g:form action="newProgram" method="POST" class="form-horizontal">
+		<div class="control-group ${hasErrors(bean:program,field:'programName', 'error')}">
 			<label class="control-label" for="inputProgramName">Program Name: </label>
 			<div class="controls">
-				<input type="text" name="programName" placeholder="My Name" id="inputProgramName" />
+				<input type="text" name="programName" placeholder="My Name" id="inputProgramName"
+				  value='${program.programName}' />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:program,field:'programURI', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
-				<input type="text" name="programURI" placeholder="My URI" id="inputProgramURI" />
+				<input type="text" name="programURI" placeholder="My URI" id="inputProgramURI" 
+				  class="${hasErrors(bean:program,field:'programURI', 'error')}"
+				  value='${program.programURI}'/>
 			</div>
 		</div>
 		<div class="control-group">
