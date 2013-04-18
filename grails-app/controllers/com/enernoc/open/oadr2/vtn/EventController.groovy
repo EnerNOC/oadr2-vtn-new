@@ -96,7 +96,8 @@ class EventController {
             populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
-            event.save()
+            program.addToEvent(event)
+            program.save()
             flash.message="Success, your event has been created"
         }
         else {
@@ -197,7 +198,7 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
-        def program = Program.find("from Program as p where p.programName=?", [params.programName])
+        def newProgram = Program.find("from Program as p where p.programName=?", [params.programName])
         params.remove 'programName'
         def event = Event.get(params.id)
         if ( ! event ) {
@@ -205,12 +206,16 @@ class EventController {
             return
         }
         // FIXME it should not be possible to change the program for an event!
+        def oldProgram = event.marketContext
         event.properties = params
-        event.marketContext = program
+        event.marketContext = newProgram
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            event.save()
+            oldProgram.removeFromEvent(event)
+            newProgram.addToEvent(event)
+            oldProgram.save()
+            newProgram.save()
             //populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
