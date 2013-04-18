@@ -38,7 +38,7 @@
 			<div class="control-group ${hasErrors(bean:event,field:'marketContext', 'error')}">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programName" from="${programsList}" value="${event.marketContext}" noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
+					<g:select name="programID" from="${programsList}" value="${event.marketContext?.id}" optionKey="id" noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
 				</div>
 			</div>
 			<h3>Event Descriptor</h3>

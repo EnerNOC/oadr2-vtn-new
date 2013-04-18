@@ -31,7 +31,7 @@ public class VenStatusController {
         def event = Event.findWhere(eventID: params.eventID)
         def venStatuses = event.venStatus
         def	eventList = Event.executeQuery("SELECT distinct e.eventID FROM Event e")
-        [venStatusList: venStatuses, eventList: eventList, currentEventID: params.eventID, event: event.eventID]
+        [venStatusList: venStatuses, eventList: eventList, event: event.eventID]
     }
 
     /** Removes the venStatus with the given id from the database

@@ -98,11 +98,12 @@ class VenController {
     def editVEN() {
         def model = [:]
         model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
-        if ( ! flash.chainModel?.currentVen)
+        if ( ! flash.chainModel?.currentVen) {
             model.currentVen = Ven.get(params.id)
-        if ( ! model.currentVen ) {
-            response.sendError 404, "No ven for ID $params.id"
-            return
+            if ( ! model.currentVen ) {
+                response.sendError 404, "No ven for ID $params.id"
+                return
+            }
         }
         model
     }

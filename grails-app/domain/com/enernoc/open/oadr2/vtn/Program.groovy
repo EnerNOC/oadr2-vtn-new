@@ -17,5 +17,9 @@ class Program {
     static constraints = {
         programName blank: false, nullable: false, unique: true
         programURI blank:false, url:true
-    }    
+    }  
+    
+    public String toString(){
+        programName
+    }
 }

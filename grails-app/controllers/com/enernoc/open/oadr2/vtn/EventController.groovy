@@ -55,7 +55,7 @@ class EventController {
     def blankEvent() {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
         def model = [:]        
-        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
+        model.programsList = Program.list()
         if( ! flash.chainModel?.event )
             model.event = new Event(startDate: new Date(), endDate:new Date())
         model
@@ -85,10 +85,14 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
 
+        def program = Program.get( params.programID.toLong() )
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.programID"
+            return
+        } 
+        
+        params.remove( 'programID' )
         def event = new Event(params)
-        // TODO should use ID, not program name
-        def program = Program.find("from Program as p where p.programName=?", [params.programName])
-
         event.marketContext = program
 
         if ( event.validate() ) {
@@ -167,12 +171,13 @@ class EventController {
      */
     def editEvent() {
         def model = [:]
-        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
-        if ( ! flash.chainModel?.currentEvent )
+        model.programsList = Program.list()
+        if ( ! flash.chainModel?.currentEvent ) {
             model.currentEvent = Event.get(params.id)
-        if ( ! model.currentEvent ) {
-            response.sendError 404, "No event for ID $params.id"
-            return
+            if ( ! model.currentEvent ) {
+                response.sendError 404, "No event for ID $params.id"
+                return
+            }
         }
         model
     }
@@ -198,8 +203,13 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
-        def newProgram = Program.find("from Program as p where p.programName=?", [params.programName])
-        params.remove 'programName'
+        def newProgram = Program.get( params.programID.toLong() )
+        if ( ! newProgram ) {
+            response.sendError 404, "No program for ID $params.programID"
+            return
+        } 
+        
+        params.remove 'programID'
         def event = Event.get(params.id)
         if ( ! event ) {
             response.sendError 404, "No event for ID $params.id"
