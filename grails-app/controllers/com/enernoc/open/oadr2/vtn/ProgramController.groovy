@@ -1,7 +1,13 @@
 package com.enernoc.open.oadr2.vtn
 
 
-
+/**
+ * Program controller to manage all Program objects created
+ * and the display page for those objects
+ *
+ * @author Yang Xiang
+ * 
+ */
 class ProgramController {
     def messageSource
     
@@ -19,35 +25,19 @@ class ProgramController {
     /**
      * Default method to render the page for the Program table
      *
-     * @return the default render page for Program display and deletion
+     * @return the default render page for Program display, edit and deletion
      */
-
     def programs() {
-        /**
-         * Comparator to sort the Program table by name
-         *
-         * @author Jeff LaJoie
-         *
-         class ProgramFormComparator implements Comparator<Program>{
-         public int compare(Program programOne, Program programTwo){
-         return programOne.getProgramName().compareTo(programTwo.getProgramName())
-         }
-         }
-         List<Program> programs = JPA.em().createQuery("FROM Program").getResultList()
-         Collections.sort(programs, new ProgramFormComparator())
-         return ok(views.html.programs.render(programs))*/
         def results = Program.listOrderByProgramName(order:"desc")
         [programList: results]
     }
 
     /**
-     * Called upon submission of the Create Program button
+     * The default page render for new program to be created based on
+     * the file at program/blankProgram.gsp
      *
-     * @return a rendering of the Program creation form with all fields blank
-     public static Result blankProgram(){
-     return ok(views.html.newProgram.render(form(Program.class)))
-     }*/
-
+     * @return the rendered page to create an program
+     */
     def blankProgram() {
         def model = [:]
         if ( ! flash.chainModel?.program ) 
@@ -56,23 +46,11 @@ class ProgramController {
     }
 
     /**
-     * Persists the form from the newProgram page to the Program table
+     * Persists the form from the blankProgram page to the database
      *
-     * @return a redirect to the default display page with the Program added
-     @Transactional
-     public static Result newProgram(){
-     Form<Program> filledForm = form(Program.class).bindFromRequest()
-     if(filledForm.hasErrors()){
-     return badRequest()
-     }
-     else{
-     Program newProgram = filledForm.get()
-     JPA.em().persist(newProgram)
-     flash("success", "Program as been created")
-     }
-     return redirect(routes.Programs.programs())
-     }*/
-
+     * @return on success: a redirect to the programs()
+     * @return on fail: a chain to blankProgram with invalid program
+     */
     def newProgram() {
         def program = new Program(params)
         if ( program.validate() ) {
@@ -88,19 +66,13 @@ class ProgramController {
         }
         redirect action: "programs"
     }
+    
     /**
+     * Removes the Program with the given id from the database
      *
      * @param id - the database ID of the Program to be deleted
-     * @return a redirect to the default display page without the deleted Program
+     * @return a redirect to programs() without the deleted Program
      */
-    /*@Transactional
-     public static Result deleteProgram(Long id){
-     Program program = JPA.em().find(Program.class, id)
-     flash("success", "Program has been deleted")
-     JPA.em().remove(program)
-     return redirect(routes.Programs.programs())
-     }*/
-
     def deleteProgram() {
         def program = Program.get(params.id)
         if ( ! program ) {
@@ -109,12 +81,13 @@ class ProgramController {
         }
         program.delete()
         redirect(action:"programs")
-        //render(params.id)
     }
     
     /**
      * Edits the program with the given id
      * 
+     * @param id - database ID of Program to be updated
+     * @return renders program/editProgram.gsp for form submission
      */
     def editProgram() {
         def model =[:]
@@ -128,9 +101,10 @@ class ProgramController {
     }
     
     /**
-     * Updates the program from editProgram() with new user input
-     * If fails return to editProgram() else programs()
-     * 
+     * Persists the form from the editProgram page to the database
+     *
+     * @return on success: a redirect to the programs()
+     * @return on fail: a chain to editProgram with invalid program
      */
     def updateProgram() {
         def program = Program.get( params.id )

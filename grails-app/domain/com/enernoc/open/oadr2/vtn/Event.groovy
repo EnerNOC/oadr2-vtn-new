@@ -21,11 +21,13 @@ import com.enernoc.open.oadr2.model.Properties
 import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
 
 
+
 /**
- * A wrapper class to use the Play specific binding to cast 
- * a form to an EiEvent as well as manage the event itself
+ * Model class for Events that persists unto the database
+ * Events will always be enrolled in a Program and may link to multiple VenStatuses
+ * May be converted into EiEvent for XML handling 
  * 
- * @author Jeff LaJoie
+ * @authors Thom Nichols, Yang Xiang
  *
  */
 class Event {
@@ -83,6 +85,10 @@ class Event {
         // TODO determine if "far" or "near"
     }
     
+    /**
+     * Creates DatatypeFactory instance
+     * @return DatatypeFactory
+     */
     protected DatatypeFactory getDtf() {
         if ( this._dtf == null ) {
             try {
@@ -133,10 +139,9 @@ class Event {
     }
 
     /**
-     * compares if two events are conflicting by using events as oppose to eiEvents
-     * modified to fit a groovier framework
-     * @author Yang Xiang
+     * compares if two events are enrolled in the same program with overlapping times
      * 
+     * @return boolean value 
      */
     private boolean isConflicting() {
         //Event.where breaks if null exists, thus an indirect id to designate a value
@@ -150,26 +155,4 @@ class Event {
             cancelled != true }.count()
         return activePrograms == 0
     }
-
-    /**
-     * Creates an EiEvent with only mandatory fields filled in
-     * 
-     * @return an incomplete EiEvent which is still fully acceptable for conflict comparison
-     */
-    /*
-    public EiEvent getQuasiEvent(){
-        return new EiEvent()
-            .withEventDescriptor(new EventDescriptor()
-                .withEventID(eventID)
-                .withEiMarketContext(new EiMarketContext()
-                    .withMarketContext(new MarketContext()
-                        .withValue(marketContext.programName))))
-            .withEiActivePeriod(new EiActivePeriod()
-                .withProperties(new Properties()
-                    .withDtstart(new Dtstart(new DateTime(this.xmlStart)))
-                    .withDuration(new DurationPropType()
-                        .withDuration(new DurationValue(
-                            this.eventDuration.toString())))))
-    }
-    */
 }

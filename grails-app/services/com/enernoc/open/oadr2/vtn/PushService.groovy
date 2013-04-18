@@ -19,7 +19,7 @@ import com.enernoc.open.oadr2.vtn.EventPushTask
  * TODO make this configurable; define an interface so a true queueing
  * mechanism can be used.
  * 
- * @author Jeff LaJoie
+ * @author Thom Nichols
  */
 public class PushService {
 

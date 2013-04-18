@@ -1,5 +1,13 @@
 package com.enernoc.open.oadr2.vtn
 
+
+/**
+ * Model class for VEN that persists unto the database
+ * Ven may have multiple Programs and VenStatuses
+ * 
+ * @author Yang Xiang
+ *
+ */
 class Ven {
 
     String venID

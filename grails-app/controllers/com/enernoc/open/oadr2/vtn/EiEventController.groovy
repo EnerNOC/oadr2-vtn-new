@@ -6,12 +6,17 @@ import javax.xml.bind.Unmarshaller
 
 import com.enernoc.open.oadr2.xmpp.JAXBManager
 
+
+
 /**
- * Controller to respond for OADR requests with an XML payload
+ * Controller class to handle HTTP Requests
+ *
+ * @authors Thom Nichols, Yang Xiang
+ *
  */
+
 public class EiEventController {
     
-//    static allowedMethods = [post:'POST']
     
     static JAXBManager jaxbManager // this is threadsafe
     
@@ -26,10 +31,9 @@ public class EiEventController {
     EiEventService eiEventService
 
     /**
-     * Returns a Result object that will be returned via the PlayFramework
-     * containing the payload based upon the incoming HTTP request
-     * 
-     * @return the Result to be rendered by PlayFramework 
+     * handles a HTTP POST 
+     * unmarshalls and re-marshalls xml
+     * @return null 
      * @throws JAXBException
      */
     def post() throws JAXBException {
@@ -62,6 +66,11 @@ public class EiEventController {
         }
     }
     
+    /**
+     * Default render if user attempts to access the URL path to controller
+     * 
+     * @return render text
+     */
     def index() {
         render status: 406, contentType: "text/plain", 
             text: "You must POST an oadrRequestEvent or oadrCreatedEvent"

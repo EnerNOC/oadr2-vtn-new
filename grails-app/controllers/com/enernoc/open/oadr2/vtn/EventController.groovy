@@ -5,7 +5,8 @@ package com.enernoc.open.oadr2.vtn
  * Events controller to manage all Event objects created
  * and the display page for those objects
  *
- * @author Jeff LaJoie
+ * @author Yang Xiang
+ * 
  */
 class EventController {
     def messageSource
@@ -18,17 +19,16 @@ class EventController {
     /**
      * Base return for the default rendering of the Events page
      *
-     * @return a redirect for the routes.Events.events() route
+     * @return a redirect for the events()
      */
     def index() {
         redirect action:"events"
     }
 
     /**
-     * The default page render for Events, inclusive of ordering of EiEvents
-     * based on their start DateTime, in ascending order
+     * Default method to render the page for the Event table
      *
-     * @return the rendered views.html.events page with a sorted list of EiEvents
+     * @return the default render page for event display, edit and deletion
      */
     def events() {
         def event = Event.list()
@@ -48,9 +48,9 @@ class EventController {
     
     /**
      * The default page render for new events to be created based on
-     * the file at views.html.newEvent
+     * the file at event/blankEvent.gsp
      *
-     * @return the rendered page to create an event, with all fields vacant
+     * @return the rendered page to create an event
      */
     def blankEvent() {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
@@ -64,8 +64,9 @@ class EventController {
     /**
      * Method called on the newEvent page when the Create this event button is submitted
      *
-     * @return a redirect to the VENStatus page based on the EventID of the created Event
-     * @throws JAXBException
+     * @param Event 
+     * @return on success: redirect to the VENStatus page based on the EventID of the created Event
+     * @return on fail: chains to blankEvent() with invalid event
      */
     def newEvent() {
         try {
@@ -88,12 +89,10 @@ class EventController {
         // TODO should use ID, not program name
         def program = Program.find("from Program as p where p.programName=?", [params.programName])
 
-//        if (program != null) program.addToEvent(event)
         event.marketContext = program
 
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-//            program.save()
             populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
@@ -114,6 +113,13 @@ class EventController {
 
     }
     
+    /**
+     * Parses the String date and String time into a Date object
+     * 
+     * @param String date
+     * @param String time
+     * @return Date
+     */
     static parseDttm( String date, String time) {
         return Date.parse( "dd/MM/yyyy HH:mm", "$date $time")
     }
@@ -149,10 +155,15 @@ class EventController {
             return
         }
         event.delete()
-        //flash("success", "Event has been deleted")
         redirect actions: "events"
     }
 
+    /**
+     * On the Event display page, allows user to edit selected event
+     *
+     * @param id - The database ID of the Event to be edited
+     * @return renders event/editEvent.gsp to allow user to update current event
+     */
     def editEvent() {
         def model = [:]
         model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
@@ -167,6 +178,10 @@ class EventController {
 
     /**
      * Updates the event with a given id with the new parameters input from the user
+     * 
+     * @param Event, id
+     * @return on success: redirects to events() to render updated event
+     * @return on fail: chains to editEvent() with the invalid event
      */
     def updateEvent() {
         try {
