@@ -31,7 +31,7 @@ public class VenStatusController {
         def event = Event.findWhere(eventID: params.eventID)
         def venStatuses = event.venStatus
         def	eventList = Event.executeQuery("SELECT distinct e.eventID FROM Event e")
-        [venStatusList: venStatuses, eventList: eventList, currentEventID: params.eventID]
+        [venStatusList: venStatuses, eventList: eventList, currentEventID: params.eventID, event: event.eventID]
     }
 
     /** Removes the venStatus with the given id from the database
@@ -41,7 +41,12 @@ public class VenStatusController {
      */
     def deleteStatus(){
         def venStatus = VenStatus.get(params.id)
+        if ( ! venStatus ) {
+            response.sendError 404, "No VEN Status for ID $params.id"
+            return
+        }
+        def event = venStatus.event.eventID
         venStatus.delete()
-        redirect(action:"venStatuses", params:[program: params.program])
+        redirect(action:"venStatuses", params:[eventID: event])
     }
 }
