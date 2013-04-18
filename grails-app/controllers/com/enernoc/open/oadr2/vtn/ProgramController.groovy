@@ -91,11 +91,12 @@ class ProgramController {
      */
     def editProgram() {
         def model =[:]
-        if ( ! flash.chainModel?.currentProgram )
+        if ( ! flash.chainModel?.currentProgram ) {
             model.currentProgram = Program.get( params.id )
-        if ( ! model.currentProgram ) {
-            response.sendError 404, "No program for ID $params.id"
-            return
+            if ( ! model.currentProgram ) {
+                response.sendError 404, "No program for ID $params.id"
+                return
+            }
         }
         model
     }
