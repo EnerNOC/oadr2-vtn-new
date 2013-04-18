@@ -32,7 +32,7 @@
 		<div class="control-group ${hasErrors(bean:program,field:'programURI', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
-				<input type="text" name="programURI" placeholder="My URI" id="inputProgramURI" 
+				<input type="text" name="programURI" placeholder="http://MyURI.com" id="inputProgramURI" 
 				  class="${hasErrors(bean:program,field:'programURI', 'error')}"
 				  value='${program.programURI}'/>
 			</div>

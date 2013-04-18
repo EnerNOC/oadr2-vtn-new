@@ -22,19 +22,19 @@
 	
 	<h3>Edit VEN: ${ currentVen.venID }</h3>
 	<g:form action="updateVEN" class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentVen,field:'program', 'error')}">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
 				<g:select name="programID" from="${programsList}" value="${ currentVen.programID }" id="selectProgram" />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentVen,field:'venName', 'error')}">
 			<label class="control-label" for="inputVenName">VEN Name: </label>
 			<div class="controls">
 				<input type="text" name="venName" value="${ currentVen.venName }" id="inputVenName" />
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentVen,field:'venID', 'error')}">
 			<label class="control-label" for="inputVenID">VEN ID: </label>
 			<div class="controls">
 				<input type="text" name="venID" value="${ currentVen.venID }" id="inputVenID" />
@@ -50,7 +50,7 @@
 				</label>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group ${hasErrors(bean:currentVen,field:'clientURI', 'error')}">
 			<label class="control-label" for="inputClientURI">Client URI: </label>
 			<div class="controls">
 				<input id="clientURI" type="text" name="clientURI" value="${ currentVen.clientURI }" id="inputClientURI" />

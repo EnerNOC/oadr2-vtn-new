@@ -35,59 +35,59 @@
 	<fieldset>
 		<g:form action="newEvent" class="form-horizontal">
 			<h3>Program</h3>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'marketContext', 'error')}">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programName" from="${programList}" noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
+					<g:select name="programName" from="${programsList}" value="${event.marketContext}" noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
 				</div>
 			</div>
 			<h3>Event Descriptor</h3>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'eventID', 'error')}">
 				<label class="control-label" for="inputEvent">Event ID: </label>
 				<div class="controls">
-					<input type="text" name="eventID" id="inputEvent"
+					<input type="text" name="eventID" id="inputEvent" value="${event.eventID}"
 						placeholder="Event ID" />
 				</div>
 			</div>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'priority', 'error')}">
 				<label class="control-label" for="inputPriority">Priority: </label>
 				<div class="controls">
-					<input type="text" name="priority" placeholder="0" id="inputPriority" />
+					<input type="text" name="priority" value="${event.priority}" placeholder="0" id="inputPriority" />
 				</div>
 			</div>
 			<h3>Active Period</h3>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'intervals', 'error')}">
 				<label class="control-label" for="inputInterval">Intervals: </label>
 				<div class="controls">
-					<g:textField name="intervals" placeholder="1" id="inputInterval" />
+					<g:textField name="intervals" value="${event.intervals}" placeholder="1" id="inputInterval" />
 				</div>
 			</div>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'startDate', 'error')}">
 				<label class="control-label" for="inputStartDate">Start Date: </label>
 				<div class="controls">
-					<g:textField name="startDate"  value="${date}" class="dp" id="inputStartDate"/>
+					<g:textField name="startDate"  value="${ g.formatDate(date:event.startDate, format:"dd/MM/yyyy") }" class="dp" id="inputStartDate"/>
 				</div>
 			</div>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'startDate', 'error')}">
 					<label class="control-label" for="inputStartTime">Start Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="startTime" value="${time}" class="tp" id="inputStartTime"/>
+						<g:textField name="startTime" value="${ g.formatDate(date:event.startDate, format:"HH:mm") }" class="tp" id="inputStartTime"/>
 						<span class="add-on"><i class="icon-time"></i></span>
 					</div>
 				</div>
 			</div>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'endDate', 'error')}">
 				<label class="control-label" for="inputEndDate">End Date: </label>
 				<div class="controls">
-					<g:textField name="endDate" value="${date}" class="dp" id="inputEndDate" />
+					<g:textField name="endDate" value="${ g.formatDate(date:event.endDate, format:"dd/MM/yyyy") }" class="dp" id="inputEndDate" />
 				</div>
 			</div>
-			<div class="control-group">
+			<div class="control-group ${hasErrors(bean:event,field:'endDate', 'error')}">
 				<label class="control-label" for="inputEndTime">End Time: </label>
 				<div class="controls">
 					<div class="input-append bootstrap-timepicker">
-						<g:textField name="endTime" value="${time}" id="inputEndTime" class="tp" />
+						<g:textField name="endTime" value="${ g.formatDate(date:event.endDate, format:"HH:mm") }" id="inputEndTime" class="tp" />
 						<span class="add-on"><i class="icon-time"></i></span>
 					</div>
 				</div>

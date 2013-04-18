@@ -1,5 +1,11 @@
 package com.enernoc.open.oadr2.vtn
 
+/**
+ * Controller for index page
+ * 
+ * @author Thom Nichols
+ * 
+ */
 class HomeController {
 
     def index() {

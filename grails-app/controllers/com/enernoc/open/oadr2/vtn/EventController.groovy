@@ -5,7 +5,8 @@ package com.enernoc.open.oadr2.vtn
  * Events controller to manage all Event objects created
  * and the display page for those objects
  *
- * @author Jeff LaJoie
+ * @author Yang Xiang
+ * 
  */
 class EventController {
     def messageSource
@@ -18,17 +19,16 @@ class EventController {
     /**
      * Base return for the default rendering of the Events page
      *
-     * @return a redirect for the routes.Events.events() route
+     * @return a redirect for the events()
      */
     def index() {
         redirect action:"events"
     }
 
     /**
-     * The default page render for Events, inclusive of ordering of EiEvents
-     * based on their start DateTime, in ascending order
+     * Default method to render the page for the Event table
      *
-     * @return the rendered views.html.events page with a sorted list of EiEvents
+     * @return the default render page for event display, edit and deletion
      */
     def events() {
         def event = Event.list()
@@ -48,24 +48,25 @@ class EventController {
     
     /**
      * The default page render for new events to be created based on
-     * the file at views.html.newEvent
+     * the file at event/blankEvent.gsp
      *
-     * @return the rendered page to create an event, with all fields vacant
+     * @return the rendered page to create an event
      */
     def blankEvent() {
         // TODO 'distinct' should not be necessary (program name should be enforced unique)
-        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
-        def date = new Date()
-        def dateFormatted = g.formatDate(date:date, format:"dd/MM/yyyy")
-        def timeFormatted = g.formatDate(date:date, format:"HH:mm")
-        [ programList: programs, date: dateFormatted, time: timeFormatted]
+        def model = [:]        
+        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
+        if( ! flash.chainModel?.event )
+            model.event = new Event(startDate: new Date(), endDate:new Date())
+        model
     }
 
     /**
      * Method called on the newEvent page when the Create this event button is submitted
      *
-     * @return a redirect to the VENStatus page based on the EventID of the created Event
-     * @throws JAXBException
+     * @param Event 
+     * @return on success: redirect to the VENStatus page based on the EventID of the created Event
+     * @return on fail: chains to blankEvent() with invalid event
      */
     def newEvent() {
         try {
@@ -88,16 +89,15 @@ class EventController {
         // TODO should use ID, not program name
         def program = Program.find("from Program as p where p.programName=?", [params.programName])
 
-//        if (program != null) program.addToEvent(event)
         event.marketContext = program
 
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-//            program.save()
             populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
-            event.save()
+            program.addToEvent(event)
+            program.save()
             flash.message="Success, your event has been created"
         }
         else {
@@ -107,13 +107,20 @@ class EventController {
                 messageSource.getMessage it, null
             }
             // TODO return invalid event, not a blank event
-            return chain(action:"blankEvent", model:[errors: errors])
+            return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
         redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
 
     }
     
+    /**
+     * Parses the String date and String time into a Date object
+     * 
+     * @param String date
+     * @param String time
+     * @return Date
+     */
     static parseDttm( String date, String time) {
         return Date.parse( "dd/MM/yyyy HH:mm", "$date $time")
     }
@@ -126,6 +133,10 @@ class EventController {
      */
     def cancelEvent() {
         def event = Event.get(params.id)
+    if ( ! event ) {
+        response.sendError 404, "No event for ID $params.id"
+        return
+    }
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.cancelled = true
@@ -140,20 +151,38 @@ class EventController {
      */
     def deleteEvent() {
         def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         event.delete()
-        //flash("success", "Event has been deleted")
         redirect actions: "events"
     }
 
+    /**
+     * On the Event display page, allows user to edit selected event
+     *
+     * @param id - The database ID of the Event to be edited
+     * @return renders event/editEvent.gsp to allow user to update current event
+     */
     def editEvent() {
-        def currentEvent = Event.get(params.id)
-        def programs = Program.executeQuery("SELECT distinct programName FROM Program")
-
-        [currentEvent: currentEvent, programList: programs]
+        def model = [:]
+        model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
+        if ( ! flash.chainModel?.currentEvent )
+            model.currentEvent = Event.get(params.id)
+        if ( ! model.currentEvent ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
+        model
     }
 
     /**
      * Updates the event with a given id with the new parameters input from the user
+     * 
+     * @param Event, id
+     * @return on success: redirects to events() to render updated event
+     * @return on fail: chains to editEvent() with the invalid event
      */
     def updateEvent() {
         try {
@@ -169,16 +198,24 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
-        def program = Program.find("from Program as p where p.programName=?", [params.programName])
+        def newProgram = Program.find("from Program as p where p.programName=?", [params.programName])
         params.remove 'programName'
         def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         // FIXME it should not be possible to change the program for an event!
+        def oldProgram = event.marketContext
         event.properties = params
-        event.marketContext = program
+        event.marketContext = newProgram
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            event.save()
+            oldProgram.removeFromEvent(event)
+            newProgram.addToEvent(event)
+            oldProgram.save()
+            newProgram.save()
             //populateFromPush(event)
             def vens = Ven.findAll { event.marketContext in program }
             pushService.pushNewEvent(eiEvent, vens)
@@ -190,7 +227,7 @@ class EventController {
                 log.debug "Event update validation error: $it"
                 messageSource.getMessage(it, null)
             }
-            return chain(action:"editEvent", model:[errors: errors], params:[id: params.id])
+            return chain(action:"editEvent", model:[errors: errors, currentEvent: event])
         }
         chain action:"events", model:[error: null]
     }

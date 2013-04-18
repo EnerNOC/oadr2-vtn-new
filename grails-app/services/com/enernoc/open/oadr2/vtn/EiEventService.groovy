@@ -42,7 +42,7 @@ import com.enernoc.open.oadr2.model.Properties.Tolerance.Tolerate
 /**
  * EiEventService handles all persistence and object creation of payloads
  * 
- * @author Jeff LaJoie
+ * @author Yang Xiang
  *
  */
 public class EiEventService {

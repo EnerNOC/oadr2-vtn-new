@@ -19,8 +19,7 @@ import com.enernoc.open.oadr2.xmpp.OADR2PacketFilter
  * XMPPService is used to establish and hold the XMPPConnection
  * to be used for sending and creating events
  *
- * @author Jeff LaJoie
- *Converted from Play to Grails by Yang Xiang
+ * @author Thom Nichols, Yang Xiang
  */
 public class XmppService implements PacketListener {
 

@@ -1,5 +1,13 @@
 package com.enernoc.open.oadr2.vtn
 
+
+/**
+ * Model class for Program that persists unto the database
+ * Program may have multiple VENs and Event enrolled
+ * 
+ * @author Yang Xiang
+ *
+ */
 class Program {
     String programName
     String programURI

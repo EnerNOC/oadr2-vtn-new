@@ -4,6 +4,10 @@ import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException;
 
 import grails.util.Environment
 
+/**
+ * @author Thom Nichols
+ *
+ */
 class ErrorController {
 
     /**
