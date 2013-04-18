@@ -87,7 +87,7 @@ class EventController {
 
         def program = Program.get( params.programID.toLong() )
         if ( ! program ) {
-            response.sendError 404, "No program for ID $params.id"
+            response.sendError 404, "No program for ID $params.programID"
             return
         } 
         
@@ -205,7 +205,7 @@ class EventController {
         
         def newProgram = Program.get( params.programID.toLong() )
         if ( ! newProgram ) {
-            response.sendError 404, "No program for ID $params.id"
+            response.sendError 404, "No program for ID $params.programID"
             return
         } 
         
