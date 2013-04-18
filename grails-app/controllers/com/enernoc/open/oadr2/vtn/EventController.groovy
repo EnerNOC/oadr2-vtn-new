@@ -126,6 +126,10 @@ class EventController {
      */
     def cancelEvent() {
         def event = Event.get(params.id)
+    if ( ! event ) {
+        response.sendError 404, "No event for ID $params.id"
+        return
+    }
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.cancelled = true
@@ -140,6 +144,10 @@ class EventController {
      */
     def deleteEvent() {
         def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         event.delete()
         //flash("success", "Event has been deleted")
         redirect actions: "events"
@@ -150,6 +158,10 @@ class EventController {
         model.programsList = Program.executeQuery("SELECT distinct programName FROM Program")
         if ( ! flash.chainModel?.currentEvent )
             model.currentEvent = Event.get(params.id)
+        if ( ! model.currentEvent ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         model
     }
 
@@ -173,6 +185,10 @@ class EventController {
         def program = Program.find("from Program as p where p.programName=?", [params.programName])
         params.remove 'programName'
         def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         // FIXME it should not be possible to change the program for an event!
         event.properties = params
         event.marketContext = program

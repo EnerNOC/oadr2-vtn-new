@@ -105,6 +105,10 @@ class VenController {
      }*/
     def deleteVEN() {
         def ven = Ven.get(params.id)
+        if ( ! ven ) {
+            response.sendError 404, "No ven for ID $params.id"
+            return
+        }
         ven.delete()
         redirect(action:"vens")
 
@@ -119,6 +123,10 @@ class VenController {
         model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
         if ( ! flash.chainModel?.currentVen)
             model.currentVen = Ven.get(params.id)
+        if ( ! model.currentVen ) {
+            response.sendError 404, "No ven for ID $params.id"
+            return
+        }
         model
     }
     
@@ -129,6 +137,10 @@ class VenController {
      */
     def updateVEN() {
         def ven = Ven.get( params.id )
+        if ( ! ven ) {
+            response.sendError 404, "No ven for ID $params.id"
+            return
+        }
         def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
         def oldProgram = Program.find("from Program as p where p.programName=?", [ven.programID])        
         oldProgram.removeFromVen(ven)

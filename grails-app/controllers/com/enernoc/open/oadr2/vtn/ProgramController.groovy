@@ -103,6 +103,10 @@ class ProgramController {
 
     def deleteProgram() {
         def program = Program.get(params.id)
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
         program.delete()
         redirect(action:"programs")
         //render(params.id)
@@ -116,6 +120,10 @@ class ProgramController {
         def model =[:]
         if ( ! flash.chainModel?.currentProgram )
             model.currentProgram = Program.get( params.id )
+        if ( ! model.currentProgram ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
         model
     }
     
@@ -126,6 +134,10 @@ class ProgramController {
      */
     def updateProgram() {
         def program = Program.get( params.id )
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.id"
+            return
+        }
         program.properties = params
         if (program.validate()) {
             //TODO Once ven.programID is remove this loop will be removed
