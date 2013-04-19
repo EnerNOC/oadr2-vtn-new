@@ -10,7 +10,7 @@ package com.enernoc.open.oadr2.vtn
  */
 class VenController {
     def messageSource
-    
+
     static defaultAction = 'vens'
 
     /**
@@ -40,9 +40,9 @@ class VenController {
      */
     def blankVEN() {
         def model = [:]
-        model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        model.programsList = Program.list()
         if ( ! flash.chainModel?.ven )
-            model.ven = new Ven() 
+            model.ven = new Ven()
         model
     }
 
@@ -53,15 +53,30 @@ class VenController {
      * @return on fail: a chain to blankVEN() with invalid VEN
      */
     def newVEN() {
-        def ven = new Ven(params)
-        def program = Program.find("from Program as p where p.programName=?", [params.programID])
-        if (program!=null) {
-            program.addToVen(ven)
+        def program = []
+        params.programID.each { pID->
+            def p =  Program.get( pID.toLong() )
+            if ( ! p ) {
+                response.sendError( 404, "No program for ID $pID" )
+            }
+            program << p
         }
+        params.remove( 'programID' )
+        def ven = new Ven(params)
+        
+        if (program!=[]) {
+            program.each  { p->
+                p.addToVen(ven)
+            }
+        }
+        
         if (ven.validate()) {
-            program.save()
+            program.each  { p->
+                p.save()
+            }
             flash.message="Success, your VEN has been created"
         } else {
+            ven.program = program
             flash.message="Please fix the errors below: "
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
@@ -97,7 +112,7 @@ class VenController {
      */
     def editVEN() {
         def model = [:]
-        model.programsList = Program.executeQuery("SELECT distinct b.programName FROM Program b")
+        model.programsList = Program.list()
         if ( ! flash.chainModel?.currentVen) {
             model.currentVen = Ven.get(params.id)
             if ( ! model.currentVen ) {
@@ -107,7 +122,7 @@ class VenController {
         }
         model
     }
-    
+
     /**
      * Persists the form from the editVEN.gsp page to the database
      *
@@ -120,18 +135,45 @@ class VenController {
             response.sendError 404, "No ven for ID $params.id"
             return
         }
-        def newProgram = Program.find("from Program as p where p.programName=?", [params.programID])
-        def oldProgram = Program.find("from Program as p where p.programName=?", [ven.programID])        
-        oldProgram.removeFromVen(ven)
-        if (newProgram!=null) {
-            newProgram.addToVen(ven)
+        
+        def oldProgram = ven.program
+        def newProgram = []
+        params.programID.each { pID->
+            def p =  Program.get( pID.toLong() )
+            if ( ! p ) {
+                response.sendError( 404, "No program for ID $pID" )
+            }
+            newProgram << p
         }
+        
+        //oldProgram.removeFromVen(ven)
+        if (newProgram == []) {
+            ven.program = null
+        }
+        params.remove('programID')
         ven.properties = params
         if (ven.validate()) {
-            oldProgram.save()
-            newProgram.save()            
+            def tempOld = []
+            def tempNew = []
+            tempOld.addAll( oldProgram )
+            tempOld.each { op ->
+                if (!newProgram.contains( op )) {
+                    println("old Loop: " + op.programName)
+                    op.removeFromVen(ven)
+                    op.save(flush:true)
+                }
+            }
+            tempNew.addAll( newProgram )
+            tempNew.each { np ->
+                if (!oldProgram.contains( np )) {
+                    println("new Loop: " + np.programName)
+                    np.addToVen(ven)
+                    np.save(flush:true)
+                }
+            }
             flash.message="Success, your VEN has been updated"
         } else {
+            ven.program = newProgram
             flash.message="Please fix the errors below: "
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)

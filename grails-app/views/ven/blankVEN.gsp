@@ -25,7 +25,7 @@
 		<div class="control-group ${hasErrors(bean:ven,field:'program', 'error')}">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
-				<g:select name="programID" from="${programsList}" value="${ven.programID}" noSelection="[null:'- Choose a Program -']" id="selectProgram" />
+				<g:select name="programID" from="${programsList}" value="${ven.program?.id}" optionKey="id" id="selectProgram" multiple="true"/>
 			</div>
 		</div>
 		<div class="control-group ${hasErrors(bean:ven,field:'venName', 'error')}">

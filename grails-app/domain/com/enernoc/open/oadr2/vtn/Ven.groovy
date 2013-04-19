@@ -11,7 +11,6 @@ package com.enernoc.open.oadr2.vtn
 class Ven {
 
     String venID
-    String programID
     String venName
     String clientURI
 

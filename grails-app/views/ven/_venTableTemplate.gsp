@@ -23,7 +23,7 @@
 					${ven.clientURI}
 				</td>
 				<td>
-					${ven.programID}
+					${ven.program}
 				</td>
 				<td><g:form controller="Ven" action="deleteVEN" params="[id : ven.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"
