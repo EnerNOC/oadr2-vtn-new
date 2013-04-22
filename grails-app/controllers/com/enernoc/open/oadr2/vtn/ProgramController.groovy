@@ -79,7 +79,13 @@ class ProgramController {
             response.sendError 404, "No program for ID $params.id"
             return
         }
+        program.ven.each { v ->
+            program.removeFromVen(v)
+            if( v.program.size() == 0)
+            v.delete()
+        }
         program.delete()
+
         redirect(action:"programs")
     }
     
