@@ -99,6 +99,10 @@ class VenController {
             response.sendError 404, "No ven for ID $params.id"
             return
         }
+        ven.program.each { p->
+            p.removeFromVen(ven)
+            p.save()
+        }
         ven.delete()
         redirect(action:"vens")
 
