@@ -57,7 +57,7 @@ class Event {
         intervals min: 1L
         modificationNumber min: 0L
         marketContext validator : { val,obj ->
-            obj.isConflicting()
+            obj.notConflicting()
         }
     }
     
