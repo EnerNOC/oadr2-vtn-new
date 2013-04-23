@@ -143,7 +143,7 @@ class Event {
      * 
      * @return boolean value 
      */
-    private boolean isConflicting() {
+    private boolean notConflicting() {
         //Event.where breaks if null exists, thus an indirect id to designate a value
         def tempID = this.id
         if (tempID == null) tempID = -1
