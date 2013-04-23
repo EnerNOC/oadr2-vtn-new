@@ -53,7 +53,7 @@
 		<div class="control-group ${hasErrors(bean:currentVen,field:'clientURI', 'error')}">
 			<label class="control-label" for="inputClientURI">Client URI: </label>
 			<div class="controls">
-				<input id="clientURI" type="text" name="clientURI" value="${ currentVen.clientURI }" id="inputClientURI" />
+				<input id="clientURI" type="text" name="clientURI" value="${ currentVen.clientURI }" placeholder="My Client" id="inputClientURI" />
 			</div>
 		</div>
 		<g:hiddenField name="id" value="${currentVen.id}" />
@@ -68,7 +68,8 @@
 	  function inputEnable() {        
 	    document.getElementById("clientURI").removeAttribute("disabled");            
 	  }          
-	  function inputDisable() {        
+	  function inputDisable() {    
+	    document.getElementById("clientURI").value = "";
 	    document.getElementById("clientURI").setAttribute("disabled");
 	  }
   </g:javascript>

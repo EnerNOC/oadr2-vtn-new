@@ -67,7 +67,8 @@
 	  function inputEnable() {        
 	    document.getElementById("clientURI").removeAttribute("disabled");            
 	  }          
-	  function inputDisable() {        
+	  function inputDisable() {   
+	    document.getElementById("clientURI").value = "";     
 	    document.getElementById("clientURI").setAttribute("disabled");
 	  }
   </g:javascript>
