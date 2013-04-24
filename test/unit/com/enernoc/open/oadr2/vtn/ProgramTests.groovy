@@ -15,7 +15,7 @@ import org.junit.*
 class ProgramTests {
 
     /**
-     * Initial setup for Event tests. Adds data into a mock database
+     * Initial setup for Program tests. Adds data into a mock database
      */
     void setUp() {
         mockDomain(Program, [ [programName:"Program1", programURI:"http://URI1.com"] ])
@@ -45,7 +45,7 @@ class ProgramTests {
         assert "unique" == badProgram.errors["programName"].code
         assert "url.invalid" == badProgram.errors["programURI"].code
         badProgram.programName = "valid"
-        badProgram.programURI = "http://AlsoSuperValid.com"
+        badProgram.programURI = "http://Valid.com"
         assert badProgram.validate()
     }
 }
