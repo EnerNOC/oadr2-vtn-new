@@ -16,9 +16,10 @@ import com.enernoc.open.oadr2.model.EiEventSignals
 import com.enernoc.open.oadr2.model.EventDescriptor
 import com.enernoc.open.oadr2.model.Interval
 import com.enernoc.open.oadr2.model.Intervals
-import com.enernoc.open.oadr2.model.MarketContext
+import com.enernoc.open.oadr2.model.ObjectFactory
+import com.enernoc.open.oadr2.model.PayloadFloat
 import com.enernoc.open.oadr2.model.Properties
-import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
+import com.enernoc.open.oadr2.model.SignalPayload
 
 
 
@@ -35,14 +36,20 @@ class Event {
     private DatatypeFactory _dtf
     
     static belongsTo = [marketContext: Program]
-    static hasMany = [venStatus: VenStatus]
+    static hasMany = [venStatus: VenStatus, signals: EventSignal]
+     
     String eventID
     long priority
     Date startDate
     Date endDate
+    long tolerance
+    long notification
+    long rampUp
+    long recovery
     boolean cancelled
-    long intervals = 1
     long modificationNumber = 0L
+    
+    // TODO event target, group, resource IDs
 
     static constraints = {
         eventID blank: false, unique: true
@@ -54,7 +61,6 @@ class Event {
             obj.startDate != null && val > obj.startDate \
                 && val > new Date() // don't allow events in the past
         }
-        intervals min: 1L
         modificationNumber min: 0L
         marketContext validator : { val,obj ->
             obj.notConflicting()
@@ -103,14 +109,38 @@ class Event {
     public XMLGregorianCalendar getXmlStart() {
         return this.dtf.newXMLGregorianCalendar(this.startDate.toCalendar()).normalize()
     }
-
-    public XMLGregorianCalendar getXmlEnd() {
-        return this.dtf.newXMLGregorianCalendar(this.endDate.toCalendar()).normalize()
+    
+    protected makeDuration( Date date, long offset ) {
+        def durationMillis = date.time + offset
+        def duration = this.dtf.newDuration durationMillis
+        GregorianCalendar cal = new GregorianCalendar()
+        cal.time = date
+        duration.normalizeWith cal
+        return duration
     }
     
-    public Duration getEventDuration() {
-        def durationMillis = this.endDate.time - this.startDate.time
-        return this.dtf.newDuration( durationMillis )
+    public long getDurationMillis() {
+        return this.endDate.time - this.startDate.time
+    }
+
+    public Duration getDuration() {
+        return makeDuration( this.startDate, this.durationMillis )
+    }
+    
+    public Duration getToleranceDuration() {
+        return makeDuration( this.startDate, this.tolerance )
+    }
+    
+    public Duration getNotificationDuration() {
+        return makeDuration( this.startDate, this.notification )
+    }
+    
+    public Duration getRampUpDuration() {
+        return makeDuration( this.startDate, this.rampUp )
+    }
+    
+    public Duration getRecoveryDuration() {
+        return makeDuration( this.endDate, this.recovery )
     }
     
     /**
@@ -119,6 +149,16 @@ class Event {
      * @return the unwrapped EiEvent with certain fields from the form filled
      */
     public EiEvent toEiEvent() {
+        ObjectFactory of = new ObjectFactory()
+        def intervals = this.intervals.collect {
+            new Interval()
+                .withDuration( new DurationPropType( 
+                    new DurationValue( it.duration.toString() ) ) )
+                .withStreamPayloadBase( of.createSignalPayload( 
+                    new SignalPayload( new PayloadFloat( it.level ) ) ) )
+                .withUid( it.uid )
+        }
+        
         return new EiEvent()
             .withEventDescriptor(new EventDescriptor()
                 .withEventID(this.eventID)
@@ -129,13 +169,11 @@ class Event {
                 .withProperties(new Properties()
                     .withDtstart(new Dtstart(new DateTime(this.xmlStart)))
                     .withDuration(new DurationPropType(new DurationValue(
-                        this.eventDuration.toString())))))
+                        this.duration.toString())))))
             .withEiEventSignals(new EiEventSignals()
                 .withEiEventSignals(new EiEventSignal()
                     .withIntervals(new Intervals()
-                        .withIntervals(new Interval()
-                            .withDuration( new DurationPropType(new DurationValue(
-                                this.eventDuration.toString())))))))
+                        .withIntervals(intervals))))
     }
 
     /**

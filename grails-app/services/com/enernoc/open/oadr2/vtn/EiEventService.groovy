@@ -6,6 +6,8 @@ import javax.xml.datatype.DatatypeFactory
 import javax.xml.datatype.Duration
 import javax.xml.datatype.XMLGregorianCalendar
 
+import org.springframework.aop.aspectj.RuntimeTestWalker.ThisInstanceOfResidueTestVisitor;
+
 import com.enernoc.open.oadr2.model.CurrentValue
 import com.enernoc.open.oadr2.model.DateTime
 import com.enernoc.open.oadr2.model.Dtstart
@@ -38,6 +40,7 @@ import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
 import com.enernoc.open.oadr2.model.OadrDistributeEvent.OadrEvent
 import com.enernoc.open.oadr2.model.Properties.Tolerance
 import com.enernoc.open.oadr2.model.Properties.Tolerance.Tolerate
+import com.sun.media.jai.opimage.LogCRIF;
 
 /**
  * EiEventService handles all persistence and object creation of payloads
@@ -259,174 +262,108 @@ public class EiEventService {
      * @return the EiEvent built from the Event wrapper
      */
     public EiEvent buildEiEvent( Event event ) {
-        Date currentDate = new Date()
-        GregorianCalendar calendar = new GregorianCalendar()
+        GregorianCalendar now = new GregorianCalendar()
         def objectFactory = new ObjectFactory()
-        calendar.setTime(currentDate)
-        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
-        xCalendar.setTimezone(DatatypeConstants.FIELD_UNDEFINED) // FIXME
+        now.setTime(new Date())
 
-        JAXBElement<SignalPayload> signalPayload = objectFactory.createSignalPayload(
-                new SignalPayload(new PayloadFloat(1)))
-
-        def intervalList = []
-        EiEvent newEvent = event.toEiEvent()
-
-        /*event.intervals.each { evt, i ->
-            intervalList.add(new Interval()
+        EiEvent eiEvent = event.toEiEvent()
+        eiEvent.withEiActivePeriod(new EiActivePeriod()
+            .withProperties(new Properties()
+                .withDtstart(new Dtstart()
+                    .withDateTime(new DateTime()
+                        .withValue(event.xmlStart) ) )
                 .withDuration(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue(formatDuration(getDuration(newEvent)))))
-                    .withUid(new Uid().withText("" + i))
-                    .withStreamPayloadBase(signalPayload))
-        }*/
-        event.intervals.eachWithIndex { evt, i->
-            intervalList.add(new Interval()
-                    .withDuration(new DurationPropType()
+                        .withValue(event.duration.toString() ) ) )
+                .withTolerance(new Tolerance()
+                    .withTolerate(new Tolerate()
+                        .withStartafter(new DurationValue()
+                            .withValue(event.toleranceDuration.toString() ) ) ) )
+                .withXEiNotification(new DurationPropType()
                     .withDuration(new DurationValue()
-                    .withValue(formatDuration(getDuration(newEvent)))))
-                    .withUid(new Uid()
-                    .withText("" + i))
-                    .withStreamPayloadBase(signalPayload))
-        }
-        Intervals intervals = new Intervals(intervalList)
-        newEvent.withEiActivePeriod(new EiActivePeriod()
-                    .withProperties(new Properties()
-                        .withDtstart(new Dtstart()
-                            .withDateTime(new DateTime()
-                                .withValue(newEvent.eiActivePeriod.properties.dtstart.dateTime.value.normalize())))
-                        .withDuration(new DurationPropType()
-                            .withDuration(new DurationValue()
-                                .withValue(formatDuration(getDuration(newEvent, (int)event.intervals)))))
-                        .withTolerance(new Tolerance()
-                            .withTolerate(new Tolerate()
-                                .withStartafter(new DurationValue()
-                                    // FIXME proper duration
-                                    .withValue((formatDuration(getDuration("P0Y0M0DT0H0M0S")))))))
-                        .withXEiNotification(new DurationPropType()
-                            .withDuration(new DurationValue()
-                                // FIXME proper duration
-                                .withValue((formatDuration(getDuration("P0Y0M0DT0H0M0S"))))))
-                        .withXEiRampUp(new DurationPropType()
-                            .withDuration(new DurationValue()
-                                // FIXME proper duration
-                                .withValue((formatDuration(getDuration("P0Y0M0DT0H0M0S"))))))
-                        .withXEiRecovery(new DurationPropType()
-                            .withDuration(new DurationValue()
-                                // FIXME proper duration
-                                .withValue((formatDuration(getDuration("P0Y0M0DT0H0M0S"))))))))
-                    .withEiTarget(new EiTarget())
-                    .withEventDescriptor(new EventDescriptor()
-                        .withCreatedDateTime(new DateTime().withValue(xCalendar))
-                        .withEiMarketContext(new EiMarketContext()
-                            .withMarketContext(new MarketContext()
-                                .withValue(event.marketContext.programURI)))
-                        .withEventID(event.eventID)
-                        .withEventStatus(updateStatus(newEvent, (int)event.intervals))
-                        .withModificationNumber(event.modificationNumber) //changed to the set modification number
-                        .withPriority(event.priority)
-                        .withTestEvent("False")
-                        .withVtnComment("No VTN Comment"))
-                    .withEiEventSignals(new EiEventSignals()
-                        .withEiEventSignals(new EiEventSignal()
-                            .withCurrentValue(new CurrentValue()
-                                .withPayloadFloat(new PayloadFloat()
-                                    .withValue(updateSignalPayload(newEvent)))) //TODO Not sure what this value is supposed to be, must be 0 when NEAR
-                            .withIntervals(new Intervals()
-                                .withIntervals(intervalList))
-                            .withSignalID("TH_SIGNAL_ID")
-                            .withSignalName("simple")
-                    .withSignalType(SignalTypeEnumeratedType.LEVEL)))
-        return newEvent
+                        .withValue(event.notificationDuration.toString() ) ) )
+                .withXEiRampUp(new DurationPropType()
+                    .withDuration(new DurationValue()
+                        .withValue(event.rampUpDuration.toString() ) ) )
+                .withXEiRecovery(new DurationPropType()
+                    .withDuration(new DurationValue()
+                        .withValue( event.recoveryDuration.toString() ) ) ) 
+                ) 
+            )
+//                .withEiTarget(new EiTarget()) // TODO
+        .withEventDescriptor(new EventDescriptor()
+            .withCreatedDateTime(new DateTime()
+                .withValue( df.newXMLGregorianCalendar(now) ) )
+            .withEiMarketContext(new EiMarketContext()
+                .withMarketContext(new MarketContext()
+                    .withValue( event.marketContext.programURI ) ) )
+            .withEventID( event.eventID )
+            .withEventStatus( this.getCurrentStatus( event ) )
+            .withModificationNumber( event.modificationNumber )
+            .withPriority( event.priority )
+            .withTestEvent("False")
+            .withVtnComment(""))
+        .withEiEventSignals( new EiEventSignals()
+            .withEiEventSignals(
+                event.signals.collect { signal ->
+                    new EiEventSignal()
+                        .withCurrentValue(new CurrentValue()
+                            .withPayloadFloat(new PayloadFloat()
+                                .withValue( signal.getCurrentValue() ) ) )
+                        .withIntervals( signal.intervals.collect {
+                            this.buildInterval it
+                        })
+                        .withSignalID( signal.signalID )
+                        .withSignalName( signal.name )
+                        .withSignalType( this.getEiSignalType(signal.type) )
+            }))
+        return eiEvent
+    }
+    
+    protected Interval buildInterval( EventInterval interval ) {
+        return new Interval()
+            .withDuration( new DurationPropType()
+                .withDuration( new DurationValue()
+                    .withValue( interval.duration.toString() )))
+            .withUid( interval.uid.toString() )
+            .withText( interval.uid )
+            .withStreamPayloadBase(
+                objectFactory.createSignalPayload(
+                    new SignalPayload(new PayloadFloat( interval.level ) ) ) )
     }
     
     /**
-     * Formats a duration to be acceptable by the schema validation
+     * Returns the correct event status (FAR, NEAR, ACTIVE) based on the current 
+     * time and time of the event
      *
-     * @param duration - the duration to be modified with the .000 truncated
-     * @return String with an acceptable duration value, minus the .000 precision
+     * @param event - the Event domain object
+     * @return the EventStatusEnumeratedType
      */
-    static String formatDuration( Duration duration ) {
-        return duration.toString().replaceAll(".000", "")
-    }
-    
-    /**
-     * Updates the SignalPayloadFloat based on the EventStatus contained in the EiEvent
-     *
-     * @param event - Contains the EventStatus that determines the SignalPayload
-     * @return the SignalPayload as a float to be set in the construction of the EiEvent
-     */
-    protected float updateSignalPayload( EiEvent event ) {
-        if(event.eventDescriptor.eventStatus.equals(EventStatusEnumeratedType.ACTIVE)) {
-            return 1
-        }
-        return 0
-    }
-    
-    /**
-     * Converts an event to a duration based on the event and number of intervals
-     *
-     * @param event - Duration that needs to be converted from String to Duration
-     * @param intervals - number of intervals to be serviced
-     * @return Duration from the event multiplied by the number of intervals
-     */
-    protected Duration getDuration( EiEvent event, int intervals ) {
-        Duration duration = df.newDuration(event.eiActivePeriod.properties.duration.duration.value)
-        if ( intervals ) duration = duration.multiply(intervals)
-        return duration
-    }
-
-
-    /**
-     * Converts an event string of DurationValue to a Duration
-     *
-     * @param duration - Duration that needs to be converted from String to Duration
-     * @return Duration from the event
-     */
-    protected Duration getDuration( String duration ) {
-        return df.newDuration( duration )
-    }
-    
-    /**
-     * Updates the EventStatus based on the current time and time of the event
-     *
-     * @param event - the event to have the EventStatus updated
-     * @param intervals - the number of time intervals contained in the
-     * @return the EventStatusEnumeratedType the EventStatus should be set to
-     */
-    protected EventStatusEnumeratedType updateStatus( EiEvent event, int intervals ) {
-
-        Date currentDate = new Date()
-        GregorianCalendar calendar = new GregorianCalendar()
-        calendar.time = currentDate
-        XMLGregorianCalendar xCalendar = df.newXMLGregorianCalendar(calendar)
-        xCalendar.timezone = 0 // GMT
-
-        DateTime currentTime = new DateTime(xCalendar)
-        def startDttm = event.eiActivePeriod.properties.dtstart.dateTime.value.normalize()
-        DateTime startTime = new DateTime(startDttm)
-        DateTime endTime = new DateTime(startDttm) // FIXME
-
-        DateTime rampUpTime = new DateTime().withValue(startDttm)
-
-        rampUpTime.value.add(getDuration(event.eiActivePeriod.properties.XEiRampUp.duration.value))
-        Duration d = getDuration(event, intervals)
-        endTime.value.add(d)
-
-        if ( currentTime.value.compare( startTime.value) == -1) {
-            if( currentTime.value.compare(rampUpTime.value) == -1 )
+    protected EventStatusEnumeratedType getCurrentStatus( Event event ) {
+        if ( event.cancelled )
+            return EventStatusEnumeratedType.CANCELLED
+        
+        Date now = new Date()
+        if ( now < event.startDate ) {
+            def rampUpStart = new Date(now.time - event.rampUp)
+            if ( now < rampUpStart ) 
                 return EventStatusEnumeratedType.FAR
-            else return EventStatusEnumeratedType.NEAR
+            return EventStatusEnumeratedType.NEAR
         }
-        else if ( currentTime.value.compare(startTime.value) > 0
-        && currentTime.value.compare(endTime.value) == -1 )
+        
+        if ( now < event.endDate )
             return EventStatusEnumeratedType.ACTIVE
-
-        else if ( currentTime.value.compare(endTime.value) > 0)
-            return EventStatusEnumeratedType.COMPLETED
-
-        else return EventStatusEnumeratedType.NONE
+        
+        // else event is ended
+        return EventStatusEnumeratedType.COMPLETED
     }
-
     
+    protected SignalTypeEnumeratedType getEiSignalType( EventInterval interval ) {
+        switch ( interval.signalType ) {
+            case SignalType.PRICE_RELATIVE:
+                return SignalTypeEnumeratedType.PRICE_RELATIVE
+            default:
+                return SignalTypeEnumeratedType.LEVEL
+        }
+    }
 }

@@ -3,11 +3,13 @@
 	<thead>
 		<tr>
 			<th>Event ID</th>
+			<th>Signals</th>
 			<th>Priority</th>
 			<th>Status</th>
 			<th>Start</th>
 			<th>End</th>
-			<th>Market Context</th>
+			<th>Program</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tfoot>
@@ -18,7 +20,13 @@
 				<td><g:link controller="VenStatus" action="venStatuses"
 						params="[eventID:event.eventID]">
 						${event.eventID}
-					</g:link></td>
+					</g:link>
+				</td>
+				<td>
+				  ${event.signals.size()}
+				  <g:link controller="EventSignal" params="[id: event.id]"
+            class=""><i class='icon-edit' title='Edit Intervals'></i></g:link>
+				</td>
 				<td>
 					${event.priority}
 				</td>
@@ -35,12 +43,11 @@
 					${event.marketContext.programName}
 				</td>
 				<td><g:link controller="Event" action="editEvent" params="[id: event.id]"
-						class="btn">
-							Edit</g:link></td>
+						class="btn">Edit</g:link></td>
 				<td><g:link controller="Event" action="deleteEvent" params="[id: event.id]"
 						class="btn btn-danger">Delete</g:link></td>
 				<td><g:link controller="Event" action="cancelEvent" params="[id: event.id]"
-						class="btn btn-inverse">Cancel</g:link>
+						class="btn btn-warn">Cancel</g:link>
 			</tr>
 		</g:each>
 	</tbody>

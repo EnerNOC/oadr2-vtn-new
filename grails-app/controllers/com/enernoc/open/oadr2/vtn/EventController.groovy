@@ -70,12 +70,6 @@ class EventController {
      */
     def newEvent() {
         try {
-            params.intervals = params.intervals.toLong()
-        }
-        catch ( IllegalArgumentException ) {
-            params.intervals = -1L
-        }
-        try {
             params.priority = params.priority.toLong()
         }
         catch ( IllegalArgumentException ) {
@@ -96,13 +90,13 @@ class EventController {
         event.marketContext = program
 
         if ( event.validate() ) {
-            def eiEvent = eiEventService.buildEiEvent(event)
-            populateFromPush(event)
-            def vens = Ven.findAll { event.marketContext in program }
-            pushService.pushNewEvent(eiEvent, vens)
-            program.addToEvent(event)
+//            def eiEvent = eiEventService.buildEiEvent(event)
+//            populateFromPush(event)
+//            def vens = Ven.findAll { event.marketContext in program }
+//            pushService.pushNewEvent(eiEvent, vens)
+            program.addToEvent event
             program.save()
-            flash.message="Success, your event has been created"
+            flash.message = "Success, your event has been created"
         }
         else {
             flash.message="Please fix the errors below"
@@ -114,8 +108,8 @@ class EventController {
             return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
-        redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
-
+//        redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID
+        redirect controller: "EventInterval", id: event.id
     }
     
     /**
@@ -191,13 +185,9 @@ class EventController {
      */
     def updateEvent() {
         try {
-            params.intervals = params.intervals.toLong()
-        } catch(IllegalArgumentException) {
-            params.intervals = -1L
-        }
-        try {
             params.priority = params.priority.toLong()
-        } catch(IllegalArgumentException) {
+        } 
+        catch(IllegalArgumentException) {
             params.priority = -1L
         }
         params.startDate = parseDttm( params.startDate, params.startTime )

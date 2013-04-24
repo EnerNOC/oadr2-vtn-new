@@ -54,47 +54,32 @@
 				</div>
 			</div>
 			<h3>Active Period</h3>
-			<div class="control-group ${hasErrors(bean:currentEvent,field:'intervals', 'error')}">
-				<label class="control-label" for="inputInterval">Intervals: </label>
-				<div class="controls">
-					<g:textField name="intervals" value="${ currentEvent.intervals }" id="inputInterval" />
-        </div>
-			</div>
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'startDate', 'error')}">
 				<label class="control-label" for="inputStartDate">Start Date: </label>
 				<div class="controls">
-					<g:textField name="startDate" value="${ g.formatDate(date:currentEvent.startDate, format:"dd/MM/yyyy") }" class="dp" id="inputStartDate" />
-				</div>
-			</div>
-			<div class="control-group ${hasErrors(bean:currentEvent,field:'startDate', 'error')}">
-				<label class="control-label" for="inputStartTime">Start Time: </label>
-				<div class="controls">
-					<div class="input-append bootstrap-timepicker">
-						<g:textField name="startTime" value="${ g.formatDate(date:currentEvent.startDate, format:"HH:mm") }" class="tp" id="inputStartTime" />
-						<span class="add-on">
-							<i class="icon-time"></i>
-						</span>
-					</div>
+          <div class='input-append bootstrap-timepicker'>
+						<g:textField name="startDate" value="${ g.formatDate(date:currentEvent.startDate, format:"dd/MM/yyyy") }" 
+						 class="dp input-small" placeholder='dd/mm/yyyy' />
+	          <g:textField name="startTime" value="${ g.formatDate(date:currentEvent.startDate, format:"HH:mm") }" 
+	            class="tp input-mini" placeholder='hh:mm' />
+          </div>
 				</div>
 			</div>
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'endDate', 'error')}">
 				<label class="control-label" for="inputEndDate">End Date: </label>
 				<div class="controls">
-					<g:textField name="endDate" value="${ g.formatDate(date:currentEvent.endDate, format:"dd/MM/yyyy") }" class="dp" id="inputEndDate" />
+				  <div class='input-append'>
+						<g:textField name="endDate" value="${ g.formatDate(date:currentEvent.endDate, format:"dd/MM/yyyy") }" 
+						 class="dp input-small" />
+	          <g:textField name="endTime" value="${ g.formatDate(date:currentEvent.endDate, format:"HH:mm") }" 
+	            class="tp input-mini" placeholder='hh:mm' />
+	          <span class="add-on"><i class="icon-time"></i></span>
+	        </div>
 				</div>
 			</div>
-			<div class="control-group ${hasErrors(bean:currentEvent,field:'endDate', 'error')}">
-				<label class="control-label" for="inputEndTime">End Time: </label>
-				<div class="controls">
-					<div class="input-append bootstrap-timepicker">
-						<g:textField name="endTime" value="${ g.formatDate(date:currentEvent.endDate, format:"HH:mm") }" id="inputEndTime" class="tp" />
-						<span class="add-on">
-							<i class="icon-time"></i>
-						</span>
-					</div>
-				</div>
-			</div>
+			
       <g:hiddenField name="id" value="${currentEvent.id}" />
+      
 			<div class="control-group">
 				<div class="controls form-buttons">
 					<input type="submit" value="Update!" class="btn btn-primary">

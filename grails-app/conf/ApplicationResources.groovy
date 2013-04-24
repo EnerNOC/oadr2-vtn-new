@@ -3,6 +3,13 @@ modules = {
 		resource url: '/css/custom.css'
         resource url:'/js/application.js'
     }
+    
+    eventIntervals {
+        dependsOn 'backbone', 'formTime'
+        
+        resource url: '/js/eventIntervals.js'
+    }
+    
 	formTime {
 		dependsOn 'jquery'
 
@@ -12,4 +19,11 @@ modules = {
 		resource url: '/js/bootstrap.js', attrs:[type:'js']
 		resource url: '/js/bootstrap-timepicker.min.js', attrs:[type:'js']
 	}
+    backbone {
+        dependsOn 'jquery'
+        
+        resource url: '/js/underscore-min.js'
+        resource url: '/js/ICanHaz.min.js'
+        resource url: '/js/backbone-min.js'
+    }
 }
