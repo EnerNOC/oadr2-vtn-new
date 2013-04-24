@@ -1,10 +1,6 @@
 package com.enernoc.open.oadr2.vtn
 
-
-
 import grails.test.mixin.*
-
-import com.enernoc.oadr2.vtn.PushService
 import org.junit.*
 
 /**
