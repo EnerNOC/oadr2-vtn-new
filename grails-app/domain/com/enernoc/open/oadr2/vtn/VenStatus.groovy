@@ -28,7 +28,7 @@ class VenStatus {
      * @return String
      */
     public String toString(){
-        "VEN Status \n  VEN ID: $ven.venID\n  Event ID: $event.eventID\n  Program: $event.marketContext.programName" +
+        "VEN Status \n  VEN ID: $ven.venID\n  Event ID: $event.eventID\n  Program: $event.marketContext.name" +
         "\n  Status: $optStatus\n  Time: $time"
     }
 

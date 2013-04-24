@@ -12,10 +12,10 @@
 		<g:each var="program" in="${programList}">
 			<tr>
 				<td>
-					${program.programName}
+					${program.name}
 				</td>
 				<td>
-					${program.programURI}
+					${program.marketContext}
 				</td>
 				<td><g:form controller="Program" action="deleteProgram" params="[id : program.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"

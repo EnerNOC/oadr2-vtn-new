@@ -66,7 +66,7 @@ class VenController {
         
         if (program!=[]) {
             program.each  { p->
-                p.addToVen(ven)
+                p.addToVens(ven)
             }
         }
         
@@ -162,16 +162,14 @@ class VenController {
             tempOld.addAll( oldProgram )
             tempOld.each { op ->
                 if (!newProgram.contains( op )) {
-                    println("old Loop: " + op.programName)
-                    op.removeFromVen(ven)
+                    op.removeFromVens(ven)
                     op.save(flush:true)
                 }
             }
             tempNew.addAll( newProgram )
             tempNew.each { np ->
                 if (!oldProgram.contains( np )) {
-                    println("new Loop: " + np.programName)
-                    np.addToVen(ven)
+                    np.addToVens(ven)
                     np.save(flush:true)
                 }
             }

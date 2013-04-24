@@ -320,7 +320,7 @@ public class EiEventService {
                         .withCreatedDateTime(new DateTime().withValue(xCalendar))
                         .withEiMarketContext(new EiMarketContext()
                             .withMarketContext(new MarketContext()
-                                .withValue(event.marketContext.programURI)))
+                                .withValue(event.marketContext.marketContext)))
                         .withEventID(event.eventID)
                         .withEventStatus(updateStatus(newEvent, (int)event.intervals))
                         .withModificationNumber(event.modificationNumber) //changed to the set modification number

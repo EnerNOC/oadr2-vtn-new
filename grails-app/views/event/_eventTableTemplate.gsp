@@ -32,7 +32,7 @@
           <g:formatDate format='dd/MM/yyyy HH:mm' date='${event.endDate}' />
 				</td>
 				<td>
-					${event.marketContext.programName}
+					${event.marketContext.name}
 				</td>
 				<td><g:link controller="Event" action="editEvent" params="[id: event.id]"
 						class="btn">

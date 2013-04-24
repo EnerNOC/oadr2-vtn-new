@@ -9,17 +9,17 @@ package com.enernoc.open.oadr2.vtn
  *
  */
 class Program {
-    String programName
-    String programURI
+    String name
+    String marketContext
 
-    static hasMany = [ven:Ven, event:Event]
+    static hasMany = [vens:Ven, events:Event]
 
     static constraints = {
-        programName blank: false, unique: true
-        programURI blank:false, url:true
+        name blank: false, unique: true
+        marketContext blank:false, url:true
     }  
     
     public String toString(){
-        programName
+        name
     }
 }
