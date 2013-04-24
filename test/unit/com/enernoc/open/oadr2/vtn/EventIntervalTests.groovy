@@ -27,7 +27,7 @@ class EventIntervalTests {
         assert ! interval.validate(), "Interval level range validation should have failed: ${interval.errors}"
         
         interval.level = 1.1
-        assert ! interval.valdiate(true), "Interval level float validation should have failed: ${interval.errors}"
+        assert ! interval.validate(), "Interval level float validation should have failed: ${interval.errors}"
         
         signal.type = SignalType.PRICE_RELATIVE
         assert interval.validate(), "Price level validation should not have failed: ${interval.errors}"
