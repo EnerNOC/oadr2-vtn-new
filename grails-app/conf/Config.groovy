@@ -11,7 +11,7 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
-vtnID = "testVTN1"
+vtnID = "ENOCtestVTN1"
 
 xmppSvc {
 	jid = '<your account here>@gmail.com'
@@ -22,6 +22,7 @@ xmppSvc {
 	serviceName = 'gmail.com'
 }
 
+oadrTest.templatesFolder = "oadrTemplates"
 //xmpp.debug = true
 
 if ( xmpp.debug ) {
@@ -30,7 +31,7 @@ if ( xmpp.debug ) {
 }
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
-grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
+grails.mime.file.extensions = false
 grails.mime.use.accept.header = false
 grails.mime.types = [
 	all:           '*/*',
@@ -93,7 +94,7 @@ log4j = {
 	    console name:'stdout', layout:pattern(conversionPattern: '%d{ISO8601} %p %c{2} %m%n')
 	}
 
-	error  'org.codehaus.groovy.grails.web.servlet',        // controllers
+	warn  'org.codehaus.groovy.grails.web.servlet',        // controllers
 			'org.codehaus.groovy.grails.web.pages',          // GSP
 			'org.codehaus.groovy.grails.web.sitemesh',       // layouts
 			'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -105,8 +106,17 @@ log4j = {
 			'org.hibernate',
 			'net.sf.ehcache.hibernate'
 
+    error 'grails.app.services.org.grails.plugin.resource',
+          'grails.app.taglib.org.grails.plugin.resource',
+          'grails.app.resourceMappers.org.grails.plugin.resource'
+            
 	info 'grails.app'
-
+    
+    debug 'grails.app.controllers',
+          'grails.app.services',
+          'org.hibernate.SQL'
+          
+//    trace 'org.hibernate.type'
 }
 
 //configuration for jabber accounts
