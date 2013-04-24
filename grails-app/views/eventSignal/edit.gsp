@@ -1,4 +1,4 @@
-<%! import grails.converters.deep.JSON %>
+<%! import grails.converters.JSON %>
 <html>
 <head>
 <meta name="layout" content="bootstrap" />
@@ -119,7 +119,7 @@
 
 <g:javascript>
 $(function() {
-  var _event = <%= eventJSON %>;
+  var _event = <%= eventJSON as JSON %>;
 
   window.intervals.init(_event);
 });

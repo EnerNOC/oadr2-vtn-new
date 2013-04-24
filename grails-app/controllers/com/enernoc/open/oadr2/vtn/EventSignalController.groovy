@@ -43,7 +43,7 @@ class EventSignalController {
                         duration : it.durationMillis     
                     ]}
                 ]}
-            ] as JSON
+            ]
         ]   
     }
 }
