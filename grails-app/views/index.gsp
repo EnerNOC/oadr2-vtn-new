@@ -17,12 +17,14 @@
           <g:render template="/event/eventTableTemplate" model="[eventList:eventList]" />
         </div>
       </div>
-			<div class="row-fluid">
+			<div class="row">
 				<div class="span6">
 					<h3><g:link controller="Program" action="programs">Programs</g:link></h3>
 					<g:render template="/program/programTableTemplate" model="[programList:programList]" />
 				</div>
-        <div class="span6">
+				</div>
+			<div class="row">
+        <div class="span12">
           <h3><g:link controller="Ven" action="vens">VENs</g:link></h3>
           <g:render template="/ven/venTableTemplate" model="[venList:venList]" />
         </div>
