@@ -15,7 +15,7 @@ class Program {
     static hasMany = [ven:Ven, event:Event]
 
     static constraints = {
-        programName blank: false, nullable: false, unique: true
+        programName blank: false, unique: true
         programURI blank:false, url:true
     }  
     
