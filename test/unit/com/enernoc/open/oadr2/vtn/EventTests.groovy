@@ -19,11 +19,11 @@ class EventTests {
      */
     void setUp() {
         mockDomain(Program, [
-            [programName:"Program1", programURI:"http://URI1.com"],
-            [programName:"Program2", programURI:"http://URI2.com"] ])
+            [name:"Program1", marketContext:"http://URI1.com"],
+            [name:"Program2", marketContext:"http://URI2.com"] ])
         
         mockDomain(Event, [
-            [marketContext: Program.findWhere(programName: "Program1"), eventID: "valid", startDate: new Date(), endDate: new Date().next()] ])
+            [marketContext: Program.findWhere(name: "Program1"), eventID: "valid", startDate: new Date(), endDate: new Date().next()] ])
           
     }
     
@@ -48,7 +48,7 @@ class EventTests {
      */
     void testConstraintEvent() {
         def badEvent = new Event(
-                marketContext: Program.findWhere(programName: "Program2"),
+                marketContext: Program.findWhere(name: "Program2"),
                 eventID: "",
                 startDate: new Date(),
                 endDate: new Date().next(),
@@ -73,7 +73,7 @@ class EventTests {
         def sDate = new Date()
         def eDate = sDate.next()
         def badValidateEvent = new Event(
-                marketContext: Program.findWhere(programName: "Program2"),
+                marketContext: Program.findWhere(name: "Program2"),
                 eventID: "valid2",
                 startDate: eDate,
                 endDate: sDate,
@@ -91,7 +91,7 @@ class EventTests {
         badValidateEvent.startDate = sDate
         badValidateEvent.endDate = eDate
         assert badValidateEvent.validate()
-        badValidateEvent.marketContext = Program.findWhere(programName: "Program1")
+        badValidateEvent.marketContext = Program.findWhere(name: "Program1")
         assert !badValidateEvent.validate()
         assert "validator.invalid" == badValidateEvent.errors["marketContext"].code        
     }

@@ -18,10 +18,10 @@ class VenTests {
      * Initial setup for VEN tests. Adds data into a mock database
      */
     void setUp() {
-        mockDomain(Program, [ [programName:"Program1", programURI:"http://URI1.com"] ])
+        mockDomain(Program, [ [name:"Program1", marketContext:"http://URI1.com"] ])
         
         mockDomain(Ven, [
-            [program: Program.findWhere(programName: "Program1"), venName: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
+            [program: Program.findWhere(name: "Program1"), venName: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
           
     }
     
@@ -41,11 +41,11 @@ class VenTests {
      * Test VEN blank, unique and url constraints
      */
     void testConstraintEvent() {
-        def blankVen = new Ven(program: Program.findWhere(programName: "Program1"), venName: "", venID: "")
+        def blankVen = new Ven(program: Program.findWhere(name: "Program1"), venName: "", venID: "")
         assert !blankVen.validate()
         assert "blank" == blankVen.errors["venID"].code
         
-        def badVen = new Ven(program: Program.findWhere(programName: "Program1"), venName: "", venID: "VEN1", clientURI: "URI")
+        def badVen = new Ven(program: Program.findWhere(name: "Program1"), venName: "", venID: "VEN1", clientURI: "URI")
         assert !badVen.validate()
         assert "unique" == badVen.errors["venID"].code
         assert "url.invalid" == badVen.errors["clientURI"].code
