@@ -60,9 +60,9 @@ class OADRTestController {
     def programs() {
         render(contentType: "text/json") {
             programs = Program.list(limit:10).collect {
-                [ name : it.programName,
+                [ name : it.program,
                   id  : it.id,
-                  marketContext : it.programURI
+                  marketContext : it.marketContext
                 ]
             }
         }

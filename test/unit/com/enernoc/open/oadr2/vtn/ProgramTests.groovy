@@ -18,7 +18,7 @@ class ProgramTests {
      * Initial setup for Program tests. Adds data into a mock database
      */
     void setUp() {
-        mockDomain(Program, [ [programName:"Program1", programURI:"http://URI1.com"] ])
+        mockDomain(Program, [ [name:"Program1", marketContext:"http://URI1.com"] ])
     }
     
     /**
@@ -27,25 +27,25 @@ class ProgramTests {
     void testNullProgram() {
         def nullProgram = new Program()
         assert !nullProgram.validate()
-        assert "nullable" == nullProgram.errors["programName"].code
-        assert "nullable" == nullProgram.errors["programURI"].code
+        assert "nullable" == nullProgram.errors["name"].code
+        assert "nullable" == nullProgram.errors["marketContext"].code
     }
     
     /**
      * Test Program blank, unique and url constraints
      */
     void testConstraintEvent() {   
-        def blankProgram = new Program(programName: "", programURI: "")
+        def blankProgram = new Program(name: "", marketContext: "")
         assert !blankProgram.validate()
-        assert "blank" == blankProgram.errors["programName"].code
-        assert "blank" == blankProgram.errors["programURI"].code
+        assert "blank" == blankProgram.errors["name"].code
+        assert "blank" == blankProgram.errors["marketContext"].code
         
-        def badProgram = new Program(programName: "Program1", programURI: "URIFail")
+        def badProgram = new Program(name: "Program1", marketContext: "URIFail")
         assert !badProgram.validate()
-        assert "unique" == badProgram.errors["programName"].code
-        assert "url.invalid" == badProgram.errors["programURI"].code
-        badProgram.programName = "valid"
-        badProgram.programURI = "http://Valid.com"
+        assert "unique" == badProgram.errors["name"].code
+        assert "url.invalid" == badProgram.errors["marketContext"].code
+        badProgram.name = "valid"
+        badProgram.marketContext = "http://Valid.com"
         assert badProgram.validate()
     }
 }

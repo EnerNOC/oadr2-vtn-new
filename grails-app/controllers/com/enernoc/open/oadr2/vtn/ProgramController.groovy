@@ -28,7 +28,7 @@ class ProgramController {
      * @return the default render page for Program display, edit and deletion
      */
     def programs() {
-        def results = Program.listOrderByProgramName(order:"desc")
+        def results = Program.listOrderByName(order:"desc")
         [programList: results]
     }
 
@@ -79,8 +79,8 @@ class ProgramController {
             response.sendError 404, "No program for ID $params.id"
             return
         }
-        program.ven.each { v ->
-            program.removeFromVen(v)
+        program.vens.each { v ->
+            program.removeFromVens(v)
             if( v.program.size() == 0)
             v.delete()
         }
@@ -123,8 +123,8 @@ class ProgramController {
         program.properties = params
         if (program.validate()) {
             //TODO Once ven.programID is remove this loop will be removed
-            program.ven.each {v->
-                v.venID = program.programName
+            program.vens.each {v->
+                v.venID = program.name
             }
             program.save()
             flash.message = "Success, your Program has been updated"

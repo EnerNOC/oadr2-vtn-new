@@ -22,19 +22,19 @@
 	
 	<h3>Market Context</h3>
 	<g:form action="newProgram" method="POST" class="form-horizontal">
-		<div class="control-group ${hasErrors(bean:program,field:'programName', 'error')}">
+		<div class="control-group ${hasErrors(bean:program,field:'name', 'error')}">
 			<label class="control-label" for="inputProgramName">Program Name: </label>
 			<div class="controls">
-				<input type="text" name="programName" placeholder="My Name" id="inputProgramName"
-				  value='${program.programName}' />
+				<input type="text" name="name" placeholder="My Name" id="inputProgramName"
+				  value='${program.name}' />
 			</div>
 		</div>
 		<div class="control-group ${hasErrors(bean:program,field:'programURI', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
-				<input type="text" name="programURI" placeholder="http://MyURI.com" id="inputProgramURI" 
-				  class="${hasErrors(bean:program,field:'programURI', 'error')}"
-				  value='${program.programURI}'/>
+				<input type="text" name="marketContext" placeholder="http://MyURI.com" id="inputProgramURI" 
+				  class="${hasErrors(bean:program,field:'marketContext', 'error')}"
+				  value='${program.marketContext}'/>
 			</div>
 		</div>
 		<div class="control-group">

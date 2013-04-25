@@ -94,7 +94,7 @@ class EventController {
 //            populateFromPush(event)
 //            def vens = Ven.findAll { event.marketContext in program }
 //            pushService.pushNewEvent(eiEvent, vens)
-            program.addToEvent event
+            program.addToEvents event
             program.save()
             flash.message = "Success, your event has been created"
         }
@@ -212,8 +212,8 @@ class EventController {
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            oldProgram.removeFromEvent(event)
-            newProgram.addToEvent(event)
+            oldProgram.removeFromEvents(event)
+            newProgram.addToEvents(event)
             oldProgram.save()
             newProgram.save()
             //populateFromPush(event)
