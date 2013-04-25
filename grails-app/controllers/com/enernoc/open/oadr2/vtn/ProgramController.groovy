@@ -97,12 +97,14 @@ class ProgramController {
      */
     def editProgram() {
         def model = [:]
-        def program = Program.get params.id
-        if ( ! program ) {
-            response.sendError 404, "No program for ID $params.id"
-            return
+        if ( ! flash.chainModel?.program ) {
+            def program = Program.get params.id
+            if ( ! program ) {
+                response.sendError 404, "No program for ID $params.id"
+                return
+            }
+             model.program = program 
         }
-        if ( ! flash.chainModel?.program ) model.program = program 
         model
     }
     
@@ -134,8 +136,7 @@ class ProgramController {
             def errors = program.errors.allErrors.collect {
                 messageSource.getMessage it, null
             }
-            return chain( action:"editProgram", id: program.id, 
-                model:[errors: errors, program: program] )
+            return chain( action:"editProgram", model:[errors: errors, program: program] )
         }
         redirect action: "programs"
     }
