@@ -77,6 +77,8 @@ grails.exceptionresolver.params.exclude = ['password']
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
+// see: http://grails.org/doc/2.1.0/guide/single.html#configGORM
+grails.gorm.failOnError=true
 
 environments {
 	development {
