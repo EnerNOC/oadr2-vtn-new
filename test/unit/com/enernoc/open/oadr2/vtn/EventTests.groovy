@@ -23,7 +23,7 @@ class EventTests {
             [name:"Program2", marketContext:"http://URI2.com"] ])
         
         mockDomain(Event, [
-            [marketContext: Program.findWhere(name: "Program1"), eventID: "valid", startDate: new Date(), endDate: new Date().next()] ])
+            [program: Program.findWhere(name: "Program1"), eventID: "valid", startDate: new Date(), endDate: new Date().next()] ])
           
     }
     
@@ -33,7 +33,7 @@ class EventTests {
     void testNullEvent() {
         def nullEvent = new Event()
         assert !nullEvent.validate()
-        assert "nullable" == nullEvent.errors["marketContext"].code
+        assert "nullable" == nullEvent.errors["program"].code
         assert "nullable" == nullEvent.errors["eventID"].code
         assert 0L == nullEvent.priority
         assert "nullable" == nullEvent.errors["startDate"].code
@@ -48,7 +48,7 @@ class EventTests {
      */
     void testConstraintEvent() {
         def badEvent = new Event(
-                marketContext: Program.findWhere(name: "Program2"),
+                program: Program.findWhere(name: "Program2"),
                 eventID: "",
                 startDate: new Date(),
                 endDate: new Date().next(),
@@ -73,7 +73,7 @@ class EventTests {
         def sDate = new Date()
         def eDate = sDate.next()
         def badValidateEvent = new Event(
-                marketContext: Program.findWhere(name: "Program2"),
+                program: Program.findWhere(name: "Program2"),
                 eventID: "valid2",
                 startDate: eDate,
                 endDate: sDate,
@@ -91,8 +91,8 @@ class EventTests {
         badValidateEvent.startDate = sDate
         badValidateEvent.endDate = eDate
         assert badValidateEvent.validate()
-        badValidateEvent.marketContext = Program.findWhere(name: "Program1")
+        badValidateEvent.program = Program.findWhere(name: "Program1")
         assert !badValidateEvent.validate()
-        assert "validator.invalid" == badValidateEvent.errors["marketContext"].code        
+        assert "validator.invalid" == badValidateEvent.errors["program"].code        
     }
 }

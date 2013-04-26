@@ -35,8 +35,8 @@ class Event {
 
     private DatatypeFactory _dtf
     
-    static belongsTo = [marketContext: Program]
-    static hasMany = [venStatus: VenStatus, signals: EventSignal]
+    static belongsTo = [program: Program]
+    static hasMany = [venStatuses: VenStatus, signals: EventSignal]
      
     String eventID
     long priority
@@ -62,7 +62,7 @@ class Event {
                 && val > new Date() // don't allow events in the past
         }
         modificationNumber min: 0L
-        marketContext validator : { val,obj ->
+        program validator : { val,obj ->
             obj.notConflicting()
         }
     }
@@ -186,7 +186,7 @@ class Event {
         def tempID = this.id
         if (tempID == null) tempID = -1
         def activePrograms = Event.where {
-            marketContext == this.marketContext
+            program == this.program
             endDate > this.startDate
             startDate < this.endDate
             id != tempID

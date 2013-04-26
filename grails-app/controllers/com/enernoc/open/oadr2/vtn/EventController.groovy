@@ -87,12 +87,12 @@ class EventController {
         
         params.remove( 'programID' )
         def event = new Event(params)
-        event.marketContext = program
+        event.program = program
 
         if ( event.validate() ) {
 //            def eiEvent = eiEventService.buildEiEvent(event)
 //            populateFromPush(event)
-//            def vens = Ven.findAll { event.marketContext in program }
+//            def vens = Ven.findAll { event.program in program }
 //            pushService.pushNewEvent(eiEvent, vens)
             program.addToEvents event
             program.save()
@@ -206,9 +206,9 @@ class EventController {
             return
         }
         // FIXME it should not be possible to change the program for an event!
-        def oldProgram = event.marketContext
+        def oldProgram = event.program
         event.properties = params
-        event.marketContext = newProgram
+        event.program = newProgram
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
@@ -217,7 +217,7 @@ class EventController {
             oldProgram.save()
             newProgram.save()
             //populateFromPush(event)
-            def vens = Ven.findAll { event.marketContext in program }
+            def vens = Ven.findAll { event.program in program }
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
@@ -243,7 +243,7 @@ class EventController {
         def customers = []
         AllVens.each {v ->
             print(v.venID)
-            if (v.program.contains( event.marketContext )) {
+            if (v.program.contains( event.program )) {
                 print("true")
                 customers << v
             }
@@ -265,7 +265,7 @@ class EventController {
             venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
-            event.addToVenStatus(venStatus)
+            event.addToVenStatuses(venStatus)
             v.addToVenStatus(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {

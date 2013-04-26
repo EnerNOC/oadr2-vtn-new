@@ -60,7 +60,7 @@ class OADRTestController {
     def programs() {
         render(contentType: "text/json") {
             programs = Program.list(limit:10).collect {
-                [ name : it.program,
+                [ name : it.marketContext,
                   id  : it.id,
                   marketContext : it.marketContext
                 ]
@@ -84,7 +84,7 @@ class OADRTestController {
     def events() {
         def programID = params.programID
         log.debug("Events for program ID: $programID")
-        def eventList = Event.find { marketContext.id == programID }
+        def eventList = Event.find { program.id == programID }
         render(contentType: "text/json") {
             events = eventsList.collect {
                 [ id  : it.venID ]
