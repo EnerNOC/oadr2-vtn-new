@@ -54,7 +54,7 @@ class ProgramController {
     def newProgram() {
         def program = new Program(params)
         if ( program.validate() ) {
-            program.save()
+            program.save(flush: true)
             flash.message = "Success, your Program has been created"
         } 
         else {
@@ -79,12 +79,14 @@ class ProgramController {
             response.sendError 404, "No program for ID $params.id"
             return
         }
-        program.vens.each { v ->
-            program.removeFromVens(v)
+        def venList = []
+        venList.addAll(program.vens)
+        venList.each { v ->
+            v.removeFromProgram(program)
             if( v.program.size() == 0)
-            v.delete()
+            v.delete(flush: true)
         }
-        program.delete()
+        program.delete(flush: true)
 
         redirect(action:"programs")
     }
@@ -125,10 +127,7 @@ class ProgramController {
         program.properties = params
         if (program.validate()) {
             //TODO Once ven.programID is remove this loop will be removed
-            program.vens.each {v->
-                v.venID = program.name
-            }
-            program.save()
+            program.save(flush: true)
             flash.message = "Success, your Program has been updated"
         }
         else {
