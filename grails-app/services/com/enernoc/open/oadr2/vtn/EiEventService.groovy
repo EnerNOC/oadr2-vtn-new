@@ -160,7 +160,7 @@ public class EiEventService {
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
         def events = Event.findAll(max : limit) { 
-            marketContext.id == ven.program.id
+            program.id == ven.program.id
             endDate > new Date() // include only events that have not ended
         }
 
@@ -188,7 +188,7 @@ public class EiEventService {
             if ( ! venStatus ) {
                 venStatus = new VenStatus()
                 ven.addToVenStatus(venStatus)
-                event.addToVenStatus(venStatus)
+                event.addToVenStatuses(venStatus)
                 venStatus.optStatus = "Pending response"
             }
 
@@ -320,7 +320,7 @@ public class EiEventService {
                         .withCreatedDateTime(new DateTime().withValue(xCalendar))
                         .withEiMarketContext(new EiMarketContext()
                             .withMarketContext(new MarketContext()
-                                .withValue(event.marketContext.marketContext)))
+                                .withValue(event.program.marketContext)))
                         .withEventID(event.eventID)
                         .withEventStatus(updateStatus(newEvent, (int)event.intervals))
                         .withModificationNumber(event.modificationNumber) //changed to the set modification number

@@ -35,10 +35,10 @@
 	<fieldset>
 		<g:form action="updateEvent" class="form-horizontal">
 			<h3>Event Descriptor</h3>
-			<div class="control-group ${hasErrors(bean:currentEvent,field:'marketContext', 'error')}">
+			<div class="control-group ${hasErrors(bean:currentEvent,field:'program', 'error')}">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programID" from="${programsList}" value="${ currentEvent.marketContext.id }" optionKey="id" id="selectProgram" />
+					<g:select name="programID" from="${programsList}" value="${ currentEvent.program.id }" optionKey="id" id="selectProgram" />
 				</div>
 			</div>
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'eventID', 'error')}">

@@ -20,7 +20,7 @@
 					${venStatus.event.eventID}
 				</td>
 				<td>
-					${venStatus.event.marketContext.programName}
+					${venStatus.event.program.name}
 				</td>
 				<td><g:if test="${venStatus.optStatus == "OPT_OUT"}">
 						<a disabled="disabled" class="btn btn-danger">Opted Out</a>
