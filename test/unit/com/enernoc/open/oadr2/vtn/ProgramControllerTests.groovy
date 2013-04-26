@@ -25,8 +25,8 @@ class ProgramControllerTests {
         
         def pro1 = new Program(name:"Program1", marketContext:"http://URI1.com")
         def pro2= new Program(name:"Program2", marketContext:"http://URI2.com")
-        def ven1 = new Ven(program: pro1, venName: "ven-one", venID: "VEN1", clientURI: "http://URI1.com").save(flush: true, failOnError: true)
-        def ven2 = new Ven(program: [pro1, pro2], venName: "ven-two", venID: "VEN2", clientURI: "http://URI2.com").save(flush: true, failOnError: true)
+        def ven1 = new Ven(programs: pro1, name: "ven-one", venID: "VEN1", clientURI: "http://URI1.com").save(flush: true, failOnError: true)
+        def ven2 = new Ven(programs: [pro1, pro2], name: "ven-two", venID: "VEN2", clientURI: "http://URI2.com").save(flush: true, failOnError: true)
         pro1.vens = [ven1, ven2]
         pro1.save(flush: true, failOnError: true)
         pro2.vens = [ven2]

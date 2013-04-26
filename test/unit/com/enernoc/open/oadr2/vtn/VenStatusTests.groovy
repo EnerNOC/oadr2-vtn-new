@@ -25,7 +25,7 @@ class VenStatusTests {
             [program: Program.findWhere(name: "Program1"), eventID: "event1", startDate: new Date(), endDate: new Date().next()] ])
        
         mockDomain(Ven, [
-            [program: Program.findWhere(name: "Program1"), venName: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
+            [programs: Program.findWhere(name: "Program1"), name: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
     }
     
     /**

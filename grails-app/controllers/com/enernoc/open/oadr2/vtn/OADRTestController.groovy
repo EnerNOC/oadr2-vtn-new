@@ -71,10 +71,11 @@ class OADRTestController {
     def vens() {
         def programID = params.programID
         log.debug("Vens for program ID: $programID")
-        def venList = Ven.find { program.id == programID }
+        //TODO This requires going through the array of programs to find venList. Current implementation fails
+        def venList = Ven.find { programs.id == programID }
         render(contentType: "text/json") {
             vens = venList.collect {
-                [ name : it.venName,
+                [ name : it.name,
                   id  : it.venID
                 ]
             }
@@ -86,7 +87,7 @@ class OADRTestController {
         log.debug("Events for program ID: $programID")
         def eventList = Event.find { program.id == programID }
         render(contentType: "text/json") {
-            events = eventsList.collect {
+            events = eventList.collect {
                 [ id  : it.venID ]
             }
         }

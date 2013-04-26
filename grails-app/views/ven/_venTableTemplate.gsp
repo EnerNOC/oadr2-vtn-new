@@ -14,7 +14,7 @@
 		<g:each var="ven" in="${venList}">
 			<tr>
 				<td>
-					${ven.venName}
+					${ven.name}
 				</td>
 				<td>
 					${ven.venID}
@@ -23,7 +23,7 @@
 					${ven.clientURI}
 				</td>
 				<td>
-					${ven.program}
+					${ven.programs}
 				</td>
 				<td><g:form controller="Ven" action="deleteVEN" params="[id : ven.id]">
 						<input type="submit" value="Delete" class="btn btn-danger"

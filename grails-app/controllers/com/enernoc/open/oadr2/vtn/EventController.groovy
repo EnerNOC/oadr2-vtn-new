@@ -84,13 +84,16 @@ class EventController {
         
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
-
-        def program = Program.get( params.programID.toLong() )
-        if ( ! program ) {
-            response.sendError 404, "No program for ID $params.programID"
-            return
-        } 
-        
+        def program;
+        print("program id is " + params.programID)
+        if ( params.programID == "null" ) {
+        } else {
+            program = Program.get( params.programID.toLong() )
+            if ( ! program ) {
+                response.sendError 404, "No program for ID $params.programID"
+                return
+            }
+        }
         params.remove( 'programID' )
         def event = new Event(params)
         event.program = program
@@ -253,7 +256,7 @@ class EventController {
         def customers = []
         AllVens.each {v ->
             print(v.venID)
-            if (v.program.contains( event.program )) {
+            if (v.programs.contains( event.program )) {
                 print("true")
                 customers << v
             }
@@ -276,7 +279,7 @@ class EventController {
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
             event.addToVenStatuses(venStatus)
-            v.addToVenStatus(venStatus)
+            v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
                 v.save()

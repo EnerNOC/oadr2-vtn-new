@@ -22,16 +22,16 @@
 	
 	<h3>Edit VEN: ${ currentVen.venID }</h3>
 	<g:form action="updateVEN" class="form-horizontal">
-		<div class="control-group ${hasErrors(bean:currentVen,field:'program', 'error')}">
+		<div class="control-group ${hasErrors(bean:currentVen,field:'programs', 'error')}">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
-				<g:select name="programID" from="${programsList}" value="${ currentVen.program.id }" optionKey="id" id="selectProgram" multiple="true"/>
+				<g:select name="programID" from="${programsList}" value="${ currentVen.programs.id }" optionKey="id" id="selectProgram" multiple="true"/>
 			</div>
 		</div>
-		<div class="control-group ${hasErrors(bean:currentVen,field:'venName', 'error')}">
-			<label class="control-label" for="inputVenName">VEN Name: </label>
+		<div class="control-group ${hasErrors(bean:currentVen,field:'name', 'error')}">
+			<label class="control-label" for="inputname">VEN Name: </label>
 			<div class="controls">
-				<input type="text" name="venName" value="${ currentVen.venName }" id="inputVenName" />
+				<input type="text" name="name" value="${ currentVen.name }" id="inputname" />
 			</div>
 		</div>
 		<div class="control-group ${hasErrors(bean:currentVen,field:'venID', 'error')}">

@@ -29,7 +29,7 @@
 				  value='${program.name}' />
 			</div>
 		</div>
-		<div class="control-group ${hasErrors(bean:program,field:'programURI', 'error')}">
+		<div class="control-group ${hasErrors(bean:program,field:'marketContext', 'error')}">
 			<label class="control-label" for="inputProgramURI">URI: </label>
 			<div class="controls">
 				<input type="text" name="marketContext" placeholder="http://MyURI.com" id="inputProgramURI" 
