@@ -27,22 +27,30 @@ class EventSignalController {
             )
             event.discard() // prevent from causing a save error.
         }
-        
+
         return [
             event: event, 
             eventJSON: [
                 id : event.id,
                 start : event.startDate,
                 end : event.endDate,
-                signals : event.signals.collect { sig -> [
-                    id : sig.id,
-                    name : sig.name,
-                    type : sig.type.toString(),
-                    intervals : sig.intervals.collect {[
-                        level: it.level,
-                        duration : it.durationMillis     
-                    ]}
-                ]}
+                signals : event.signals.collect { sig -> 
+                    def end = event.startDate.time
+                    
+                    return [
+                        id : sig.id,
+                        name : sig.name,
+                        type : sig.type.toString(),
+                        intervals : sig.intervals.collect {
+                            end += it.durationMillis
+                            return [
+                                level: it.level,
+                                duration : it.durationMillis,
+                                endTime : end
+                            ]
+                        }
+                    ]
+                }
             ]
         ]   
     }

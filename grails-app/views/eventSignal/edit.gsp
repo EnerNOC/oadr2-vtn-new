@@ -3,6 +3,15 @@
 <head>
 <meta name="layout" content="bootstrap" />
 <r:require module="eventIntervals" />
+<style type='text/css'>
+.signalSection {
+  border-top: solid 1px #ccc
+}
+.intervals .help-inline {
+  font-size: .8em;
+  display:block
+}
+</style>
 </head>
 <body>
   
@@ -25,17 +34,26 @@
 <div class='row'>
   <div class='span12'>
 		<g:form action="intervals" class="form-horizontal">
-       <div class='pull-right'>
-         <a href='#addSignal' id='addSignalBtn' class='btn btn-success'>
-           <i class='icon-plus'></i> Add Signal...
-         </a>
-         <input type="submit" value="Save!" class="btn btn-primary" />
-         <g:link controller="event" class="btn">Cancel</g:link>
-       </div>
-       
-      <h1>Intervals for Event <span class='eventName'>${event.eventID}</span></h1>
-				
+		  <div class='row'>
+		    <div class='span7'>
+          <h1>Intervals for Event '<span class='eventName'>${event.eventID}</span>'</h1>
+		    </div>
+		    
+		    <div class='span2'>
+		      <p><span class='label'>Start: ${formatDate(format:'dd/MM/yyyy HH:mm', date:event.startDate)}</span></p>
+          <p><span class='label'>End: ${formatDate(format:'dd/MM/yyyy HH:mm', date:event.endDate)}</span></p>
+		    </div>
+	      <div class='span3'>
+	        <a href='#addSignal' id='addSignalBtn' class='btn btn-success'>
+	          <i class='icon-plus'></i> Add Signal...
+	        </a>
+	        <input type="submit" value="Save!" class="btn btn-primary" />
+	        <g:link controller="event" class="btn">Cancel</g:link>
+	      </div>
+		  </div>
+             
 			<div id='signals'>
+			 <!-- Signal templates inserted here -->
 			</div>		
 		</g:form>
 	</div>
@@ -43,7 +61,7 @@
 
 <script type='text/html' id='signalTmpl'>
   <div class='row signalSection'>
-  <div class='span12'>
+  <div class='span10 '>
 	  <div class='pull-right'>
 	    <a href='#remove' class='remove'>&times; Remove</a>
 	  </div>
@@ -87,6 +105,7 @@
 			     </tr>
 			   </thead>
 			   <tbody class='intervals'>
+			     <!-- interval templates inserted here -->
 			   </tbody>
 			  </table>
 		  </div>
@@ -100,14 +119,20 @@
 <script type='text/html' id='intervalTmpl'>
   <tr>
     <td>
-       <input type="text" name="val" value="{{level}}" placeholder="1" class='input-small' />    
-        <input type='hidden' name='intervalID' value='{{name}}' />
+      <div class='control-group'>
+	      <input type="text" name="val" value="{{level}}" placeholder="1" class='input-small' />    
+	      <input type='hidden' name='intervalID' value='{{name}}' />
+        <span class='help-inline'></span>
+      </div>
     </td>
     <td>
-      <div class='bootstrap-timepicker input-append'>
-	      <g:textField name="endDate" class="dp input-small" value=""/>
-	      <g:textField name="endTime" value="" class="tp input-mini" />
-	      <span class="add-on"><i class="icon-time"></i></span>
+      <div class='bootstrap-timepicker control-group'>
+        <div class='input-append'>
+		      <g:textField name="endDate" class="dp input-small" value=""/>
+		      <g:textField name="endTime" value="" class="tp input-mini" />
+		      <span class="add-on"><i class="icon-time"></i></span>
+	      </div>
+	      <span class='help-inline'></span>
       </div>
     </td>
     <td>
