@@ -69,7 +69,6 @@ class VenController {
                 p.addToVens(ven)
             }
         }
-        
         if (ven.validate()) {
             programs.each  { p->
                 p.save()
@@ -99,7 +98,7 @@ class VenController {
             response.sendError 404, "No ven for ID $params.id"
             return
         }
-        ven.program.each { p->
+        ven.programs.each { p->
             p.removeFromVens(ven)
             p.save()
         }
@@ -149,11 +148,7 @@ class VenController {
             }
             newPrograms << p
         }
-        
-        //oldProgram.removeFromVen(ven)
-        if (newPrograms == []) {
-            ven.programs = null
-        }
+        if ( newPrograms == []) ven.programs = null
         params.remove('programID')
         ven.properties = params
         if (ven.validate()) {
