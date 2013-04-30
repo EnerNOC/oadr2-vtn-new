@@ -5,7 +5,7 @@
 <body> 
 	<h3>Select Event:</h3>
 		<g:form action="venStatuses" class="form-inline form-buttons">
-		      <g:select name="eventID" from="${eventList}" value="${event}" class="btn"/>
+		      <g:select name="eventID" from="${eventList}" value="${event}" optionValue="eventID" class="btn"/>
 		      <input type="submit" value="Change Event" class="btn btn-primary"/>
 		</g:form>
 	<h3>VEN Status</h3>

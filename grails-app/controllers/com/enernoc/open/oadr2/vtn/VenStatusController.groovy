@@ -30,7 +30,7 @@ public class VenStatusController {
         //def eventList = Event.list()
         def event = Event.findWhere(eventID: params.eventID)
         def venStatuses = event.venStatuses
-        def	eventList = Event.executeQuery("SELECT distinct e.eventID FROM Event e")
+        def	eventList = Event.list()
         [venStatusList: venStatuses, eventList: eventList, event: event.eventID]
     }
 
@@ -46,7 +46,7 @@ public class VenStatusController {
             return
         }
         def event = venStatus.event.eventID
-        venStatus.delete()
+        venStatus.delete(flush: true)
         redirect(action:"venStatuses", params:[eventID: event])
     }
 }
