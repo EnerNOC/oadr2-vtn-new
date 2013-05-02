@@ -93,18 +93,18 @@ class EventController {
                 return
             }
         }
-        params.remove( 'programID' )
+        params.remove 'programID'
         def event = new Event(params)
         event.program = program
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
-            pushService.pushNewEvent(eiEvent, vens)
-            program.addToEvents(event)
+            def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
+            pushService.pushNewEvent eiEvent, vens
+            program.addToEvents event
             program.save(flush: true)
-            prepareVenStatus(event)
-            flash.message="Success, your event has been created"
+            prepareVenStatus event
+            flash.message = "Success, your event has been created"
         }
         else {
             flash.message="Please fix the errors below"
@@ -162,7 +162,7 @@ class EventController {
             return
         }
         def program = event.program
-        event.program.removeFromEvents(event)
+        event.program.removeFromEvents event
         event.delete()
         program.save()
         redirect actions: "events"
@@ -215,7 +215,7 @@ class EventController {
             event.modificationNumber +=1 // TODO this could be done with a save hook
             event.save()
             //prepareVenStatus(event)
-            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
+            def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
@@ -238,8 +238,8 @@ class EventController {
      */
     protected void prepareVenStatus ( Event event ) {
         
-        def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
-
+        def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
+        
         vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
