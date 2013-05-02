@@ -1,6 +1,12 @@
 class UrlMappings {
 
 	static mappings = {
+        
+        name eventSignal: "/event/$eventID/signals" {
+            controller = "eventSignal"
+            action = [GET:'edit',POST:'update']
+        }
+        
 		"/$controller/$action?/$id?"{
 			constraints {
 				// apply constraints here
@@ -9,10 +15,6 @@ class UrlMappings {
 		
 		"/OpenADR2/Simple/EiEvent"(controller : "eiEvent") {
             action = [POST:"post"]
-        }
-        
-        "/event/$id/intervals"(controller: "eventSignal") {
-            action = [GET:'edit',POST:'update']
         }
         
         "/OADRTest/template/$service/$template"(controller: "OADRTest", action: "template")

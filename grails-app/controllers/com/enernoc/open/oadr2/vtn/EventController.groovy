@@ -95,7 +95,7 @@ class EventController {
 //            def vens = Ven.findAll { event.program in program }
 //            pushService.pushNewEvent(eiEvent, vens)
             program.addToEvents event
-            program.save()
+            program.save(flush:true)
             flash.message = "Success, your event has been created"
         }
         else {
@@ -108,8 +108,9 @@ class EventController {
             return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
+        event.refresh()
 //        redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID
-        redirect controller: "EventInterval", id: event.id
+        redirect mapping: "eventSignal", params:[eventID: event.id]
     }
     
     /**

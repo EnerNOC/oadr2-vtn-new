@@ -6,11 +6,13 @@ import org.hibernate.FetchMode as FM
 class EventSignalController {
 
     static defaultAction = 'edit'
+    static allowedMethods = [edit:'GET', update:'POST']
     
     def edit() {
-        def event = Event.findById(params.id, [fetch:[signals:'select']])         
+        def eventID = params.eventID
+        def event = Event.findById(eventID, [fetch:[signals:'select']])         
         if ( ! event ) {
-            response.sendError 404, "No Event for ID $params.eventID"
+            response.sendError 404, "No Event for ID $eventID"
             return 
         }
         log.info "EVENT: $event"
@@ -53,5 +55,19 @@ class EventSignalController {
                 }
             ]
         ]   
+    }
+    
+    
+    def update() {
+        def data = request.JSON
+        def eventID = params.eventID
+        log.debug "Creating signals: $data for $eventID"
+        
+        flash.message = "Saved event signals"
+        
+        render( contentType: 'text/json' ) {
+            location = g.createLink( controller: 'event', id: eventID)
+            msg = "OK"
+        }
     }
 }

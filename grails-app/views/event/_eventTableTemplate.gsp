@@ -24,8 +24,8 @@
 				</td>
 				<td>
 				  ${event.signals.size()}
-				  <g:link controller="EventSignal" params="[id: event.id]"
-            class=""><i class='icon-edit' title='Edit Intervals'></i></g:link>
+				  <g:link mapping="eventSignal" params="[eventID: event.id]">
+				    <i class='icon-edit' title='Edit Intervals'></i></g:link>
 				</td>
 				<td>
 					${event.priority}
