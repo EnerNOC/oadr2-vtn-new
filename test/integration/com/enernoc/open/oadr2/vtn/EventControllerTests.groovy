@@ -221,7 +221,6 @@ class EventControllerTests {
         def id = Event.findWhere(eventID: "event1").id
         controller.params.id = id
         def event3 = new Event(
-                program: Program.findWhere(name: "Program3"),
                 eventID: "eventUpdated",
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2025 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:14"),
@@ -229,7 +228,6 @@ class EventControllerTests {
                 intervals: 2L,
                 modificationNumber: 0L
                 )
-        controller.params.programID = event3.program.id
         controller.params.eventID = event3.eventID
         controller.params.priority = event3.priority
         controller.params.intervals = event3.intervals
@@ -240,7 +238,6 @@ class EventControllerTests {
         controller.updateEvent()
 
         assert controller.response.redirectedUrl == '/event/events'
-        assert Event.get( id ).program == event3.program
         assert Event.get( id ).eventID == event3.eventID
         assert Event.get( id ).priority == event3.priority
         assert Event.get( id ).intervals == event3.intervals
@@ -258,7 +255,6 @@ class EventControllerTests {
         def id = Event.findWhere(eventID: "event1").id
         controller.params.id = id
         def eventFail = new Event(
-                program: Program.findWhere(name: "Program3"),
                 eventID: "eventFail",
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2025 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2010 12:14"),
@@ -266,7 +262,6 @@ class EventControllerTests {
                 intervals: -2L,
                 modificationNumber: 0L
                 )
-        controller.params.programID = eventFail.program.id
         controller.params.eventID = eventFail.eventID
         controller.params.priority = eventFail.priority
         controller.params.intervals = eventFail.intervals
@@ -277,7 +272,6 @@ class EventControllerTests {
         controller.updateEvent()
 
         assert controller.response.redirectedUrl == '/event/editEvent'
-        assert controller.flash.chainModel.currentEvent.program == eventFail.program
         assert controller.flash.chainModel.currentEvent.eventID == eventFail.eventID
         assert controller.flash.chainModel.currentEvent.priority == eventFail.priority
         assert controller.flash.chainModel.currentEvent.intervals == eventFail.intervals
@@ -317,14 +311,21 @@ class EventControllerTests {
     }
     
     /**
-     * 13: Test populateFromPush
+     * 13: Test prepareVenStatus
      */
-    void testPopulateFromPush() {
+    void testPrepareVenStatus() {
         def controller = new EventController()
         def event1 = Event.findWhere(eventID: "event1")
-        def vens = controller.populateFromPush(event1)
+        def ven1 = Ven.findWhere(venID: "ven1")
+        def ven2 = Ven.findWhere(venID: "ven2")
+        def currentVenStatusCount = VenStatus.count
+        def vens = controller.prepareVenStatus(event1)
 
-        assert vens.contains(Ven.findWhere(venID: "ven1")) && vens.contains(Ven.findWhere(venID: "ven2"))
+        assert VenStatus.count() > currentVenStatusCount
+        assert event1.venStatuses != null
+        assert ven1.venStatuses != null
+        assert ven2.venStatuses != null
+        
         
     }
     
