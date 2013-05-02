@@ -79,11 +79,13 @@ class ProgramControllerTests {
      * 5: Test successful newProgram
      */
     void testSuccessfulNewProgram() {
-        controller.params.name = "Program3"
-        controller.params.marketContext = "http://URI3.com"
+        def program3 = new Program(name: "Program3", marketContext: "http://URI3.com") 
+        controller.params.name = program3.name
+        controller.params.marketContext = program3.marketContext
         controller.newProgram()
-
+        
         assert response.redirectedUrl == '/program/programs'
+        assert controller.flash.message == "Success, your Program has been created"
         assert Program.findWhere(name: "Program3") != null
 
     }
@@ -92,14 +94,15 @@ class ProgramControllerTests {
      * 6: Test fail newProgram
      */
     void testInvalidNewProgram() {
-        
-        controller.params.name = "Program4"
-        controller.params.marketContext = "http://URI3"
+        def programBad = new Program(name: "Program3", marketContext: "http://URI3")
+        controller.params.name = programBad.name
+        controller.params.marketContext = programBad.marketContext
         controller.newProgram()
 
         assert controller.response.redirectedUrl == '/program/blankProgram'
-        assert controller.flash.chainModel.program.name == 'Program4'
-        assert controller.flash.chainModel.program.marketContext == 'http://URI3'
+        assert controller.flash.message == "Please fix the errors below: "
+        assert controller.flash.chainModel.program.name == programBad.name
+        assert controller.flash.chainModel.program.marketContext == programBad.marketContext
         assert Program.findWhere(name: "Program4") == null
         
 
@@ -131,14 +134,16 @@ class ProgramControllerTests {
      * 9: Test successful updateProgram
      */
     void testSuccessfulUpdateProgram() {
+        def program1 = new Program(name: "Program1-1", marketContext: "http://URI1-1.com")
         controller.params.id = 1
-        controller.params.name = "Program1-1"
-        controller.params.marketContext = "http://URI1-1.com"
+        controller.params.name = program1.name
+        controller.params.marketContext = program1.marketContext
         controller.updateProgram()
 
         assert response.redirectedUrl == '/program/programs'
-        assert Program.get(1).name == "Program1-1"
-        assert Program.get(1).marketContext == "http://URI1-1.com"
+        assert controller.flash.message == "Success, your Program has been updated"
+        assert Program.get(1).name == program1.name
+        assert Program.get(1).marketContext == program1.marketContext
         
     }
 
@@ -146,15 +151,16 @@ class ProgramControllerTests {
      * 10: Test fail updateProgram
      */
     void testInvalidUpdateProgram() {
+        def programBad = new Program(name: "Program2", marketContext: "http://URI2")
         controller.params.id = 1
-        controller.params.name = "Program2"
-        controller.params.marketContext = "http://URI3.com"
+        controller.params.name = programBad.name
+        controller.params.marketContext = programBad.marketContext
         controller.updateProgram()
 
         assert controller.response.redirectedUrl == '/program/editProgram'
-        assert controller.flash.chainModel.program.name == 'Program2'
-        assert controller.flash.chainModel.program.marketContext == 'http://URI3.com'
-        assert controller.flash.chainModel.program.id == 1
+        assert controller.flash.message == "Please fix the errors below: "
+        assert controller.flash.chainModel.program.name == programBad.name
+        assert controller.flash.chainModel.program.marketContext == programBad.marketContext
 
     }
     
