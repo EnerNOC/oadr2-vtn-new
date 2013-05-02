@@ -21,7 +21,7 @@ class VenTests {
         mockDomain(Program, [ [name:"Program1", marketContext:"http://URI1.com"] ])
         
         mockDomain(Ven, [
-            [program: Program.findWhere(name: "Program1"), venName: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
+            [programs: Program.findWhere(name: "Program1"), name: "ven-one", venID: "VEN1", clientURI: "http://URI1.com"] ])
           
     }
     
@@ -31,9 +31,9 @@ class VenTests {
     void testNullVen() {
         def nullVen = new Ven()
         assert !nullVen.validate()
-        assert "nullable" == nullVen.errors["venName"].code
+        assert "nullable" == nullVen.errors["name"].code
         assert "nullable" == nullVen.errors["venID"].code
-        assert "nullable" == nullVen.errors["program"].code
+        assert "nullable" == nullVen.errors["programs"].code
         
     }
     
@@ -41,11 +41,11 @@ class VenTests {
      * Test VEN blank, unique and url constraints
      */
     void testConstraintEvent() {
-        def blankVen = new Ven(program: Program.findWhere(name: "Program1"), venName: "", venID: "")
+        def blankVen = new Ven(programs: Program.findWhere(name: "Program1"), name: "", venID: "")
         assert !blankVen.validate()
         assert "blank" == blankVen.errors["venID"].code
         
-        def badVen = new Ven(program: Program.findWhere(name: "Program1"), venName: "", venID: "VEN1", clientURI: "URI")
+        def badVen = new Ven(programs: Program.findWhere(name: "Program1"), name: "", venID: "VEN1", clientURI: "URI")
         assert !badVen.validate()
         assert "unique" == badVen.errors["venID"].code
         assert "url.invalid" == badVen.errors["clientURI"].code

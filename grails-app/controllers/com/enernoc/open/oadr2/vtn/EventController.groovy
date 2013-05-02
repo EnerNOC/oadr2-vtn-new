@@ -78,25 +78,27 @@ class EventController {
         
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
-
-        def program = Program.get( params.programID.toLong() )
-        if ( ! program ) {
-            response.sendError 404, "No program for ID $params.programID"
-            return
-        } 
-        
+        def program;
+        if ( params.programID == "null" ) {
+        } else {
+            program = Program.get( params.programID.toLong() )
+            if ( ! program ) {
+                response.sendError 404, "No program for ID $params.programID"
+                return
+            }
+        }
         params.remove( 'programID' )
         def event = new Event(params)
         event.program = program
-
+        
         if ( event.validate() ) {
-//            def eiEvent = eiEventService.buildEiEvent(event)
-//            populateFromPush(event)
-//            def vens = Ven.findAll { event.program in program }
-//            pushService.pushNewEvent(eiEvent, vens)
-            program.addToEvents event
-            program.save(flush:true)
-            flash.message = "Success, your event has been created"
+            def eiEvent = eiEventService.buildEiEvent(event)
+            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
+            pushService.pushNewEvent(eiEvent, vens)
+            program.addToEvents(event)
+            program.save(flush: true)
+            prepareVenStatus(event)
+            flash.message="Success, your event has been created"
         }
         else {
             flash.message="Please fix the errors below"
@@ -112,7 +114,7 @@ class EventController {
 //        redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID
         redirect mapping: "eventSignal", params:[eventID: event.id]
     }
-    
+
     /**
      * Parses the String date and String time into a Date object
      * 
@@ -154,7 +156,10 @@ class EventController {
             response.sendError 404, "No event for ID $params.id"
             return
         }
+        def program = event.program
+        event.program.removeFromEvents(event)
         event.delete()
+        program.save()
         redirect actions: "events"
     }
 
@@ -166,7 +171,6 @@ class EventController {
      */
     def editEvent() {
         def model = [:]
-        model.programsList = Program.list()
         if ( ! flash.chainModel?.currentEvent ) {
             model.currentEvent = Event.get(params.id)
             if ( ! model.currentEvent ) {
@@ -194,31 +198,15 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
-        def newProgram = Program.get( params.programID.toLong() )
-        if ( ! newProgram ) {
-            response.sendError 404, "No program for ID $params.programID"
-            return
-        } 
-        
-        params.remove 'programID'
         def event = Event.get(params.id)
-        if ( ! event ) {
-            response.sendError 404, "No event for ID $params.id"
-            return
-        }
         // FIXME it should not be possible to change the program for an event!
-        def oldProgram = event.program
         event.properties = params
-        event.program = newProgram
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            oldProgram.removeFromEvents(event)
-            newProgram.addToEvents(event)
-            oldProgram.save()
-            newProgram.save()
-            //populateFromPush(event)
-            def vens = Ven.findAll { event.program in program }
+            event.save()
+            //prepareVenStatus(event)
+            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
@@ -234,31 +222,15 @@ class EventController {
     }
 
     /**
-     * Passes the VENs and event to the prepareVENs method
-     *
-     * @param event - event to be used for getVENs and prepareVENs
-     */
-    protected void populateFromPush( Event event ) {
-        //TODO find a more elegant to do do this process
-        def AllVens = Ven.findAll()
-        def customers = []
-        AllVens.each {v ->
-            print(v.venID)
-            if (v.program.contains( event.program )) {
-                print("true")
-                customers << v
-            }
-        }
-        prepareVENs customers, event
-    }
-
-    /**
      * Prepares the VENs by creating a VENStatus object for each and setting the OptStatus to Pending 1
      *
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVENs ( List<Ven> vens, Event event ) {
+    protected void prepareVenStatus ( Event event ) {
+        
+        def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
+
         vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
@@ -267,11 +239,11 @@ class EventController {
             venStatus.requestID = v.clientURI
             // FIXME make this a 'belongsTo' relationship
             event.addToVenStatuses(venStatus)
-            v.addToVenStatus(venStatus)
+            v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                v.save()
-                event.save()
+                v.save(flush: true)
+                event.save(flush: true)
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!

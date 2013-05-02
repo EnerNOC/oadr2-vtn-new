@@ -53,30 +53,29 @@ class VenController {
      * @return on fail: a chain to blankVEN() with invalid VEN
      */
     def newVEN() {
-        def program = []
+        def programs = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
             if ( ! p ) {
                 response.sendError( 404, "No program for ID $pID" )
             }
-            program << p
+            programs << p
         }
         params.remove( 'programID' )
         def ven = new Ven(params)
         
-        if (program!=[]) {
-            program.each  { p->
+        if (programs!=[]) {
+            programs.each  { p->
                 p.addToVens(ven)
             }
         }
-        
         if (ven.validate()) {
-            program.each  { p->
+            programs.each  { p->
                 p.save()
             }
             flash.message="Success, your VEN has been created"
         } else {
-            ven.program = program
+            ven.programs = programs
             flash.message="Please fix the errors below: "
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)
@@ -99,8 +98,8 @@ class VenController {
             response.sendError 404, "No ven for ID $params.id"
             return
         }
-        ven.program.each { p->
-            p.removeFromVen(ven)
+        ven.programs.each { p->
+            p.removeFromVens(ven)
             p.save()
         }
         ven.delete()
@@ -140,42 +139,38 @@ class VenController {
             return
         }
         
-        def oldProgram = ven.program
-        def newProgram = []
+        def oldPrograms = ven.programs
+        def newPrograms = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
             if ( ! p ) {
                 response.sendError( 404, "No program for ID $pID" )
             }
-            newProgram << p
+            newPrograms << p
         }
-        
-        //oldProgram.removeFromVen(ven)
-        if (newProgram == []) {
-            ven.program = null
-        }
+        if ( newPrograms == []) ven.programs = null
         params.remove('programID')
         ven.properties = params
         if (ven.validate()) {
             def tempOld = []
             def tempNew = []
-            tempOld.addAll( oldProgram )
+            tempOld.addAll( oldPrograms )
             tempOld.each { op ->
-                if (!newProgram.contains( op )) {
+                if (!newPrograms.contains( op )) {
                     op.removeFromVens(ven)
                     op.save(flush:true)
                 }
             }
-            tempNew.addAll( newProgram )
+            tempNew.addAll( newPrograms )
             tempNew.each { np ->
-                if (!oldProgram.contains( np )) {
+                if (!oldPrograms.contains( np )) {
                     np.addToVens(ven)
                     np.save(flush:true)
                 }
             }
             flash.message="Success, your VEN has been updated"
         } else {
-            ven.program = newProgram
+            ven.programs = newPrograms
             flash.message="Please fix the errors below: "
             def errors = ven.errors.allErrors.collect {
                 messageSource.getMessage(it, null)

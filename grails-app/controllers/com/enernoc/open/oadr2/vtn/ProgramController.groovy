@@ -82,8 +82,8 @@ class ProgramController {
         def venList = []
         venList.addAll(program.vens)
         venList.each { v ->
-            v.removeFromProgram(program)
-            if( v.program.size() == 0)
+            v.removeFromPrograms(program)
+            if( v.programs.size() == 0)
             v.delete(flush: true)
         }
         program.delete(flush: true)

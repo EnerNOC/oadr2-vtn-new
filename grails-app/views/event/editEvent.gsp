@@ -38,7 +38,7 @@
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'program', 'error')}">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programID" from="${programsList}" value="${ currentEvent.program.id }" optionKey="id" id="selectProgram" />
+					<input type="text" value="${ currentEvent.program }" id="selectProgram" disabled />
 				</div>
 			</div>
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'eventID', 'error')}">

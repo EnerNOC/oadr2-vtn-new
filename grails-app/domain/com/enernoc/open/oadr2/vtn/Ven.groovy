@@ -11,15 +11,15 @@ package com.enernoc.open.oadr2.vtn
 class Ven {
 
     String venID
-    String venName
+    String name
     String clientURI
 
     static belongsTo = Program
-    static hasMany = [program: Program, venStatus: VenStatus]
+    static hasMany = [programs: Program, venStatuses: VenStatus]
 
     static constraints = {
         venID blank: false, unique: true
         clientURI nullable: true, url:true
-        program nullable: false
+        programs nullable: false
     }    
 }

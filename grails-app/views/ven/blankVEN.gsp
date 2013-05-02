@@ -22,16 +22,16 @@
 	
 	<h3>Create a VEN</h3>
 	<g:form action="newVEN" class="form-horizontal">
-		<div class="control-group ${hasErrors(bean:ven,field:'program', 'error')}">
+		<div class="control-group ${hasErrors(bean:ven,field:'programs', 'error')}">
 			<label class="control-label" for="selectProgram">Program: </label>
 			<div class="controls">
-				<g:select name="programID" from="${programsList}" value="${ven.program?.id}" optionKey="id" id="selectProgram" multiple="true"/>
+				<g:select name="programID" from="${programsList}" value="${ven.programs?.id}" optionKey="id" id="selectProgram" multiple="true"/>
 			</div>
 		</div>
-		<div class="control-group ${hasErrors(bean:ven,field:'venName', 'error')}">
+		<div class="control-group ${hasErrors(bean:ven,field:'name', 'error')}">
 			<label class="control-label" for="inputVenName">VEN Name: </label>
 			<div class="controls">
-				<input type="text" name="venName" value="${ven.venName}" placeholder="My Name" id="inputVenName"/>
+				<input type="text" name="name" value="${ven.name}" placeholder="My Name" id="inputVenName"/>
 			</div>
 		</div>
 		<div class="control-group ${hasErrors(bean:ven,field:'venID', 'error')}">

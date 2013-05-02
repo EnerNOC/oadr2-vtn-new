@@ -128,7 +128,7 @@ public class EiEventService {
                 response = "404"
                 desc = "Event not found"
             }
-            if ( ! ven ) {
+            if ( ! venStatuses ) {
                 response = "409"
                 desc = "Invalid VEN ID"
             }
@@ -163,7 +163,7 @@ public class EiEventService {
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
         def events = Event.findAll(max : limit) { 
-            program.id == ven.program.id
+            program.id == ven.programs.id
             endDate > new Date() // include only events that have not ended
         }
 
@@ -190,7 +190,7 @@ public class EiEventService {
 
             if ( ! venStatus ) {
                 venStatus = new VenStatus()
-                ven.addToVenStatus(venStatus)
+                ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
                 venStatus.optStatus = "Pending response"
             }
