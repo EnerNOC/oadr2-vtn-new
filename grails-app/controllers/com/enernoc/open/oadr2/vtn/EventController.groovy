@@ -99,11 +99,11 @@ class EventController {
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            def vens = Ven.findAll { event.program in program }
+            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
             pushService.pushNewEvent(eiEvent, vens)
             program.addToEvents(event)
             program.save(flush: true)
-            populateFromPush(event)
+            prepareVenStatus(event)
             flash.message="Success, your event has been created"
         }
         else {
@@ -231,8 +231,8 @@ class EventController {
             newProgram.addToEvents(event)
             oldProgram.save()
             newProgram.save()
-            //populateFromPush(event)
-            def vens = Ven.findAll { event.program in programs }
+            //prepareVenStatus(event)
+            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
@@ -248,29 +248,15 @@ class EventController {
     }
 
     /**
-     * Passes the VENs and event to the prepareVENs method
-     *
-     * @param event - event to be used for getVENs and prepareVENs
-     */
-    protected void populateFromPush( Event event ) {
-        //TODO find a more elegant to do do this process
-        def AllVens = Ven.findAll()
-        def customers = []
-        AllVens.each {v ->
-            if (v.programs.contains( event.program )) {
-                customers << v
-            }
-        }
-        prepareVENs customers, event
-    }
-
-    /**
      * Prepares the VENs by creating a VENStatus object for each and setting the OptStatus to Pending 1
      *
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVENs ( List<Ven> vens, Event event ) {
+    protected void prepareVenStatus (Event event ) {
+        
+        def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
+
         vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
