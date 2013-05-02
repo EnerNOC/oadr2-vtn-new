@@ -15,6 +15,7 @@
 </head>
 <body>
   
+<div class='alert-container'>
 <g:if test="${errors}">
   <div class="alert alert-error">
     <g:if test="${flash.message}">
@@ -30,10 +31,11 @@
 <g:elseif test="${flash.message}">
   <div class="alert">${flash.message}</div>
 </g:elseif>
+</div>
   
 <div class='row'>
   <div class='span12'>
-		<g:form action="intervals" class="form-horizontal">
+		<g:form name='signalsForm' action="intervals" class="form-horizontal">
 		  <div class='row'>
 		    <div class='span7'>
           <h1>Intervals for Event '<span class='eventName'>${event.eventID}</span>'</h1>
@@ -71,14 +73,14 @@
 	  <div class="control-group">
 	    <label class="control-label" for="name">Name: </label>
 	    <div class='controls'>
-	     <input type="text" name="name" value="{{name}}" placeholder="simple" />
+	     <input type="text" class='signalName' name="name" value="{{name}}" placeholder="simple" />
      </div>
 	  </div>
 	  
 	  <div class="control-group">
 	    <label class="control-label" for="type">Type: </label>
       <div class='controls'>	    
-		    <select name="type" placeholder="Select...">
+		    <select name="type" class='signalType' placeholder="Select...">
 		      <option value='LEVEL'>Level</option>
 		      <option value='PRICE_RELATIVE'>Relative Price</option>
 		    </select>
@@ -117,7 +119,7 @@
 </script>
 
 <script type='text/html' id='intervalTmpl'>
-  <tr>
+  <tr class='intervalRow'>
     <td>
       <div class='control-group'>
 	      <input type="text" name="val" value="{{level}}" placeholder="1" class='input-small' />    

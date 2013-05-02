@@ -1,4 +1,5 @@
 (function($,_,ich,app) {
+
 	var self = {};
 	if ( typeof window != 'undefined' )
 		window.intervals = self;
@@ -39,10 +40,21 @@
 				.find('.help-inline').text('')
 	}
 
+
+	self.getAllIntervals = function(section) {
+		var intervals = []
+		section.find('.intervalRow').each( function(i,row) {
+			intervals.push( self.getInterval( $(row) ) )
+		})
+		return intervals
+	}
+
+
 	self.getPreviousInterval = function(row) {
 		return self.getInterval(row.prev())
 	}
 	
+
 	self.validateNumber = function(val) {
 		if ( typeof val == 'number' ) return true
 		if ( typeof val == 'string' )
@@ -50,9 +62,11 @@
 		return false
 	}
 
-	self.getInterval = function(row) {
-		if ( row.size() < 1 ) return null
 
+	self.getInterval = function(row) {
+		if ( row.length < 1 ) return null
+		
+		console.debug('row:', row)
 		var dateStr = row.find('.dp').val()
 		var time = row.find('.tp').val()
 		time = time.split(':')
@@ -74,6 +88,7 @@
 			level : level,
 			id : id }
 	}
+
 
 	self.addSignal = function(signal) {
 		if ( ! signal ) signal = {}
@@ -97,6 +112,7 @@
 		$('#signals').append(newSection)
 	}
 
+
 	self.addInterval = function(interval) {
 		if ( typeof interval == 'undefined' ) interval = {}
 		console.log("Adding interval ")
@@ -118,6 +134,61 @@
 	}
 
 
+	self.getAllSignals = function(form) {
+		var signals = []
+		form.find('.signalSection').each( function(i,sig) {
+			signals.push( self.getSignal($(sig)) )
+		})
+		return signals
+	}
+
+
+	self.getSignal = function(section) {
+		console.log("Section:",section)
+		var sig = {}
+		sig.name = section.find('.signalName').first().val()
+		sig.type = section.find('.signalType').first().val()
+		sig.intervals = self.getAllIntervals(section)
+
+		return sig
+	}
+
+	self.saveSignals = function(evt) {
+		evt.preventDefault();
+
+		var signals = self.getAllSignals(this)
+		console.log("Sending", signals)
+
+		$.ajax('', {
+			type: 'post',
+			data: JSON.stringify( signals ),
+			contentType: 'application/json',
+			processData: false,
+			success: function(data,stat,xhr) {
+				console.log('Signals success', xhr, stat, data)
+
+				var $N = window.app.n
+				$('.alert-container').html(
+					$N('div', {'class':'alert alert-success'}, "Saved! Hold on a sec...") )
+				//redirect to new page:
+				if ( data.location ) window.setTimeout(function() {
+//					 window.location = data.location
+				}, 1000)
+			},
+			error: function(xhr,stat,err) {
+				console.log("Signals save error", xhr, stat, err)
+				var msg = "Unknown error"
+				if (typeof err == 'object')
+					if ( err.message ) msg = err.message
+				else if ( typeof err == 'string' )
+					msg = err
+				$('.alert-container').html(
+					$N('div', {'class':'alert alert-error'}, "Error: " + msg ) )
+			}
+		})
+	}
+
+
 	self.init = function(_event) {
 		_event.start = new Date(_event.start)
 		_event.end = new Date(_event.end)
@@ -130,6 +201,9 @@
 		$('#addSignalBtn').on('click',function(evt) {
 			self.addSignal()
 		});
+
+		$('#signalsForm').on('submit', self.saveSignals.bind($('#signals')) );
+
 	};
 
 	if ( typeof window != 'undefined' ) {
