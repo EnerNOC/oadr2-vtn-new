@@ -176,7 +176,6 @@ class EventController {
      */
     def editEvent() {
         def model = [:]
-        model.programsList = Program.list()
         if ( ! flash.chainModel?.currentEvent ) {
             model.currentEvent = Event.get(params.id)
             if ( ! model.currentEvent ) {
@@ -208,29 +207,13 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         
-        def newProgram = Program.get( params.programID.toLong() )
-        if ( ! newProgram ) {
-            response.sendError 404, "No program for ID $params.programID"
-            return
-        } 
-        
-        params.remove 'programID'
         def event = Event.get(params.id)
-        if ( ! event ) {
-            response.sendError 404, "No event for ID $params.id"
-            return
-        }
         // FIXME it should not be possible to change the program for an event!
-        def oldProgram = event.program
         event.properties = params
-        event.program = newProgram
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            oldProgram.removeFromEvents(event)
-            newProgram.addToEvents(event)
-            oldProgram.save()
-            newProgram.save()
+            event.save()
             //prepareVenStatus(event)
             def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
             pushService.pushNewEvent(eiEvent, vens)
@@ -253,7 +236,7 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus (Event event ) {
+    protected void prepareVenStatus ( Event event ) {
         
         def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
 
