@@ -86,8 +86,9 @@ class VenControllerTests {
         controller.params.name = Ven3.name
         controller.params.clientURI = Ven3.clientURI
         controller.newVEN()
-
+        
         assert controller.response.redirectedUrl == '/ven/vens'
+        assert controller.flash.message == "Success, your VEN has been created"
         assert Ven.findWhere(name: "ven-three") != null
 
     }
@@ -105,6 +106,7 @@ class VenControllerTests {
         controller.newVEN()
 
         assert controller.response.redirectedUrl == '/ven/blankVEN'
+        assert controller.flash.message == "Please fix the errors below: "
         assert controller.flash.chainModel.ven.programs.isEmpty()
         assert controller.flash.chainModel.ven.venID == Ven4.venID
         assert controller.flash.chainModel.ven.name == Ven4.name
@@ -153,6 +155,7 @@ class VenControllerTests {
         controller.updateVEN()
 
         assert controller.response.redirectedUrl == '/ven/vens'
+        assert controller.flash.message == "Success, your VEN has been updated"
         assert Ven.get(1).programs.contains(Program.get( 2 )) && Ven.get(1).programs.contains(Program.get( 3 ))
         assert Ven.get(1).venID == Ven4.venID
         assert Ven.get(1).name == Ven4.name
@@ -175,6 +178,7 @@ class VenControllerTests {
 
 
         assert controller.response.redirectedUrl == '/ven/editVEN'
+        assert controller.flash.message == "Please fix the errors below: "
         assert controller.flash.chainModel.currentVen.programs.isEmpty()
         assert controller.flash.chainModel.currentVen.venID == Ven.venID
         assert controller.flash.chainModel.currentVen.name == Ven.name
