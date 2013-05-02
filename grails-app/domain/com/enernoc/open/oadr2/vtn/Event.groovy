@@ -4,6 +4,7 @@ import javax.xml.datatype.DatatypeConfigurationException
 import javax.xml.datatype.DatatypeFactory
 import javax.xml.datatype.Duration
 import javax.xml.datatype.XMLGregorianCalendar
+import org.hibernate.FlushMode
 
 import com.enernoc.open.oadr2.model.DateTime
 import com.enernoc.open.oadr2.model.Dtstart
@@ -147,12 +148,17 @@ class Event {
         //Event.where breaks if null exists, thus an indirect id to designate a value
         def tempID = this.id
         if (tempID == null) tempID = -1
-        def activePrograms = Event.where {
-            program == this.program
-            endDate > this.startDate
-            startDate < this.endDate
-            id != tempID
-            cancelled != true }.count()
+        def activePrograms = Event.withSession { tempSession ->
+            tempSession.setFlushMode(FlushMode.MANUAL);
+            def result = Event.where {
+                program == this.program
+                endDate > this.startDate
+                startDate < this.endDate
+                id != tempID
+                cancelled != true }.count()
+            tempSession.setFlushMode(FlushMode.AUTO);
+            return result
+        }
         return activePrograms == 0
     }
 }

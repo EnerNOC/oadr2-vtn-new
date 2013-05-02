@@ -85,7 +85,6 @@ class EventController {
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         def program;
-        print("program id is " + params.programID)
         if ( params.programID == "null" ) {
         } else {
             program = Program.get( params.programID.toLong() )
@@ -97,14 +96,14 @@ class EventController {
         params.remove( 'programID' )
         def event = new Event(params)
         event.program = program
-
+        
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            populateFromPush(event)
             def vens = Ven.findAll { event.program in program }
             pushService.pushNewEvent(eiEvent, vens)
             program.addToEvents(event)
-            program.save()
+            program.save(flush: true)
+            populateFromPush(event)
             flash.message="Success, your event has been created"
         }
         else {
@@ -120,7 +119,7 @@ class EventController {
         redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID]
 
     }
-    
+
     /**
      * Parses the String date and String time into a Date object
      * 
@@ -162,7 +161,10 @@ class EventController {
             response.sendError 404, "No event for ID $params.id"
             return
         }
+        def program = event.program
+        event.program.removeFromEvents(event)
         event.delete()
+        program.save()
         redirect actions: "events"
     }
 
@@ -230,7 +232,7 @@ class EventController {
             oldProgram.save()
             newProgram.save()
             //populateFromPush(event)
-            def vens = Ven.findAll { event.program in program }
+            def vens = Ven.findAll { event.program in programs }
             pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
@@ -255,9 +257,7 @@ class EventController {
         def AllVens = Ven.findAll()
         def customers = []
         AllVens.each {v ->
-            print(v.venID)
             if (v.programs.contains( event.program )) {
-                print("true")
                 customers << v
             }
         }
@@ -282,8 +282,8 @@ class EventController {
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                v.save()
-                event.save()
+                v.save(flush: true)
+                event.save(flush: true)
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!
