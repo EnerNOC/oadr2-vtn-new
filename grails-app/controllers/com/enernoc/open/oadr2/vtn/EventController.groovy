@@ -1,5 +1,7 @@
 package com.enernoc.open.oadr2.vtn
 
+import java.util.List;
+
 
 /**
  * Events controller to manage all Event objects created
@@ -101,8 +103,8 @@ class EventController {
             def eiEvent = eiEventService.buildEiEvent(event)
             pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             program.addToEvents event
-            program.save(flush: true)
             prepareVenStatus event
+            program.save(flush: true)
             flash.message = "Success, your event has been created"
         }
         else {
@@ -207,15 +209,12 @@ class EventController {
         params.endDate = parseDttm( params.endDate, params.endTime )
         
         def event = Event.get(params.id)
-        // FIXME it should not be possible to change the program for an event!
         event.properties = params
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
             event.save()
-            //prepareVenStatus(event)
-            def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
-            pushService.pushNewEvent(eiEvent, vens)
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message="Success, your event has been updated"
         }
         else {
@@ -235,7 +234,7 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus ( Event event ) {
+    protected void prepareVenStatus( Event event ) {
         
         event.program.vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
@@ -243,13 +242,11 @@ class EventController {
             def venStatus = new VenStatus()
             venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
-            // FIXME make this a 'belongsTo' relationship
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                v.save(flush: true)
-                event.save(flush: true)
+                v.save()
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!
