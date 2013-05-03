@@ -116,8 +116,7 @@ class EventControllerTests {
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:45"),
                 priority: 4L,
-                intervals: 2L,
-                modificationNumber: 0L
+                intervals: 2L
                 )
         def controller = new EventController()
         controller.params.programID = event2.program.id
@@ -147,8 +146,7 @@ class EventControllerTests {
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2025 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"),
                 priority: 4L,
-                intervals: -2L,
-                modificationNumber: 0L
+                intervals: -2L
                 )
         def controller = new EventController()
         controller.params.programID = eventFail.program.id
@@ -167,9 +165,7 @@ class EventControllerTests {
         assert controller.flash.chainModel.event.priority == eventFail.priority
         assert controller.flash.chainModel.event.intervals == eventFail.intervals
         assert controller.flash.chainModel.event.startDate == eventFail.startDate
-        assert controller.flash.chainModel.event.endDate == eventFail.endDate
-        assert controller.flash.chainModel.event.modificationNumber == 0L
-        
+        assert controller.flash.chainModel.event.endDate == eventFail.endDate        
 
     }
     
@@ -189,7 +185,7 @@ class EventControllerTests {
         assert model.currentEvent.endDate == event1.endDate
         assert model.currentEvent.cancelled == event1.cancelled
         assert model.currentEvent.intervals == event1.intervals
-        assert model.currentEvent.modificationNumber == 0L
+        assert model.currentEvent.modificationNumber == event1.modificationNumber
 
     }
 
@@ -205,7 +201,6 @@ class EventControllerTests {
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"),
                 priority: 4L,
                 intervals: -2L,
-                modificationNumber: 0L
                 )]
         def model = controller.editEvent()
 
@@ -225,9 +220,10 @@ class EventControllerTests {
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2025 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:14"),
                 priority: 3L,
-                intervals: 2L,
-                modificationNumber: 0L
+                intervals: 2L
                 )
+        def counter = Event.get( id ).modificationNumber
+        
         controller.params.eventID = event3.eventID
         controller.params.priority = event3.priority
         controller.params.intervals = event3.intervals
@@ -243,7 +239,7 @@ class EventControllerTests {
         assert Event.get( id ).intervals == event3.intervals
         assert Event.get( id ).startDate == event3.startDate
         assert Event.get( id ).endDate == event3.endDate
-        assert Event.get( id ).modificationNumber == 1L
+        assert Event.get( id ).modificationNumber == (counter + 1)
 
     }
 
@@ -260,7 +256,6 @@ class EventControllerTests {
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2010 12:14"),
                 priority: -3L,
                 intervals: -2L,
-                modificationNumber: 0L
                 )
         controller.params.eventID = eventFail.eventID
         controller.params.priority = eventFail.priority
