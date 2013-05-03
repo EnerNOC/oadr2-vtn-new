@@ -1,5 +1,7 @@
 package com.enernoc.open.oadr2.vtn
 
+import java.util.List;
+
 
 /**
  * Events controller to manage all Event objects created
@@ -103,7 +105,7 @@ class EventController {
             pushService.pushNewEvent(eiEvent, vens)
             program.addToEvents(event)
             program.save(flush: true)
-            prepareVenStatus(event)
+            prepareVenStatus(event, vens)
             flash.message="Success, your event has been created"
         }
         else {
@@ -214,9 +216,6 @@ class EventController {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
             event.save()
-            //prepareVenStatus(event)
-            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
-            pushService.pushNewEvent(eiEvent, vens)
             flash.message="Success, your event has been updated"
         }
         else {
@@ -236,10 +235,8 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus ( Event event ) {
+    protected void prepareVenStatus ( Event event, List<Ven> vens) {
         
-        def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
-
         vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object

@@ -311,10 +311,11 @@ class EventControllerTests {
     void testPrepareVenStatus() {
         def controller = new EventController()
         def event1 = Event.findWhere(eventID: "event1")
+        def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event1.program])
         def ven1 = Ven.findWhere(venID: "ven1")
         def ven2 = Ven.findWhere(venID: "ven2")
         def currentVenStatusCount = VenStatus.count
-        def vens = controller.prepareVenStatus(event1)
+        controller.prepareVenStatus(event1, vens)
 
         assert VenStatus.count() > currentVenStatusCount
         assert event1.venStatuses != null
