@@ -31,7 +31,7 @@ class EventController {
      * @return the default render page for event display, edit and deletion
      */
     def events() {
-        def event = Event.list()
+        def event = Event.list( limit:20, sort:'startDate', order:'desc' )
         [eventList:event]
     }
 
@@ -99,8 +99,7 @@ class EventController {
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
-            pushService.pushNewEvent eiEvent, vens
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             program.addToEvents event
             program.save(flush: true)
             prepareVenStatus event
@@ -238,9 +237,7 @@ class EventController {
      */
     protected void prepareVenStatus ( Event event ) {
         
-        def vens = Ven.executeQuery("from Ven v where ? in elements(v.programs)", [event.program])
-        
-        vens.each { v ->
+        event.program.vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
