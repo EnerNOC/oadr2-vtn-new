@@ -83,7 +83,7 @@ class EventController {
         catch ( IllegalArgumentException ) {
             params.priority = -1L
         }
-        
+
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         def program;
@@ -206,7 +206,12 @@ class EventController {
         } catch(IllegalArgumentException) {
             params.priority = -1L
         }
-        params.startDate = parseDttm( params.startDate, params.startTime )
+        if (params.startDate == null || params.startTime == null) {
+            params.remove( 'startDate' )
+            params.remove( 'startTime' )
+        } else {
+            params.startDate = parseDttm( params.startDate, params.startTime )
+        }
         params.endDate = parseDttm( params.endDate, params.endTime )
         
         def event = Event.get(params.id)
