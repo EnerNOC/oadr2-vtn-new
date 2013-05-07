@@ -69,7 +69,6 @@ class Event {
      * @param event - the EiEvent to be cast to an Event wrapper class
      */
     public Event(EiEvent event){
-        eiEvent = event
         this.eventID = event.eventDescriptor.eventID
         this.priority = event.eventDescriptor.priority
         this.startDate = event.eiActivePeriod.properties.dtstart.dateTime.value

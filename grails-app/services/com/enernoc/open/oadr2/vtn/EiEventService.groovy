@@ -73,7 +73,8 @@ public class EiEventService {
         }
         else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
-            handleOadrResponse( (OadrResponse)o )
+            //TODO implement handleOadrResponse
+            //handleOadrResponse( (OadrResponse)o )
             return null
         }
         else {
@@ -83,8 +84,10 @@ public class EiEventService {
     }
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        def responseCode, desc = verifyOadrCreated( oadrCreatedEvent )
-
+        def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
+        def desc = verifyOadrCreated( oadrCreatedEvent )[1]
+        println("responsecode is: " + responseCode)
+        println("desc is: "+ desc)
         if ( isSuccessful( oadrCreatedEvent ) )
             persistFromCreatedEvent oadrCreatedEvent
 
@@ -99,7 +102,7 @@ public class EiEventService {
     }
 
     protected boolean isSuccessful( OadrCreatedEvent payload ) {
-        oadrCreatedEvent.eiCreatedEvent.eiResponse.responseCode.value == '200'
+        payload.eiCreatedEvent.eiResponse.responseCode.value == '200'
     }
 
     /**
@@ -155,15 +158,10 @@ public class EiEventService {
             .withVtnID(this.vtnID)
 
         // FIXME validate VEN ID against HTTP credentials
-        def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )
-
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
-        def events = Event.findAll(max : limit) { 
-            program.id == ven.programs.id
-            endDate > new Date() // include only events that have not ended
-        }
-
+        def events = Event.executeQuery("select e from Event e, Ven v where  v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
+            [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit])
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
                     .withEiEvent(buildEiEvent(e))
