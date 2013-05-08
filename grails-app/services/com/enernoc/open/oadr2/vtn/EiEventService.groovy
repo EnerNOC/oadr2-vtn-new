@@ -85,9 +85,9 @@ public class EiEventService {
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
         def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
-        def desc = verifyOadrCreated( oadrCreatedEvent )[1]
-        println("responsecode is: " + responseCode)
-        println("desc is: "+ desc)
+        def description = verifyOadrCreated( oadrCreatedEvent )[1]
+        log.debug responseCode
+        log.debug description
         if ( isSuccessful( oadrCreatedEvent ) )
             persistFromCreatedEvent oadrCreatedEvent
 
@@ -98,7 +98,7 @@ public class EiEventService {
             .withEiResponse(new EiResponse()
                 .withRequestID(UUID.randomUUID().toString())
                 .withResponseCode(new ResponseCode(responseCode))
-                .withResponseDescription(desc))
+                .withResponseDescription(description))
     }
 
     protected boolean isSuccessful( OadrCreatedEvent payload ) {
@@ -114,26 +114,34 @@ public class EiEventService {
     def verifyOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
         def venID = oadrCreatedEvent.eiCreatedEvent.venID
         def response = "200"
-        def desc = "OK"
-        oadrCreatedEvent.eiCreatedEvent.eventResponses?.eventResponses?.each { evtResponse ->
-            if ( response != "200" ) return // skip remaining elements if there's already an error.
+        def description = "OK"
+        try {
+            oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses.each { evtResponse ->
+                if ( evtResponse.responseCode.value != "200" ) {
+                    response = evtResponse.responseCode.value
+                    description = "eventResponse contained a non-200 response: $evtResponse"
+                    return [response, description]// skip remaining elements if there's already an error.
+                }
+                String eventId = evtResponse.qualifiedEventID.eventID
+                long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
 
-            String eventId = evtResponse.qualifiedEventID.eventID
-            long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
+                def event = Event.findWhere( eventID: eventId)
+                def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
 
-            def event = Event.findWhere( eventID: eventId, venID: venID )
-            def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
-
-            if ( ! event ) {
-                response = "404"
-                desc = "Event not found"
+                if ( ! event ) {
+                    response = "404"
+                    description = "Event not found"
+                }
+                if ( ! venStatuses ) {
+                    response = "409"
+                    description = "Invalid VEN ID"
+                }
             }
-            if ( ! venStatuses ) {
-                response = "409"
-                desc = "Invalid VEN ID"
-            }
+        } catch (e) {
+            log.warn "oadrCreatedEvent does not have eventResponses"
         }
-        return [response, desc]
+        
+        return [response, description]
     }
 
     /**
