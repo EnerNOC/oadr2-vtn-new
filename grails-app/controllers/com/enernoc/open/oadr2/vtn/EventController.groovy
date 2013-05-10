@@ -77,7 +77,7 @@ class EventController {
         catch ( IllegalArgumentException ) {
             params.priority = -1L
         }
-        
+
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
         def program;
@@ -196,7 +196,12 @@ class EventController {
         catch(IllegalArgumentException) {
             params.priority = -1L
         }
-        params.startDate = parseDttm( params.startDate, params.startTime )
+        if (params.startDate == null || params.startTime == null) {
+            params.remove( 'startDate' )
+            params.remove( 'startTime' )
+        } else {
+            params.startDate = parseDttm( params.startDate, params.startTime )
+        }
         params.endDate = parseDttm( params.endDate, params.endTime )
         
         def event = Event.get(params.id)
@@ -232,7 +237,6 @@ class EventController {
             // creates a new VenStatus object
             def venStatus = new VenStatus()
             venStatus.optStatus = "Pending request"
-            venStatus.requestID = v.clientURI
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()

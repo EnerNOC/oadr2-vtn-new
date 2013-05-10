@@ -10,7 +10,15 @@
     $('.tp').timepicker({
     showMeridian: false
     });
+    if(document.getElementById("dateDisable") != null) {    
+       document.getElementById("inputStartTime").setAttribute("disabled");
+       document.getElementById("inputStartDate").setAttribute("disabled");
+       document.getElementById("inputStartDate").className = "";
+       document.getElementById("inputStartTime").className= "";
+     }
   });
+  
+
 </g:javascript>
 </head>
 <body>
@@ -30,7 +38,10 @@
   <g:elseif test="${flash.message}">
     <div class="alert">${flash.message}</div>
   </g:elseif>
-
+  <g:if test="${currentEvent.status == "Active" }">
+    <div id="dateDisable"></div>
+  </g:if>
+  
   <h1>Edit Event: ${currentEvent.eventID}</h1>
 	<fieldset>
 		<g:form action="updateEvent" class="form-horizontal">

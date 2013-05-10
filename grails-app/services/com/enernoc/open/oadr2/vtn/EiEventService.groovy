@@ -86,8 +86,10 @@ public class EiEventService {
     }
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        def responseCode, desc = verifyOadrCreated( oadrCreatedEvent )
-
+        def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
+        def description = verifyOadrCreated( oadrCreatedEvent )[1]
+        log.debug responseCode
+        log.debug description
         if ( isSuccessful( oadrCreatedEvent ) )
             persistFromCreatedEvent oadrCreatedEvent
 
@@ -98,11 +100,11 @@ public class EiEventService {
             .withEiResponse(new EiResponse()
                 .withRequestID(UUID.randomUUID().toString())
                 .withResponseCode(new ResponseCode(responseCode))
-                .withResponseDescription(desc))
+                .withResponseDescription(description))
     }
 
     protected boolean isSuccessful( OadrCreatedEvent payload ) {
-        oadrCreatedEvent.eiCreatedEvent.eiResponse.responseCode.value == '200'
+        payload.eiCreatedEvent.eiResponse.responseCode.value == '200'
     }
 
     /**
@@ -114,26 +116,34 @@ public class EiEventService {
     def verifyOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
         def venID = oadrCreatedEvent.eiCreatedEvent.venID
         def response = "200"
-        def desc = "OK"
-        oadrCreatedEvent.eiCreatedEvent.eventResponses?.eventResponses?.each { evtResponse ->
-            if ( response != "200" ) return // skip remaining elements if there's already an error.
+        def description = "OK"
+        try {
+            oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses.each { evtResponse ->
+                if ( evtResponse.responseCode.value != "200" ) {
+                    response = evtResponse.responseCode.value
+                    description = "eventResponse contained a non-200 response: $evtResponse"
+                    return [response, description]// skip remaining elements if there's already an error.
+                }
+                String eventId = evtResponse.qualifiedEventID.eventID
+                long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
 
-            String eventId = evtResponse.qualifiedEventID.eventID
-            long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
+                def event = Event.findWhere( eventID: eventId)
+                def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
 
-            def event = Event.findWhere( eventID: eventId, venID: venID )
-            def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
-
-            if ( ! event ) {
-                response = "404"
-                desc = "Event not found"
+                if ( ! event ) {
+                    response = "404"
+                    description = "Event not found"
+                }
+                if ( ! venStatuses ) {
+                    response = "409"
+                    description = "Invalid VEN ID"
+                }
             }
-            if ( ! venStatuses ) {
-                response = "409"
-                desc = "Invalid VEN ID"
-            }
+        } catch (e) {
+            log.warn "oadrCreatedEvent does not have eventResponses"
         }
-        return [response, desc]
+        
+        return [response, description]
     }
 
     /**
@@ -144,10 +154,9 @@ public class EiEventService {
      * @return an OadrDistributeEvent containing all payload information
      */
     public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
-
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
-        if ( ! oadrRequestEvent.eiRequestEvent.requestID )
+        if ( oadrRequestEvent.eiRequestEvent.requestID )
             eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID
         else
             eiResponse.requestID = UUID.randomUUID().toString()
@@ -158,15 +167,10 @@ public class EiEventService {
             .withVtnID(this.vtnID)
 
         // FIXME validate VEN ID against HTTP credentials
-        def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )
-
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
-        def events = Event.findAll(max : limit) { 
-            program.id == ven.programs.id
-            endDate > new Date() // include only events that have not ended
-        }
-
+        def events = Event.executeQuery("select e from Event e, Ven v where  v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
+            [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit])
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
                     .withEiEvent(buildEiEvent(e))
@@ -234,11 +238,11 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    public void handleFromOadrResponse( OadrResponse response ) {
-        def status = VenStatus.findByRequestID( response.eiResponse.requestID )
+    public void handleOadrResponse( OadrResponse response ) {
+        //def status = VenStatus.findByRequestID( response.eiResponse.requestID ) TODO implement a new VenTranaction to handle responses
         if ( status ) {
             status.time = new Date()
-            status.optStatus = response.eiResponse.optType
+            status.optStatus = "Pending 2"
             status.save()
         }
         else log.warn "No status found for response $response"
