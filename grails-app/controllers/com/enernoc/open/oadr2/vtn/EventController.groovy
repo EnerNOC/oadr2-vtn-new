@@ -246,7 +246,6 @@ class EventController {
             // creates a new VenStatus object
             def venStatus = new VenStatus()
             venStatus.optStatus = "Pending request"
-            venStatus.requestID = v.clientURI
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()

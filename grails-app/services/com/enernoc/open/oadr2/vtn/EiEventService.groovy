@@ -73,8 +73,7 @@ public class EiEventService {
         }
         else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
-            //TODO implement handleOadrResponse
-            //handleOadrResponse( (OadrResponse)o )
+            handleOadrResponse( (OadrResponse)o )
             return null
         }
         else {
@@ -152,10 +151,9 @@ public class EiEventService {
      * @return an OadrDistributeEvent containing all payload information
      */
     public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
-
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
-        if ( ! oadrRequestEvent.eiRequestEvent.requestID )
+        if ( oadrRequestEvent.eiRequestEvent.requestID )
             eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID
         else
             eiResponse.requestID = UUID.randomUUID().toString()
@@ -237,11 +235,11 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    public void handleFromOadrResponse( OadrResponse response ) {
-        def status = VenStatus.findByRequestID( response.eiResponse.requestID )
+    public void handleOadrResponse( OadrResponse response ) {
+        //def status = VenStatus.findByRequestID( response.eiResponse.requestID ) TODO implement a new VenTranaction to handle responses
         if ( status ) {
             status.time = new Date()
-            status.optStatus = response.eiResponse.optType
+            status.optStatus = "Pending 2"
             status.save()
         }
         else log.warn "No status found for response $response"
