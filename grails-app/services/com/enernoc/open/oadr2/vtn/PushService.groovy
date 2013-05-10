@@ -49,9 +49,6 @@ public class PushService {
 
             payload.withVtnID( this.vtnID )
                     .withRequestID( UUID.randomUUID().toString() )
-                    .withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
-                        .withResponseCode(new ResponseCode("200"))
-                        .withResponseDescription("OK"))
                     .withOadrEvents(new OadrEvent().withEiEvent(e))
 
             queue.add( new EventPushTask( ven.clientURI, payload ) )

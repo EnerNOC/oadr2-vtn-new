@@ -95,7 +95,7 @@ class EventController {
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+//            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             program.addToEvents event
             prepareVenStatus event
             program.save(flush: true)

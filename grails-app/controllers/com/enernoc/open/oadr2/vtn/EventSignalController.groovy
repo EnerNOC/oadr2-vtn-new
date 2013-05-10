@@ -10,7 +10,7 @@ class EventSignalController {
     
     def edit() {
         def eventID = params.eventID
-        def event = Event.findById(eventID, [fetch:[signals:'select']])         
+        def event = Event.findById(eventID, [fetch:[signals:'select']])
         if ( ! event ) {
             response.sendError 404, "No Event for ID $eventID"
             return 
@@ -63,8 +63,11 @@ class EventSignalController {
         def eventID = params.eventID
         log.debug "Creating signals: $data for $eventID"
         
-        flash.message = "Saved event signals"
+        def event = Event.findById(eventID, [fetch:[signals:'select']])
         
+        pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+        
+        flash.message = "Saved event signals"
         render( contentType: 'text/json' ) {
             location = g.createLink( controller: 'event', id: eventID)
             msg = "OK"
