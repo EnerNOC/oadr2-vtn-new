@@ -33,7 +33,7 @@ class EventController {
      * @return the default render page for event display, edit and deletion
      */
     def events() {
-        def event = Event.list()
+        def event = Event.list( limit:20, sort:'startDate', order:'desc' )
         [eventList:event]
     }
 
@@ -95,18 +95,17 @@ class EventController {
                 return
             }
         }
-        params.remove( 'programID' )
+        params.remove 'programID'
         def event = new Event(params)
         event.program = program
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: event.program])
-            pushService.pushNewEvent(eiEvent, vens)
-            program.addToEvents(event)
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+            program.addToEvents event
+            prepareVenStatus event
             program.save(flush: true)
-            prepareVenStatus(event, vens)
-            flash.message="Success, your event has been created"
+            flash.message = "Success, your event has been created"
         }
         else {
             flash.message="Please fix the errors below"
@@ -164,7 +163,7 @@ class EventController {
             return
         }
         def program = event.program
-        event.program.removeFromEvents(event)
+        event.program.removeFromEvents event
         event.delete()
         program.save()
         redirect actions: "events"
@@ -215,12 +214,12 @@ class EventController {
         params.endDate = parseDttm( params.endDate, params.endTime )
         
         def event = Event.get(params.id)
-        // FIXME it should not be possible to change the program for an event!
         event.properties = params
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
             event.save()
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message="Success, your event has been updated"
         }
         else {
@@ -240,21 +239,19 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus ( Event event, List<Ven> vens) {
+    protected void prepareVenStatus( Event event ) {
         
-        vens.each { v ->
+        event.program.vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
             venStatus.optStatus = "Pending request"
             venStatus.requestID = v.clientURI
-            // FIXME make this a 'belongsTo' relationship
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                v.save(flush: true)
-                event.save(flush: true)
+                v.save()
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!
