@@ -101,10 +101,10 @@ class EventController {
         
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             program.addToEvents event
             prepareVenStatus event
             program.save(flush: true)
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message = "Success, your event has been created"
         }
         else {
@@ -218,7 +218,7 @@ class EventController {
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            event.save()
+            event.save(flush:true)
             pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message="Success, your event has been updated"
         }
@@ -250,7 +250,7 @@ class EventController {
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
             if ( venStatus.validate() ) {
-                v.save()
+                v.save(flush:true)
                 log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
             }
             // TODO raise exception if VenStatus couldn't be created!
