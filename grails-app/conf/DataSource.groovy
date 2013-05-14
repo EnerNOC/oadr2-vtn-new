@@ -13,11 +13,11 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+//            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+//            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
             // If you want to persist your DB between shutdown/ restarts:
-//            dbCreate = "update"
-//            url = "jdbc:h2:dev.db;MVCC=TRUE;LOCK_TIMEOUT=10000"
+            dbCreate = "update"
+            url = "jdbc:h2:dev.db;MVCC=TRUE;LOCK_TIMEOUT=10000"
         }
     }
     test {
