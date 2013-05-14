@@ -45,11 +45,18 @@ public class PushService {
      */
     public void pushNewEvent( EiEvent e, List<Ven> vens ) throws JAXBException{
         vens.each { ven ->
+            if (!ven.clientURI)
+                return
             OadrDistributeEvent payload = new OadrDistributeEvent()
 
             payload.withVtnID( this.vtnID )
                     .withRequestID( UUID.randomUUID().toString() )
                     .withOadrEvents(new OadrEvent().withEiEvent(e))
+            ven.venStatuses.each { venStatus ->
+                venStatus.optStatus = "Awaiting Response"
+                venStatus.time = new Date()
+                venStatus.save(flush:true)
+            }
 
             queue.add( new EventPushTask( ven.clientURI, payload ) )
         }

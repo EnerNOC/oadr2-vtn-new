@@ -76,7 +76,7 @@ public class EiEventService {
         }
         else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
-            handleOadrResponse( (OadrResponse)o )
+            //handleOadrResponse( (OadrResponse)o )
             return null
         }
         else {
@@ -237,7 +237,7 @@ public class EiEventService {
      * Persists the information from an OadrResponse into the database
      * 
      * @param requestEvent - The event to be used to form the persistence object
-     */
+     *
     public void handleOadrResponse( OadrResponse response ) {
         //def status = VenStatus.findByRequestID( response.eiResponse.requestID ) TODO implement a new VenTranaction to handle responses
         if ( status ) {
@@ -246,7 +246,7 @@ public class EiEventService {
             status.save()
         }
         else log.warn "No status found for response $response"
-    }
+    }*/
 
     /**
      * Gets the DurationValue from an EiEvent as a java.util.Duration
