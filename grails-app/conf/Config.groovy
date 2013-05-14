@@ -30,7 +30,7 @@ if ( xmpp.debug ) {
 	System.setProperty "smack.debuggerClass", "org.jivesoftware.smack.debugger.ConsoleDebugger"
 }
 
-grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
+grails.project.groupId = 'com.enernoc.open.oadr2.vtn'
 grails.mime.file.extensions = false
 grails.mime.use.accept.header = false
 grails.mime.types = [
@@ -53,6 +53,7 @@ grails.mime.types = [
 
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
+grails.resources.debug=true
 
 // The default codec used to encode data with ${}
 grails.views.default.codec = "html" // none, html, base64
