@@ -310,27 +310,29 @@ public class EiEventService {
         .withEiEventSignals( new EiEventSignals()
             .withEiEventSignals(
                 event.signals.collect { signal ->
-                    new EiEventSignal()
-                        .withCurrentValue(new CurrentValue()
-                            .withPayloadFloat(new PayloadFloat()
-                                .withValue( signal.getCurrentValue() ) ) )
-                        .withIntervals( signal.intervals.collect {
-                            this.buildInterval it
-                        })
+                    def eiSignal = new EiEventSignal()
+                        .withIntervals( new Intervals( signal.intervals.collect {
+                            this.buildInterval it, objectFactory
+                        } ) )
                         .withSignalID( signal.signalID )
                         .withSignalName( signal.name )
-                        .withSignalType( this.getEiSignalType(signal.type) )
-            }))
+                        .withSignalType( signal.type.xmlType )
+
+                    def currentInterval = signal.currentInterval
+                    if ( currentInterval )
+                        eiSignal.currentValue = new CurrentValue( new PayloadFloat( signal.currentInterval ) )
+                    return eiSignal
+                }
+            ))
         return eiEvent
     }
     
-    protected Interval buildInterval( EventInterval interval ) {
+    protected Interval buildInterval( EventInterval interval, ObjectFactory objectFactory ) {
         return new Interval()
             .withDuration( new DurationPropType()
                 .withDuration( new DurationValue()
                     .withValue( interval.duration.toString() )))
-            .withUid( interval.uid.toString() )
-            .withText( interval.uid )
+            .withUid( new Uid( interval.uid.toString() ) )
             .withStreamPayloadBase(
                 objectFactory.createSignalPayload(
                     new SignalPayload(new PayloadFloat( interval.level ) ) ) )
@@ -360,14 +362,5 @@ public class EiEventService {
         
         // else event is ended
         return EventStatusEnumeratedType.COMPLETED
-    }
-    
-    protected SignalTypeEnumeratedType getEiSignalType( EventInterval interval ) {
-        switch ( interval.signalType ) {
-            case SignalType.PRICE_RELATIVE:
-                return SignalTypeEnumeratedType.PRICE_RELATIVE
-            default:
-                return SignalTypeEnumeratedType.LEVEL
-        }
     }
 }

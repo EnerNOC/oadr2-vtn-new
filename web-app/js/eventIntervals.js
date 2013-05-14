@@ -56,10 +56,7 @@
 	
 
 	self.validateNumber = function(val) {
-		if ( typeof val == 'number' ) return true
-		if ( typeof val == 'string' )
-			return /[\d\.]+/.test( val )
-		return false
+		return ! isNaN(parseInt(val))
 	}
 
 
@@ -74,15 +71,15 @@
 		console.log(dateStr)
 		var dateStr = dateStr.split('/') // ugh this sucks.
 		var date = new Date(
-			Number.toInteger(dateStr[2]), // year
-			Number.toInteger(dateStr[1])-1, // month
-			Number.toInteger(dateStr[0]), // day
-			Number.toInteger(time[0]), // hours
-			Number.toInteger(time[1]), // minutes
+			parseInt(dateStr[2]), // year
+			parseInt(dateStr[1])-1, // month
+			parseInt(dateStr[0]), // day
+			parseInt(time[0]), // hours
+			parseInt(time[1]), // minutes
 			0 ) // seconds
 		console.log( "parsed date is ", date )
 		var level = row.find('input[name=val]').val().trim()
-		var id = row.find('input[name=intervalID]').val()
+		var id = parseInt(row.find('input[name=intervalID]').val())
 		return {
 			end : date,
 			level : level,
@@ -148,6 +145,7 @@
 		var sig = {}
 		sig.name = section.find('.signalName').first().val()
 		sig.type = section.find('.signalType').first().val()
+		sig.id = parseInt(section.find('.signalID').first().val())
 		sig.intervals = self.getAllIntervals(section)
 
 		return sig
@@ -159,6 +157,8 @@
 		var signals = self.getAllSignals(this)
 		console.log("Sending", signals)
 
+		var $N = window.app.n  
+
 		$.ajax('', {
 			type: 'post',
 			data: JSON.stringify( signals ),
@@ -167,12 +167,11 @@
 			success: function(data,stat,xhr) {
 				console.log('Signals success', xhr, stat, data)
 
-				var $N = window.app.n
 				$('.alert-container').html(
 					$N('div', {'class':'alert alert-success'}, "Saved! Hold on a sec...") )
 				//redirect to new page:
 				if ( data.location ) window.setTimeout(function() {
-//					 window.location = data.location
+					 window.location = data.location
 				}, 1000)
 			},
 			error: function(xhr,stat,err) {
@@ -203,6 +202,12 @@
 		});
 
 		$('#signalsForm').on('submit', self.saveSignals.bind($('#signals')) );
+
+		$(document).ajaxStart(function() {
+			$('.busy-icon').show()
+		}).ajaxComplete(function() {
+			$('.busy-icon').hide()
+		})
 
 	};
 

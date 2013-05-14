@@ -4,8 +4,10 @@ import javax.xml.datatype.DatatypeConfigurationException
 import javax.xml.datatype.DatatypeFactory
 import javax.xml.datatype.Duration
 import javax.xml.datatype.XMLGregorianCalendar
+
 import org.hibernate.FlushMode
 
+import com.enernoc.open.oadr2.model.CurrentValue
 import com.enernoc.open.oadr2.model.DateTime
 import com.enernoc.open.oadr2.model.Dtstart
 import com.enernoc.open.oadr2.model.DurationPropType
@@ -21,6 +23,7 @@ import com.enernoc.open.oadr2.model.ObjectFactory
 import com.enernoc.open.oadr2.model.PayloadFloat
 import com.enernoc.open.oadr2.model.Properties
 import com.enernoc.open.oadr2.model.SignalPayload
+import com.enernoc.open.oadr2.model.Uid
 
 
 
@@ -153,30 +156,38 @@ class Event {
      */
     public EiEvent toEiEvent() {
         ObjectFactory of = new ObjectFactory()
-        def intervals = this.intervals.collect {
-            new Interval()
-                .withDuration( new DurationPropType( 
-                    new DurationValue( it.duration.toString() ) ) )
-                .withStreamPayloadBase( of.createSignalPayload( 
-                    new SignalPayload( new PayloadFloat( it.level ) ) ) )
-                .withUid( it.uid )
-        }
         
         return new EiEvent()
-            .withEventDescriptor(new EventDescriptor()
-                .withEventID(this.eventID)
-                .withPriority(this.priority)
-                .withCreatedDateTime(new DateTime(this.xmlStart))
-                .withModificationNumber(0))
-            .withEiActivePeriod(new EiActivePeriod()
-                .withProperties(new Properties()
-                    .withDtstart(new Dtstart(new DateTime(this.xmlStart)))
-                    .withDuration(new DurationPropType(new DurationValue(
-                        this.duration.toString())))))
+            .withEventDescriptor( new EventDescriptor()
+                .withEventID( this.eventID )
+                .withPriority( this.priority )
+                .withCreatedDateTime( new DateTime( this.xmlStart ) )
+                .withModificationNumber( 0 ) )
+            .withEiActivePeriod( new EiActivePeriod()
+                .withProperties( new Properties()
+                    .withDtstart( new Dtstart( new DateTime( this.xmlStart ) ) )
+                    .withDuration( new DurationPropType( new DurationValue(
+                        this.duration.toString() ) ) ) ) )
             .withEiEventSignals(new EiEventSignals()
-                .withEiEventSignals(new EiEventSignal()
-                    .withIntervals(new Intervals()
-                        .withIntervals(intervals))))
+                .withEiEventSignals( this.signals.collect { sig ->
+                    def eiSignal = new EiEventSignal()
+                        .withSignalType( sig.type.xmlType )
+                        .withSignalName( sig.name )
+                        .withSignalID( sig.signalID )
+                        .withIntervals( new Intervals(
+                            sig.intervals.collect { 
+                                new Interval()
+                                .withDuration( new DurationPropType(
+                                    new DurationValue( it.duration.toString() ) ) )
+                                .withStreamPayloadBase( of.createSignalPayload(
+                                    new SignalPayload( new PayloadFloat( it.level ) ) ) )
+                                .withUid( new Uid( it.uid ) )
+                            })) // end intervals
+                        
+                    def currentInterval = sig.currentInterval
+                    if ( currentInterval ) eiSignal.currentValue = new CurrentValue( new PayloadFloat( currentInterval.level ) )
+                    return eiSignal
+                })) // end eiEventSignals
     }
 
     /**

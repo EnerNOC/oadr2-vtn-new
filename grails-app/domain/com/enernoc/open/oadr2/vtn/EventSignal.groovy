@@ -20,7 +20,7 @@ class EventSignal {
         intervals validator: EventSignal.&validateIntervals
     }
     
-    public EventSignal getCurrentValue() {
+    public EventInterval getCurrentInterval() {
         Date now = new Date()
         
         // TODO not sure if this is correct:
@@ -32,7 +32,7 @@ class EventSignal {
         
         // at this point assume we're somewhere inside the event window
         def intervalEnd = event.startDate.time
-        for ( EventInterval interval : event.intervals ) {
+        this.intervals.each { interval ->
             intervalEnd += interval.durationMillis
             if ( intervalEnd > now.time ) // we're in this interval
                 return interval.level

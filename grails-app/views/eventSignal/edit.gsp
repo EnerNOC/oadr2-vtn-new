@@ -87,7 +87,7 @@
 		  </div>
 	  </div>
 	  
-	  <input type='hidden' name='signalID' value='{{id}}' />
+	  <input type='hidden' name='signalID' class='signalID' value='{{id}}' />
 
     <div class='row'>
       <div class='span10'>
@@ -139,7 +139,7 @@
     </td>
     <td>
       <a href='#removeInterval' class='remove alert-warning'>&times; Remove</a>
-      <a href='#duplicateInterval'><i class='icon icon-copy'></i>Copy</a>
+      <a href='#duplicateInterval'><i class='icon icon-copy'></i> Copy</a>
     </td>
   </tr>
 </script>
