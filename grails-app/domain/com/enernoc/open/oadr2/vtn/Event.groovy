@@ -59,8 +59,11 @@ class Event {
             obj.endDate != null && val < obj.endDate 
         }
         endDate validator : { val, obj ->
-            obj.startDate != null && val > obj.startDate \
-                && val > new Date() // don't allow events in the past
+            if ( obj.startDate != null && val < obj.startDate )
+                return "beforestart"
+            def now = new Date()
+            if ( obj.endDate < now ) return // the event ended naturally, not as a result of an edit. 
+            if ( val < now ) return "inthepast"
         }
         modificationNumber min: 0L
         program validator : { val,obj ->

@@ -13,7 +13,6 @@ import java.util.List;
 class EventController {
     def messageSource
     def pushService
-    def xmppService
     def eiEventService
     
     static defaultAction = 'events'
@@ -80,30 +79,27 @@ class EventController {
 
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
-        def program;
-        if ( params.programID == "null" ) {
-        } else {
-            program = Program.get( params.programID.toLong() )
-            if ( ! program ) {
-                response.sendError 404, "No program for ID $params.programID"
-                return
-            }
+        def program = Program.get( params.programID?.toLong() )
+        if ( ! program ) {
+            response.sendError 404, "No program for ID $params.programID"
+            return
         }
+
         params.remove 'programID'
         def event = new Event(params)
         event.program = program
         
-        if ( event.validate() ) {
+        program.addToEvents event
+        if ( program.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
 //            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
-            program.addToEvents event
             prepareVenStatus event
             program.save(flush: true)
             flash.message = "Success, your event has been created"
         }
         else {
             flash.message="Please fix the errors below"
-            def errors = event.errors.allErrors.collect {
+            def errors = program.errors.allErrors.collect {
                 log.debug "Event creation validation error: $it"
                 messageSource.getMessage it, null
             }
@@ -123,7 +119,7 @@ class EventController {
      * @param String time
      * @return Date
      */
-    static parseDttm( String date, String time) {
+    def parseDttm( String date, String time) {
         return Date.parse( "dd/MM/yyyy HH:mm", "$date $time")
     }
     
@@ -158,7 +154,8 @@ class EventController {
             return
         }
         def program = event.program
-        event.program.removeFromEvents event
+        // this is causing the entire event list to re-validate, which is bad.
+//        event.program.removeFromEvents event
         event.delete()
         program.save()
         redirect actions: "events"
