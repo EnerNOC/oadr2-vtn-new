@@ -16,8 +16,7 @@
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
 
-<r:require modules="bootstrap, application" />
-<r:require modules="application" />
+<r:require modules="bootstrap, fontAwesome, application" />
 
 <link rel="apple-touch-icon"
 	href="${resource(dir: 'images', file: 'apple-touch-icon.png')}" />
@@ -71,8 +70,9 @@
 				</div>
 				<div class="nav-collapse collapse pull-right">
 				  <ul class="nav">
-            <li><a id='spinner' style='display:none'>
-              <i class='icon-spin icon-spinner icon-large'></i></a></li>
+            <li><a class='busy-icon' style='display:none'>
+              <i class='icon-spin icon-spinner icon-large'></i></a>
+            </li>
 				</div>
 			</div>
 		</div>

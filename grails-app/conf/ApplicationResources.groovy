@@ -4,6 +4,11 @@ modules = {
         resource url:'/js/application.js'
     }
     
+    fontAwesome {
+        dependsOn 'bootstrap'
+        resource url: '/css/font-awesome.min.css'
+    }
+    
     eventIntervals {
         dependsOn 'backbone', 'formTime'
         
