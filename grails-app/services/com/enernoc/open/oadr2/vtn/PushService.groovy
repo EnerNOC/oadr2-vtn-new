@@ -48,19 +48,21 @@ public class PushService {
             if (!ven.clientURI)
                 return
             OadrDistributeEvent payload = new OadrDistributeEvent()
-
+            def UID = UUID.randomUUID().toString()
             payload.withVtnID( this.vtnID )
-                    .withRequestID( UUID.randomUUID().toString() )
+                    .withRequestID( UID )
                     .withEiResponse(new EiResponse().withRequestID("Request ID") // FIXME
                         .withResponseCode(new ResponseCode("200"))
                         .withResponseDescription("OK"))
                     .withOadrEvents(new OadrEvent().withEiEvent(e))
-            ven.venStatuses.each { venStatus ->
-                venStatus.optStatus = "Awaiting Response"
-                venStatus.time = new Date()
-                venStatus.save(flush:true)
-            }
-
+                    
+            def venLog = new VenTransactionLog()
+            venLog.venID = ven.venID
+            venLog.payload = payload
+            venLog.sentDate = new Date()
+            venLog.push = true
+            venLog.UID = UID
+            venLog.save(flush: true)
             queue.add( new EventPushTask( ven.clientURI, payload ) )
         }
     }

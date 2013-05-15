@@ -170,9 +170,9 @@ class EiEventServiceTests {
         def oadrResponse = eiEventService.handleOadrCreated( oadrCreatedObject )
         
         assert oadrResponse instanceof OadrResponse
-        assert oadrResponse.eiResponse.requestID != null
-        assert oadrResponse.eiResponse.responseCode.value == "200"
-        assert oadrResponse.eiResponse.responseDescription == "OK"
+        assert oadrResponse.eiResponse.requestID == null
+        assert oadrResponse.eiResponse.responseCode.value == "404"
+        assert oadrResponse.eiResponse.responseDescription == "UID does not exit in Ven Transaction Log"
     }
     
     /**
