@@ -98,14 +98,14 @@ public class EiEventService {
             
             oadrResponse = new OadrResponse()
                 .withEiResponse(new EiResponse()
-                    .withRequestID(UUID.randomUUID().toString())
+                    .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
                     .withResponseCode(new ResponseCode(responseCode))
                     .withResponseDescription(description))
             venLog.responseDate = new Date()
             venLog.save(flush: true)
         } else {
             def responseCode = "404"
-            def description = "UID does not exit in Ven Transaction Log"
+            def description = "UID does not exist in Ven Transaction Log"
             oadrResponse = new OadrResponse()
                 .withEiResponse(new EiResponse()
                     .withRequestID(oadrCreatedEvent.eiCreatedEvent?.eiResponse?.requestID)
@@ -214,7 +214,7 @@ public class EiEventService {
                 venStatus = new VenStatus()
                 ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
-                venStatus.optStatus = "Pending response"
+                venStatus.optStatus = "Awaiting Response"
             }
 
             venStatus.time = new Date()
@@ -260,7 +260,7 @@ public class EiEventService {
         def venLog = VenTransactionLog.findWhere(UID: response.eiResponse?.requestID)
         
         if ( venLog ) {
-            def ven = Ven.findBy(venID: venLog.venID)
+            def ven = Ven.findWhere(venID: venLog.venID)
             ven.venStatuses.each { status ->
                 status.time = new Date()
                 status.optStatus = "Awaiting Response"

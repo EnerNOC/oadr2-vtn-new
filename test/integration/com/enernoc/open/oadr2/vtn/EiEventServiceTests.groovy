@@ -114,6 +114,9 @@ class EiEventServiceTests {
         event1.save( failOnError:true )
         event3.save( failOnError:true )
         ven1.save( failOnError:true )
+        
+        def venLog = new VenTransactionLog(venID: "ven1", sentDate: new Date(), UID: "ven1ID").save(failOnError:true, flush: true)
+        
     }
 
     @After
@@ -161,19 +164,30 @@ class EiEventServiceTests {
     /**
      * 2: Test handleOadrCreated
      */
-    void testHandleOadrCreated() {
+    void testBadHandleOadrCreated() {
         def eiEventService = new EiEventService()
-        def oadrCreatedObject =
+        def invalidUriOadrCreatedObject =
             new OadrCreatedEvent().withEiCreatedEvent( new EiCreatedEvent()
                 .withEiResponse( new EiResponse()
                     .withResponseCode( new ResponseCode("200")) ) )
-        def oadrResponse = eiEventService.handleOadrCreated( oadrCreatedObject )
+        def validUriOadrCreatedObject =
+            new OadrCreatedEvent().withEiCreatedEvent( new EiCreatedEvent()
+                .withEiResponse( new EiResponse()
+                    .withResponseCode( new ResponseCode("200"))
+                    .withRequestID( "ven1ID" ) ) )
+        def badOadrResponse = eiEventService.handleOadrCreated( invalidUriOadrCreatedObject )
+        def validOadrResponse = eiEventService.handleOadrCreated( validUriOadrCreatedObject )
         
-        assert oadrResponse instanceof OadrResponse
-        assert oadrResponse.eiResponse.requestID == null
-        assert oadrResponse.eiResponse.responseCode.value == "404"
-        assert oadrResponse.eiResponse.responseDescription == "UID does not exit in Ven Transaction Log"
+        assert badOadrResponse instanceof OadrResponse
+        assert badOadrResponse.eiResponse.requestID == null
+        assert badOadrResponse.eiResponse.responseCode.value == "404"
+        assert badOadrResponse.eiResponse.responseDescription == "UID does not exist in Ven Transaction Log"
+        assert validOadrResponse instanceof OadrResponse
+        assert validOadrResponse.eiResponse.requestID == "ven1ID"
+        assert validOadrResponse.eiResponse.responseCode.value == "200"
+        assert validOadrResponse.eiResponse.responseDescription == "OK"
     }
+    
     
     /**
      * 3: Test isSuccessful
@@ -325,6 +339,24 @@ class EiEventServiceTests {
             v.optStatus = optType.toString()
             
         }
+    }
+
+    /**
+     * 8: Test handleOadrResponse
+     */
+    def testHandleOadrResponse() {
+        def eiEventService = new EiEventService()
+        def oadrResponse = new OadrResponse()
+            .withEiResponse(new EiResponse()
+                .withRequestID("ven1ID")
+                .withResponseCode(new ResponseCode("200")))
+        eiEventService.handleOadrResponse( oadrResponse )
+        
+        Ven.findWhere(venID: "ven1").venStatuses.each { venStatus ->
+            assert venStatus.optStatus == "Awaiting Response"
+            assert venStatus.time.format( "dd/MM/yyyy HH:mm" ) == new Date().format( "dd/MM/yyyy HH:mm" )
+        }
+        
     }
 
 }
