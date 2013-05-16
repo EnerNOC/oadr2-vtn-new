@@ -58,7 +58,6 @@ public class PushService {
                     
             def venLog = new VenTransactionLog()
             venLog.venID = ven.venID
-            venLog.payload = payload
             venLog.sentDate = new Date()
             venLog.push = true
             venLog.UID = UID

@@ -46,7 +46,7 @@ import com.enernoc.open.oadr2.model.Properties.Tolerance.Tolerate
  *
  */
 public class EiEventService {
-
+    def messageSource
     static transactional = true
 
     String vtnID // injected property value
@@ -191,11 +191,16 @@ public class EiEventService {
         persistFromRequestEvent oadrRequestEvent, events
         
         def venLog = new VenTransactionLog()
-        venLog.venID = oadrRequestEvent.eiRequestEvent.venID
+       // venLog.venID = oadrRequestEvent.eiRequestEvent.venID
         venLog.sentDate = new Date()
         venLog.UID = eiResponse.requestID
-        venLog.save(flush: true)
-        
+        if (venLog.validate()) {
+            venLog.save(flush: true)
+        } else {
+            venLog.errors.allErrors.each {
+                log.warn(messageSource.getMessage(it, null))
+            }
+        }
         return oadrDistributeEvent
     }
 

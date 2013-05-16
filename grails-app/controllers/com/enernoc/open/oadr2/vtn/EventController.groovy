@@ -102,7 +102,8 @@ class EventController {
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             program.addToEvents event
-            prepareVenStatus event
+            def vens = Ven.executeQuery("select v from Ven v where :p in elements(v.programs)", [p: program])
+            prepareVenStatus event, vens
             program.save(flush: true)
             pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message = "Success, your event has been created"
@@ -239,9 +240,9 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus( Event event ) {
+    protected void prepareVenStatus( Event event, ArrayList<Ven> vens ) {
         
-        event.program.vens.each { v ->
+        vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
