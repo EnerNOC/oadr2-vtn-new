@@ -42,6 +42,7 @@ class Event {
     Date startDate
     Date endDate
     boolean cancelled
+    boolean responseRequired = true
     long intervals = 1
     long modificationNumber = 0L
 

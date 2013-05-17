@@ -188,6 +188,40 @@ class EventController {
         }
         model
     }
+    
+    /**
+     * On the Event display page, allows user to toggle responseRequired to True
+     *
+     * @param id - The database ID of the Event
+     * @return renders events along with given update
+     */
+    def requireResponse() {
+        def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
+        event.responseRequired = true
+        event.save(flush: true)
+        redirect actions: "events"
+    }
+    
+    /**
+     * On the Event display page, allows user to toggle responseRequired to false
+     *
+     * @param id - The database ID of the Event
+     * @return renders events along with given update
+     */
+    def noResponse() {
+        def event = Event.get(params.id)
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
+        event.responseRequired = false
+        event.save(flush: true)
+        redirect actions: "events"
+    }
 
     /**
      * Updates the event with a given id with the new parameters input from the user
