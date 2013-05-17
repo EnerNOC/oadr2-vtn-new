@@ -78,11 +78,11 @@
 			parseInt(time[1]), // minutes
 			0 ) // seconds
 		console.log( "parsed date is ", date )
-		var level = row.find('input[name=val]').val().trim()
+		var val = row.find('input[name=val]').val().trim()
 		var id = parseInt(row.find('input[name=intervalID]').val())
 		return {
 			end : date,
-			level : level,
+			val : val,
 			id : id }
 	}
 
@@ -95,10 +95,7 @@
 			evt.preventDefault();
 			self.addInterval.bind(newSection)({endTime:self.event.end})
 		})
-		newSection.find('.remove').on('click',function(evt) {
-			evt.preventDefault();
-			newSection.remove();
-		})
+		newSection.find('.remove').on('click',self.deleteSignal.bind(newSection))
 		newSection.find('input[name=name]').on('change',function(evt) {
 			newSection.find('.nameLabel').text($(evt.target).val())
 		})
@@ -122,12 +119,35 @@
 			.data('timepicker').setTime( endTime.getHours() + ":" + endTime.getMinutes() );
 		newSection.find('.dp').datepicker({ format: "dd/mm/yyyy" })
 			.data('datepicker').setValue( endTime );
-		newSection.find('.remove').on('click',function(evt) {
-			evt.preventDefault();
-			newSection.remove();
-		})
+		newSection.find('.remove').on('click',self.deleteInterval.bind(newSection))
 
 		this.find('.intervals').first().append( newSection )
+	}
+
+	
+	/**
+	 * `this` is bound to the DOM section where the interval is displayed
+	 * Interval ID to delete is found in the selector `input[name=intervalID]`
+	 */
+	self.deleteInterval = function(evt) {
+		evt.preventDefault();
+		var intervalID = $(this).find('input[name=intervalID]').val()
+		console.log("Deleting interval",intervalID)
+		var section = this
+		if ( intervalID ) {
+			$.ajax( self.intervalDeleteURL + "/" + intervalID, {
+				type : 'post',
+				success : function(data,stat,xhr) {
+					console.log('deleted', intervalID)
+					section.remove()
+				},
+				error : function(xhr,stat,err) {
+					console.log("Error", err)
+					// TODO message
+				}
+			})
+		}
+		else this.remove() // not yet saved
 	}
 
 
@@ -150,6 +170,34 @@
 
 		return sig
 	}
+
+
+	/**
+	 * `this` is bound to the DOM node where the signal is defined.
+	 * Signal ID to delete is found in the selector `input[name=signalID]`
+	 */
+	self.deleteSignal = function(evt) {
+		evt.preventDefault()
+		var signalID = $(this).find('input[name=signalID]').val()
+		console.log("Deleting signal",signalID)
+		var section = this
+		if ( signalID ) {
+			$.ajax( self.signalDeleteURL + "/" + signalID, {
+				type : 'post',
+				success : function(data,stat,xhr) {
+					console.log('deleted', signalID)
+					section.remove()
+				},
+				error : function(xhr,stat,err) {
+					console.log("Error", err)
+					// TODO message
+				}
+			})
+
+		}
+		else this.remove() // not yet saved
+	}
+
 
 	self.saveSignals = function(evt) {
 		evt.preventDefault();
@@ -178,7 +226,7 @@
 				console.log("Signals save error", xhr, stat, err)
 				var msg = "Unknown error"
 				if (typeof err == 'object')
-					if ( err.message ) msg = err.message
+					if ( err.msg ) msg = err.msg
 				else if ( typeof err == 'string' )
 					msg = err
 				$('.alert-container').html(
@@ -201,6 +249,7 @@
 			self.addSignal()
 		});
 
+		$('#submitBtn').on('click', self.saveSignals.bind($('#signals')) );
 		$('#signalsForm').on('submit', self.saveSignals.bind($('#signals')) );
 
 		$(document).ajaxStart(function() {

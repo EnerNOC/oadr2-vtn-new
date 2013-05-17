@@ -8,7 +8,7 @@ class EventSignalController {
     def eiEventService
     
     static defaultAction = 'edit'
-    static allowedMethods = [edit:'GET', update:'POST']
+    static allowedMethods = [edit:'GET', update:'POST',delete:"POST"]
     
     def edit() {
         def eventID = params.eventID
@@ -48,7 +48,8 @@ class EventSignalController {
                         intervals : sig.intervals.collect {
                             end += it.durationMillis
                             return [
-                                level: it.level,
+                                id: it.id,
+                                value: it.level,
                                 duration : it.durationMillis,
                                 endTime : end
                             ]
@@ -66,10 +67,16 @@ class EventSignalController {
         log.debug "Creating signals: $data for $eventID"
         
         def event = Event.findById eventID, [fetch:[signals:'select']]
-        event.signals = this.parseEventSignals data, event
+        this.parseEventSignals( data, event ).each {
+            event.addToSignals it
+        }
         
-        if ( event.signals.every { it.validate() } ) {
-            event.save flush:true // TODO update modification number?
+        if ( event.signals.any { it.id != -1 } )  // if this is an update, not a save
+            event.modificationNumber +=1
+        
+        if ( event.validate() ) { //signals.every { it.validate() } ) {
+            event.save flush:true
+            log.debug "Event $event saved with ${event.signals.size()} signals"
             def eiEvent = eiEventService.buildEiEvent event
             pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             
@@ -82,11 +89,24 @@ class EventSignalController {
         
         else { // validation error; render JSON error response:
             
-            render( contentType: 'text/json', statusCode: 406 ) {
+            render( contentType: 'text/json', status: 406 ) {
+                log.warn "Signal validation errors: ${event.errors}"
                 msg = "validation error: ${event.errors}"
             }
-        } 
+        }
+    }
+    
+    def delete() {
+        def signal = EventSignal.get(params.id) 
+        if ( signal ) {
+            signal.delete()
+            render( contentType: 'text/json' ) { msg = "OK" } 
+            return
+        }
         
+        render( contentType: 'text/json', code: 404 ) {
+            msg = "Could not find signal ID ${params.id}"
+        }
     }
     
     /**
@@ -98,9 +118,9 @@ class EventSignalController {
      *     "id":2,
      *     "intervals":[
      *       { "end":"2013-05-10T16:56:00.000Z",
-     *         "level":"1","id":0},
+     *         "val":"1","id":0},
      *       { "end":"2013-05-10T17:56:00.000Z",
-     *         "level":"2","id":1}
+     *         "val":"2","id":1}
      *     ]
      *   }
      * ]
@@ -109,14 +129,12 @@ class EventSignalController {
      * @return
      */
     protected parseEventSignals( signals, event ) {
-        Thread.sleep( 3000 )
         return signals.collect { sigData ->
             def sigID = sigData['id']
             def signal = ( sigID ) ? EventSignal.get( sigID ) : new EventSignal()
             
             signal.name = sigData['name']
             signal.type = SignalType.valueOf( sigData['type'] )
-            signal.event = event
 
             def lastIntervalEnd = event.startDate
             signal.intervals = sigData['intervals'].collect { intervalData ->
@@ -125,7 +143,7 @@ class EventSignalController {
                 
                 def endDt = DatatypeConverter.parseDateTime( intervalData['end'] ).time 
                 interval.durationMillis = endDt.time - lastIntervalEnd.time
-                interval.level = intervalData['level'] as float
+                interval.level = intervalData['val'] as float
                 
                 lastIntervalEnd = endDt
                 

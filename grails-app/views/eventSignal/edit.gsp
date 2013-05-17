@@ -35,9 +35,9 @@
   
 <div class='row'>
   <div class='span12'>
-		<g:form name='signalsForm' action="intervals" class="form-horizontal">
+		<g:form name='signalsForm' action="." class="form-horizontal">
 		  <div class='row'>
-		    <div class='span7'>
+		    <div class='span10'>
           <h1>Intervals for Event '<span class='eventName'>${event.eventID}</span>'</h1>
 		    </div>
 		    
@@ -45,17 +45,26 @@
 		      <p><span class='label'>Start: ${formatDate(format:'dd/MM/yyyy HH:mm', date:event.startDate)}</span></p>
           <p><span class='label'>End: ${formatDate(format:'dd/MM/yyyy HH:mm', date:event.endDate)}</span></p>
 		    </div>
-	      <div class='span3'>
-	        <a href='#addSignal' id='addSignalBtn' class='btn btn-success'>
-	          <i class='icon-plus'></i> Add Signal...
-	        </a>
-	        <input type="submit" value="Save!" class="btn btn-primary" />
-	        <g:link controller="event" class="btn">Cancel</g:link>
-	      </div>
 		  </div>
              
-			<div id='signals'>
-			 <!-- Signal templates inserted here -->
+			<div class='row'>
+	   		<div class='span10 '>
+  
+					<div id='signals'>
+					 <!-- Signal templates inserted here -->
+					</div>
+				</div>
+				<div class='span2'>
+	        <div class='btn-group btn-group-vertical'>
+	          <a href='#submit' id='submitBtn' class="btn btn-primary">
+             <i class="icon-save"></i> Save!
+	          </a>
+	          <g:link controller="event" class="btn btn-inverse">Cancel</g:link>
+            <a href='#addSignal' id='addSignalBtn' class='btn btn-success'>
+              <i class='icon-plus'></i> Add Signal
+            </a>
+	        </div>
+				</div>
 			</div>		
 		</g:form>
 	</div>
@@ -63,8 +72,7 @@
 
 <script type='text/html' id='signalTmpl'>
   <div class='row signalSection'>
-  <div class='span10 '>
-	  <div class='pull-right'>
+    <div class='pull-right'>
 	    <a href='#remove' class='remove'>&times; Remove</a>
 	  </div>
 	  
@@ -92,8 +100,8 @@
     <div class='row'>
       <div class='span10'>
 		    <div class='pull-right'>	  
-			    <a href='#addInterval' class='addIntervalBtn btn btn-success'>
-			      <i class='icon-plus'></i> Add Interval...
+			    <a href='#addInterval' class='addIntervalBtn btn btn-success btn-small'>
+			      <i class='icon-plus'></i> Add Interval
 			    </a>
 		    </div>
 		    <h4>Intervals</h4>
@@ -101,7 +109,7 @@
 			  <table class='table'>
 			   <thead>
 			     <tr>
-			       <th>Level</th>
+			       <th>Value</th>
 		         <th>End</th>
 		         <th>Actions</th>
 			     </tr>
@@ -115,15 +123,14 @@
 	  
 	  <hr />
   </div>
-  </div>
 </script>
 
 <script type='text/html' id='intervalTmpl'>
   <tr class='intervalRow'>
     <td>
       <div class='control-group'>
-	      <input type="text" name="val" value="{{level}}" placeholder="1" class='input-small' />    
-	      <input type='hidden' name='intervalID' value='{{name}}' />
+	      <input type="text" name="val" value="{{value}}" placeholder="1" class='input-small' />    
+	      <input type='hidden' name='intervalID' value='{{id}}' />
         <span class='help-inline'></span>
       </div>
     </td>
@@ -148,6 +155,8 @@
 $(function() {
   var _event = <%= eventJSON as JSON %>;
 
+  window.intervals.intervalDeleteURL = '${createLink(controller:"eventInterval",action:"delete")}'
+  window.intervals.signalDeleteURL = '${createLink(controller:"eventSignal",action:"delete")}'
   window.intervals.init(_event);
 });
 </g:javascript>
