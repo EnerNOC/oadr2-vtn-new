@@ -88,14 +88,11 @@ class EventController {
         params.endDate = parseDttm( params.endDate, params.endTime )
         
         def program
-        if ( params.programID == "null" ) {
-        } else {
+        try {
             program = Program.get( params.programID.toLong() )
-            if ( ! program ) {
-                response.sendError 404, "No program for ID $params.programID"
-                return
-            }
         }
+        catch ( ex ) { } //Program is null and will fail validation
+        
         params.remove 'programID'
         def event = new Event(params)
         event.program = program
