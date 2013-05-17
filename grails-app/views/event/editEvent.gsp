@@ -64,6 +64,12 @@
 					<input type="text" name="priority" value="${ currentEvent.priority }" id="inputPriority" />
 				</div>
 			</div>
+			<div class="control-group ${hasErrors(bean:currentEvent,field:'"responseRequired"', 'error')}">
+        <label class="control-label" for="inputResponseRequired">Require VEN Response: </label>
+        <div class="controls">
+          <g:checkBox name="responseRequired" value="${currentEvent.responseRequired}" id="inputResponseRequired" />
+        </div>
+      </div>
 			<h3>Active Period</h3>
 			<div class="control-group ${hasErrors(bean:currentEvent,field:'intervals', 'error')}">
 				<label class="control-label" for="inputInterval">Intervals: </label>

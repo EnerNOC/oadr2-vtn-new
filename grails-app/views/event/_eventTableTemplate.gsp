@@ -36,14 +36,7 @@
 					${event.program.name}
 				</td>
 				<td>
-				  <g:if test="${event.responseRequired}">
-				    <g:link controller="Event" action="requireResponse" params="[id: event.id]" class="btn btn-mini btn-primary">Yes</g:link>
-				    <g:link controller="Event" action="noResponse" params="[id: event.id]" class="btn btn-mini" >No</g:link>
-				  </g:if>
-				  <g:else>
-				    <g:link controller="Event" action="requireResponse" params="[id: event.id]" class="btn btn-mini" >Yes</g:link>
-            <g:link controller="Event" action="noResponse" params="[id: event.id]" class="btn btn-mini btn-primary">No</g:link>
-				  </g:else>
+          ${ event.responseRequired }
 				</td>
 				<g:if test="${ event.endDate > new Date() }">
 					<td><g:link controller="Event" action="editEvent" params="[id: event.id]" class="btn btn-mini">Edit</g:link>
