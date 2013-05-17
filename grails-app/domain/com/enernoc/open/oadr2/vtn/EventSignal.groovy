@@ -42,12 +42,14 @@ class EventSignal {
     }
     
     static validateIntervals( intervals, EventSignal signal ) {
-      if ( intervals.size() < 1 ) return false
+      if ( intervals.size() < 1 ) return "empty"
       def eventLength = signal.event.durationMillis
       
       def intervalDuration = 0
       intervals.each { intervalDuration += it.durationMillis }
-      return eventLength == intervalDuration
+      if ( eventLength != intervalDuration ) {
+          return "duration" // durations do not add up to event duration
+      }
     } 
 }
 

@@ -15,11 +15,9 @@ class EventInterval {
         uid blank: false
         durationMillis min: 0L
         level validator: { val, interval ->
-            switch ( interval.signal.type ) {
-                case SignalType.LEVEL:
-                    return ((int)val) == val && (int)val in 0..5
-                default:
-                    return true
+            if ( interval.signal.type == SignalType.LEVEL ) {
+                if ( ((int)val) != val ) return "notinteger"  
+                if ( ! (int)val in 0..3 ) return "range"
             }
         }
     }
