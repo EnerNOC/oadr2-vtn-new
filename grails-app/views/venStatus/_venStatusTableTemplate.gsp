@@ -36,7 +36,7 @@
 					${venStatus.displayTime()}
 				</td>
 				<td><g:form action="deleteStatus" params="[id : venStatus.id]">
-						<input type="submit" value="Delete" class="btn btn-danger"
+						<input type="submit" value="Delete" class="btn btn-mini btn-danger"
 							onClick="return confirmSubmit()">
 					</g:form></td>
 			</tr>

@@ -26,12 +26,12 @@
 					${ven.programs}
 				</td>
 				<td><g:form controller="Ven" action="deleteVEN" params="[id : ven.id]">
-						<input type="submit" value="Delete" class="btn btn-danger"
+						<input type="submit" value="Delete" class="btn btn-mini btn-danger"
 							onClick="return confirmSubmit()">
 					</g:form></td>
 				<td><g:form controller="Ven" action="editVEN"
 						params="[id : ven.id]">
-						<input type="submit" value="Edit" class="btn"
+						<input type="submit" value="Edit" class="btn btn-mini"
 							onClick="return confirmSubmit()">
 					</g:form></td>
 			</tr>
