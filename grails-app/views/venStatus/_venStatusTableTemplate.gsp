@@ -22,19 +22,14 @@
 				<td>
 					${venStatus.event.program.name}
 				</td>
-				<td><g:if test="${venStatus.optStatus == "OPT_OUT"}">
+				<td><g:if test="${venStatus.getStatusText() == "Opt Out"}">
 						<a disabled="disabled" class="btn btn-danger">Opted Out</a>
 					</g:if> <g:else>
-						<g:if test="${venStatus.optStatus == "OPT_IN"}">
+						<g:if test="${venStatus.getStatusText() == "Opt In"}">
 							<a disabled="disabled" class="btn btn-success">Opted In</a>
 						</g:if>
 						<g:else>
-							<g:if test="${venStatus.optStatus == "Pending 1"}">
-								<a disabled="disabled" class="btn">Pending 1</a>
-							</g:if>
-							<g:else>
-								<a disabled="disabled" class="btn">Pending 2</a>
-							</g:else>
+						  <a disabled="disabled" class="btn">${venStatus.getStatusText() }</a>
 						</g:else>
 					</g:else></td>
 				<td>

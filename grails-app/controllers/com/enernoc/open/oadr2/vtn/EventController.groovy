@@ -148,6 +148,7 @@ class EventController {
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.cancelled = true
+        event.save(flush: true)
         redirect action: "events"
     }
 
@@ -246,7 +247,7 @@ class EventController {
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = "Pending Distribute"
+            venStatus.optStatus = VenStatus.StatusCode.PENDING_DISTRIBUTE
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()

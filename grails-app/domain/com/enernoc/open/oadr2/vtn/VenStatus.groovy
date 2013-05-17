@@ -12,7 +12,7 @@ package com.enernoc.open.oadr2.vtn
 class VenStatus {
 
     static belongsTo = [event: Event, ven: Ven]
-    String optStatus
+    StatusCode optStatus
     Date time
     String requestID
     static constraints = {
@@ -21,7 +21,7 @@ class VenStatus {
         //TODO create enum object for optStatus
         //optStatus inList: ['optIn', 'optOut']
     }
-    
+
     /**
      * Return the string representation of Venstatus
      * 
@@ -29,8 +29,28 @@ class VenStatus {
      */
     public String toString(){
         "VEN Status \n  VEN ID: $ven.venID\n  Event ID: $event.eventID\n  Program: $event.program.name" +
-        "\n  Status: $optStatus\n  Time: $time"
+                "\n  Status: $optStatus\n  Time: $time"
     }
+
+    public String getStatusText() {
+        switch(this.optStatus) {
+            case(StatusCode.PENDING_DISTRIBUTE) :
+                return "Pending Distribute"
+            case(StatusCode.DISTRIBUTE_SENT) :
+                if (this.event.responseRequired) { 
+                    return "Awaiting Response"
+                } else {
+                    return "Payload Sent"
+                }
+            case(StatusCode.OPT_IN) :
+                return "Opt In"
+            case(StatusCode.OPT_OUT) :
+                return "Opt Out"
+            default: 
+                return null
+        }
+    }
+
 
     /**
      * Formats the date as readable format
@@ -40,4 +60,12 @@ class VenStatus {
     public String displayTime(){
         return time.format("dd/MM/yyyy HH:mm")
     }
+
+    public enum StatusCode {
+        PENDING_DISTRIBUTE,
+        DISTRIBUTE_SENT,
+        OPT_IN,
+        OPT_OUT
+    }
+
 }

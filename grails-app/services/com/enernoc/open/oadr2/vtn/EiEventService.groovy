@@ -219,7 +219,7 @@ public class EiEventService {
                 venStatus = new VenStatus()
                 ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
-                venStatus.optStatus = "Awaiting Response"
+                venStatus.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
             }
 
             venStatus.time = new Date()
@@ -248,7 +248,14 @@ public class EiEventService {
                 createdEvent.eiCreatedEvent.eventResponses.eventResponses.each { eventResponse ->
                     def optType = eventResponse.optType.toString()
                     log.debug "now setting the new optType: $optType"
-                    status.optStatus = optType
+                    switch (optType) {
+                        case("optIn") :
+                            status.optStatus = VenStatus.StatusCode.OPT_IN
+                        case("optOut") :
+                            status.optStatus = VenStatus.StatusCode.OPT_OUT
+                        default :
+                            log.error "Invalid opt Type"
+                    }
                 }
             }
             status.time = new Date()
@@ -268,7 +275,7 @@ public class EiEventService {
             def ven = Ven.findWhere(venID: venLog.venID)
             ven.venStatuses.each { status ->
                 status.time = new Date()
-                status.optStatus = "Awaiting Response"
+                status.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
                 status.save(flush: true)
             }
         }
