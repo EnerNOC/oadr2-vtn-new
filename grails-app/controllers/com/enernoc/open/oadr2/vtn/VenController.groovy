@@ -56,9 +56,6 @@ class VenController {
         def programs = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
-            if ( ! p ) {
-                response.sendError( 404, "No program for ID $pID" )
-            }
             programs << p
         }
         params.remove( 'programID' )
@@ -134,18 +131,10 @@ class VenController {
      */
     def updateVEN() {
         def ven = Ven.get( params.id )
-        if ( ! ven ) {
-            response.sendError 404, "No ven for ID $params.id"
-            return
-        }
-        
         def oldPrograms = ven.programs
         def newPrograms = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
-            if ( ! p ) {
-                response.sendError( 404, "No program for ID $pID" )
-            }
             newPrograms << p
         }
         if ( newPrograms == []) ven.programs = null

@@ -33,7 +33,7 @@ class EventController {
      * @return the default render page for event display, edit and deletion
      */
     def events() {
-        def event = Event.list( limit:20, sort:'startDate', order:'desc' )
+        def event = Event.list().sort()
         [eventList:event]
     }
 
