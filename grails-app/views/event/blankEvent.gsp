@@ -38,7 +38,7 @@
 			<div class="control-group ${hasErrors(bean:event,field:'program', 'error')}">
 				<label class="control-label" for="selectProgram">Program: </label>
 				<div class="controls">
-					<g:select name="programID" from="${programsList}" value="${event.program?.id}" optionKey="id" noSelection="[null:'- Choose a Program -']" id="selectProgram"/>
+					<g:select name="programID" from="${programsList}" value="${event.program?.id}" optionKey="id" noSelection="[(null):'- Choose a Program -']" id="selectProgram"/>
 				</div>
 			</div>
 			<h3>Event Descriptor</h3>
@@ -55,6 +55,12 @@
 					<input type="text" name="priority" value="${event.priority}" placeholder="0" id="inputPriority" />
 				</div>
 			</div>
+		  <div class="control-group ${hasErrors(bean:event,field:'"responseRequired"', 'error')}">
+	      <label class="control-label" for="inputResponseRequired">Require VEN Response: </label>
+	      <div class="controls">
+	        <g:checkBox name="responseRequired" value="${event.responseRequired}" id="inputResponseRequired" />
+	      </div>
+      </div>
 			<h3>Active Period</h3>
 			<div class="control-group ${hasErrors(bean:event,field:'startDate', 'error')}">
 				<label class="control-label" for="inputStartDate">Start Date: </label>

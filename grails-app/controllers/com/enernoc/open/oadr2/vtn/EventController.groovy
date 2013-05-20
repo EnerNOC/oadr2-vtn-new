@@ -79,12 +79,13 @@ class EventController {
 
         params.startDate = parseDttm( params.startDate, params.startTime )
         params.endDate = parseDttm( params.endDate, params.endTime )
-        def program = Program.get( params.programID?.toLong() )
-        if ( ! program ) {
-            response.sendError 404, "No program for ID $params.programID"
-            return
+        
+        def program
+        try {
+            program = Program.get( params.programID.toLong() )
         }
-
+        catch ( ex ) { } //Program is null and will fail validation
+        
         params.remove 'programID'
         def event = new Event(params)
         event.program = program
@@ -138,6 +139,7 @@ class EventController {
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.cancelled = true
+        event.save(flush: true)
         redirect action: "events"
     }
 
@@ -227,13 +229,13 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus( Event event ) {
+    protected void prepareVenStatus( Event event, ArrayList<Ven> vens ) {
         
-        event.program.vens.each { v ->
+        event.vens.each { v ->
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = "Pending request"
+            venStatus.optStatus = VenStatus.StatusCode.PENDING_DISTRIBUTE
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()

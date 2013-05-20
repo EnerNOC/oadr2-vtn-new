@@ -51,6 +51,8 @@ class Event {
     long rampUp
     long recovery
     boolean cancelled
+    boolean responseRequired = true
+    long intervals = 1
     long modificationNumber = 0L
     
     // TODO event target, group, resource IDs

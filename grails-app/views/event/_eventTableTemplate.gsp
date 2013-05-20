@@ -9,7 +9,8 @@
 			<th>Start</th>
 			<th>End</th>
 			<th>Program</th>
-			<th>Actions</th>
+			<th>Response Required</th>
+      <th>Actions</th>
 		</tr>
 	</thead>
 	<tfoot>
@@ -42,12 +43,23 @@
 				<td>
 					${event.program.name}
 				</td>
-				<td><g:link controller="Event" action="editEvent" params="[id: event.id]"
-						class="btn">Edit</g:link></td>
+				<td>
+          ${ event.responseRequired }
+				</td>
+				<g:if test="${ event.endDate > new Date() }">
+					<td><g:link controller="Event" action="editEvent" params="[id: event.id]" class="btn btn-mini">Edit</g:link>
+					</td>
+					<td><g:link controller="Event" action="cancelEvent" params="[id: event.id]"
+							class="btn btn-mini btn-inverse">Cancel</g:link></td>
+				</g:if>
+				<g:else>
+          <td><div disabled class="btn btn-mini">Edit</div>
+          </td>
+          <td><div disabled class="btn btn-mini btn-inverse">Cancel</div>
+          </td>			
+				</g:else>
 				<td><g:link controller="Event" action="deleteEvent" params="[id: event.id]"
-						class="btn btn-danger">Delete</g:link></td>
-				<td><g:link controller="Event" action="cancelEvent" params="[id: event.id]"
-						class="btn btn-warn">Cancel</g:link>
+            class="btn btn-mini btn-danger">Delete</g:link></td>
 			</tr>
 		</g:each>
 	</tbody>

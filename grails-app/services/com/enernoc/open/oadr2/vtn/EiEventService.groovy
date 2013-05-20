@@ -76,7 +76,7 @@ public class EiEventService {
         }
         else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
-            //handleOadrResponse( (OadrResponse)o )
+            handleOadrResponse( (OadrResponse)o )
             return null
         }
         else {
@@ -86,21 +86,36 @@ public class EiEventService {
     }
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
-        def description = verifyOadrCreated( oadrCreatedEvent )[1]
-        log.debug responseCode
-        log.debug description
-        if ( isSuccessful( oadrCreatedEvent ) )
-            persistFromCreatedEvent oadrCreatedEvent
-
-        else
-            log.warn "Incoming oadrCreatedEvent contained a non-200 response: $oadrCreatedEvent"
-
-        return new OadrResponse()
-            .withEiResponse(new EiResponse()
-                .withRequestID(UUID.randomUUID().toString())
-                .withResponseCode(new ResponseCode(responseCode))
-                .withResponseDescription(description))
+        def venLog = VenTransactionLog.findWhere(UID: oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
+        def oadrResponse
+        if (venLog) {
+            def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
+            def description = verifyOadrCreated( oadrCreatedEvent )[1]
+            log.debug responseCode
+            log.debug description
+            if ( isSuccessful( oadrCreatedEvent ) )
+                persistFromCreatedEvent oadrCreatedEvent
+    
+            else
+                log.warn "Incoming oadrCreatedEvent contained a non-200 response: $oadrCreatedEvent"
+            
+            oadrResponse = new OadrResponse()
+                .withEiResponse(new EiResponse()
+                    .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
+                    .withResponseCode(new ResponseCode(responseCode))
+                    .withResponseDescription(description))
+            venLog.responseDate = new Date()
+            venLog.save(flush: true)
+        } else {
+            def responseCode = "404"
+            def description = "UID does not exist in Ven Transaction Log"
+            oadrResponse = new OadrResponse()
+                .withEiResponse(new EiResponse()
+                    .withRequestID(oadrCreatedEvent.eiCreatedEvent?.eiResponse?.requestID)
+                    .withResponseCode(new ResponseCode(responseCode))
+                    .withResponseDescription(description))
+        }
+        return oadrResponse
     }
 
     protected boolean isSuccessful( OadrCreatedEvent payload ) {
@@ -177,7 +192,18 @@ public class EiEventService {
                     .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
         }
         persistFromRequestEvent oadrRequestEvent, events
-
+        
+        def venLog = new VenTransactionLog()
+       // venLog.venID = oadrRequestEvent.eiRequestEvent.venID
+        venLog.sentDate = new Date()
+        venLog.UID = eiResponse.requestID
+        if (venLog.validate()) {
+            venLog.save(flush: true)
+        } else {
+            venLog.errors.allErrors.each {
+                log.error it
+            }
+        }
         return oadrDistributeEvent
     }
 
@@ -196,7 +222,7 @@ public class EiEventService {
                 venStatus = new VenStatus()
                 ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
-                venStatus.optStatus = "Pending response"
+                venStatus.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
             }
 
             venStatus.time = new Date()
@@ -225,7 +251,14 @@ public class EiEventService {
                 createdEvent.eiCreatedEvent.eventResponses.eventResponses.each { eventResponse ->
                     def optType = eventResponse.optType.toString()
                     log.debug "now setting the new optType: $optType"
-                    status.optStatus = optType
+                    switch (optType) {
+                        case("optIn") :
+                            status.optStatus = VenStatus.StatusCode.OPT_IN
+                        case("optOut") :
+                            status.optStatus = VenStatus.StatusCode.OPT_OUT
+                        default :
+                            log.error "Invalid opt Type"
+                    }
                 }
             }
             status.time = new Date()
@@ -237,16 +270,20 @@ public class EiEventService {
      * Persists the information from an OadrResponse into the database
      * 
      * @param requestEvent - The event to be used to form the persistence object
-     *
+     */
     public void handleOadrResponse( OadrResponse response ) {
-        //def status = VenStatus.findByRequestID( response.eiResponse.requestID ) TODO implement a new VenTranaction to handle responses
-        if ( status ) {
-            status.time = new Date()
-            status.optStatus = "Pending 2"
-            status.save()
+        def venLog = VenTransactionLog.findWhere(UID: response.eiResponse?.requestID)
+        
+        if ( venLog ) {
+            def ven = Ven.findWhere(venID: venLog.venID)
+            ven.venStatuses.each { status ->
+                status.time = new Date()
+                status.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
+                status.save(flush: true)
+            }
         }
-        else log.warn "No status found for response $response"
-    }*/
+        else log.warn "RequestID $response.eiResponse?.requestID does not exist in VenTransactionLog for response $response"
+    }
 
     /**
      * Gets the DurationValue from an EiEvent as a java.util.Duration
