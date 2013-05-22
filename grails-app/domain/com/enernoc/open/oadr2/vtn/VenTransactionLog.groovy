@@ -17,6 +17,7 @@ class VenTransactionLog {
     //OadrDistributeEvent payload TODO cannot store entire object need alternative
    // response TODO cannot store entire object need alternative
     Date responseDate
+    
     static constraints = {
       //  response nullable: true
         responseDate nullable: true

@@ -166,6 +166,7 @@ public class EiEventService {
      * @return an OadrDistributeEvent containing all payload information
      */
     public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
+        log.debug "inside handleOadrRequest1"
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
         if ( oadrRequestEvent.eiRequestEvent.requestID )
@@ -182,7 +183,7 @@ public class EiEventService {
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
         // TODO order according to date, priority & status
         def events = Event.executeQuery("select e from Event e, Ven v where  v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
-            [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit])
+            [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit]).sort()
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
                     .withEiEvent(buildEiEvent(e))
@@ -219,7 +220,7 @@ public class EiEventService {
                 venStatus = new VenStatus()
                 ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
-                venStatus.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
+                venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
             }
 
             venStatus.time = new Date()
@@ -246,13 +247,13 @@ public class EiEventService {
             if ( createdEvent.eiCreatedEvent.eventResponses ) {
 
                 createdEvent.eiCreatedEvent.eventResponses.eventResponses.each { eventResponse ->
-                    def optType = eventResponse.optType.toString()
+                    def optType = eventResponse.optType.value()
                     log.debug "now setting the new optType: $optType"
                     switch (optType) {
                         case("optIn") :
-                            status.optStatus = VenStatus.StatusCode.OPT_IN
+                            status.optStatus = StatusCode.OPT_IN
                         case("optOut") :
-                            status.optStatus = VenStatus.StatusCode.OPT_OUT
+                            status.optStatus = StatusCode.OPT_OUT
                         default :
                             log.error "Invalid opt Type"
                     }
@@ -275,7 +276,7 @@ public class EiEventService {
             def ven = Ven.findWhere(venID: venLog.venID)
             ven.venStatuses.each { status ->
                 status.time = new Date()
-                status.optStatus = VenStatus.StatusCode.DISTRIBUTE_SENT
+                status.optStatus = StatusCode.DISTRIBUTE_SENT
                 status.save(flush: true)
             }
         }

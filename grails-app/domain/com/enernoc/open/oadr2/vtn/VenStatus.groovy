@@ -43,9 +43,9 @@ class VenStatus {
                     return "Payload Sent"
                 }
             case(StatusCode.OPT_IN) :
-                return "Opt In"
+                return "optIn"
             case(StatusCode.OPT_OUT) :
-                return "Opt Out"
+                return "optOut"
             default: 
                 return null
         }
@@ -59,13 +59,6 @@ class VenStatus {
      */
     public String displayTime(){
         return time.format("dd/MM/yyyy HH:mm")
-    }
-
-    public enum StatusCode {
-        PENDING_DISTRIBUTE,
-        DISTRIBUTE_SENT,
-        OPT_IN,
-        OPT_OUT
     }
 
 }

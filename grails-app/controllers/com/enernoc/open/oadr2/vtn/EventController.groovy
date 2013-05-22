@@ -245,7 +245,7 @@ class EventController {
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = VenStatus.StatusCode.PENDING_DISTRIBUTE
+            venStatus.optStatus = StatusCode.PENDING_DISTRIBUTE
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()
