@@ -1,6 +1,7 @@
 package com.enernoc.open.oadr2.vtn
 
 import javax.xml.bind.Marshaller
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.datatype.DatatypeFactory
 
 import org.jivesoftware.smack.ConnectionConfiguration
@@ -14,6 +15,7 @@ import com.enernoc.open.oadr2.xmpp.JAXBManager
 import com.enernoc.open.oadr2.xmpp.OADR2IQ
 import com.enernoc.open.oadr2.xmpp.OADR2PacketExtension
 import com.enernoc.open.oadr2.xmpp.OADR2PacketFilter
+import com.enernoc.open.oadr2.model.OadrDistributeEvent;
 
 /**
  * XMPPService is used to establish and hold the XMPPConnection
@@ -29,7 +31,8 @@ public class XmppService implements PacketListener {
     int xmppPort
     String xmppServiceName
     String xmppResource
-
+    
+    String OADR2_XMLNS = OadrDistributeEvent.class.getAnnotation(XmlRootElement.class).namespace()
     ConnectionConfiguration connConfig
     XMPPConnection xmppConn
 
@@ -50,14 +53,11 @@ public class XmppService implements PacketListener {
         this.marshaller = jaxb.createMarshaller()
     }
 
-    public void processPacket(Packet packet) {
+    public void processPacket(Packet packet) {        
         log.debug "Got packet: $packet"
         def payload = packet.getExtension(OADR2_XMLNS)?.payload
-
         def response = eiEventService.handleOadrPayload( payload )
-        log.debug "Got response: $response"
-
-        if ( response )	send payload, packet.from, packet.id
+        if ( response )	send payload, packet.from, packet.getPacketID()
     }
 
     /**
@@ -72,7 +72,6 @@ public class XmppService implements PacketListener {
             log.warn "+----------------------------------------------------+"
             return
         }
-
         try {
             if ( ! this.jid && ! this.xmppHost )
                 this.xmppHost = this.jid.split('@')[-1]
@@ -88,7 +87,7 @@ public class XmppService implements PacketListener {
             log.info "XMPP connected to ${xmppConn.host}"
     
             xmppConn.addPacketListener this, new OADR2PacketFilter()
-    
+                
             xmppConn.login this.jid, this.xmppPasswd, this.xmppResource
             log.info "Logged in as ${xmppConn.user}"
         }
@@ -112,7 +111,11 @@ public class XmppService implements PacketListener {
      * @param jid - the Jid to receive the object
      */
     def send( Object payload, String jid ) {
-        this.send payload, jid
+        IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, marshaller));
+        iq.setTo(jid)
+        //log.debug "the iq id is: " + iq.id
+        iq.setType(IQ.Type.RESULT)
+        xmppConn.sendPacket(iq)
     }
 
     /**
@@ -126,11 +129,11 @@ public class XmppService implements PacketListener {
         log.debug "XMPP send to $jid: # $packetID: $payload"
         IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, this.marshaller))
         if ( packetID ) { // this is a response
-            iq.id = packetID
-            iq.type = IQ.Type.RESULT
+            iq.setPacketID(packetID)
+            iq.type = IQ.Type.RESULT            
         }
         else iq.type = IQ.Type.SET
-        iq.to jid
+        iq.to = jid
         this.xmppConn.sendPacket iq
     }
 }
