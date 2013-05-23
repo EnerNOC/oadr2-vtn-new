@@ -166,7 +166,6 @@ public class EiEventService {
      * @return an OadrDistributeEvent containing all payload information
      */
     public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
-        log.debug "inside handleOadrRequest1"
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
         if ( oadrRequestEvent.eiRequestEvent.requestID )
@@ -190,16 +189,20 @@ public class EiEventService {
                     .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
         }
         persistFromRequestEvent oadrRequestEvent, events
-        
-        def venLog = new VenTransactionLog()
-       // venLog.venID = oadrRequestEvent.eiRequestEvent.venID
-        venLog.sentDate = new Date()
-        venLog.UID = eiResponse.requestID
-        if (venLog.validate()) {
-            venLog.save(flush: true)
-        } else {
-            venLog.errors.allErrors.each {
-                log.error it
+        VenStatus.withTransaction { v ->
+            def venLog = new VenTransactionLog()
+            venLog.venID = oadrRequestEvent.eiRequestEvent.venID
+            venLog.sentDate = new Date()
+            venLog.UID = eiResponse.requestID
+            log.debug eiResponse.requestID
+            if (venLog.validate()) {
+                log.debug "inside validate"
+                venLog.save(flush: true)
+            } else {
+                venLog.errors.allErrors.each {
+                    log.debug "validation failed"
+                    log.error it
+                }
             }
         }
         return oadrDistributeEvent
@@ -215,17 +218,15 @@ public class EiEventService {
         events.each { event ->
             def venStatus = VenStatus.findWhere(
                     ven: ven, event: event )
-
             if ( ! venStatus ) {
                 venStatus = new VenStatus()
                 ven.addToVenStatuses(venStatus)
                 event.addToVenStatuses(venStatus)
-                venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
             }
-
+            venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
             venStatus.time = new Date()
-            ven.save()
-            event.save()
+            ven.save(flush: true, failOnError: true)
+            event.save(flush: true, failOnError: true)
         }
     }
 

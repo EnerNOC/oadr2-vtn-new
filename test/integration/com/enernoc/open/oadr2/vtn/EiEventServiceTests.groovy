@@ -290,7 +290,8 @@ class EiEventServiceTests {
         assert oadrDistributeEvent.oadrEvents[0].eiEvent.eventDescriptor.eventID == "event1"
         assert oadrDistributeEvent.oadrEvents[0].eiEvent.eventDescriptor.priority == 4L
         assert oadrDistributeEvent.oadrEvents[1].eiEvent.eventDescriptor.eventID == "event3"
-        assert oadrDistributeEvent.oadrEvents[1].eiEvent.eventDescriptor.priority == 3L    
+        assert oadrDistributeEvent.oadrEvents[1].eiEvent.eventDescriptor.priority == 3L   
+        assert VenTransactionLog.findWhere(UID: "I am ID") != null 
     }
     
     /**
