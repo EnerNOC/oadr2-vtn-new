@@ -35,7 +35,7 @@ import com.enernoc.open.oadr2.model.Uid
  * @authors Thom Nichols, Yang Xiang
  *
  */
-class Event {
+class Event implements Comparable{
 
     private DatatypeFactory _dtf
     
@@ -202,6 +202,7 @@ class Event {
         def tempID = this.id
         if (tempID == null) tempID = -1
         def activePrograms = Event.withSession { tempSession ->
+            //TODO find an alternative method to setFlushMode since this does not work during unit testing while works with integration testing
             tempSession.setFlushMode(FlushMode.MANUAL);
             def result = Event.where {
                 program == this.program
@@ -214,4 +215,39 @@ class Event {
         }
         return activePrograms == 0
     }
+
+    /**
+     * Compares two events according to oadr spec 
+     * @param e
+     * @return -1, 0 or 1
+     */
+    @Override
+    public int compareTo( Object e ) {
+        if ( this.hasEnded() ) {
+            if ( e.hasEnded() ) 
+                return this.endDate.compareTo( e.endDate )
+            else 
+                return 1
+        }
+        else if ( this.inActivePeriod() ){
+            if ( e.inActivePeriod() ) {
+                if ( this.priority.compareTo( e.priority ) == 0)
+                    return this.startDate.compareTo( e.startDate )
+                else
+                    return e.priority.compareTo( this.priority )
+            } else
+                return -1
+        } 
+        else
+            return this.startDate.compareTo( e.startDate )
+    }
+    
+    def hasEnded() {
+        return this.endDate < new Date()
+    }
+    
+    def inActivePeriod() {
+        return (this.endDate >= new Date()) && (this.startDate < new Date())
+    }
+    
 }

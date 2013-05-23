@@ -32,7 +32,7 @@ class EventController {
      * @return the default render page for event display, edit and deletion
      */
     def events() {
-        def event = Event.list( limit:20, sort:'startDate', order:'desc' )
+        def event = Event.list().sort()
         [eventList:event]
     }
 
@@ -235,7 +235,7 @@ class EventController {
             // TODO create a method called VenStatus.create( ven, event ) that 
             // creates a new VenStatus object
             def venStatus = new VenStatus()
-            venStatus.optStatus = VenStatus.StatusCode.PENDING_DISTRIBUTE
+            venStatus.optStatus = StatusCode.PENDING_DISTRIBUTE
             event.addToVenStatuses(venStatus)
             v.addToVenStatuses(venStatus)
             venStatus.time = new Date()

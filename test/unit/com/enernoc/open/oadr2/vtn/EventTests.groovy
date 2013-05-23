@@ -20,10 +20,15 @@ class EventTests {
     void setUp() {
         mockDomain(Program, [
             [name:"Program1", marketContext:"http://URI1.com"],
-            [name:"Program2", marketContext:"http://URI2.com"] ])
+            [name:"Program2", marketContext:"http://URI2.com"],
+            [name:"Program3", marketContext:"http://URI3.com"] ])
         
         mockDomain(Event, [
-            [program: Program.findWhere(name: "Program1"), eventID: "valid", startDate: new Date(), endDate: new Date().next()] ])
+            [program: Program.findWhere(name: "Program1"), priority: 1, eventID: "valid1", startDate: new Date(), endDate: new Date().next()],
+            [program: Program.findWhere(name: "Program2"), priority: 33, eventID: "valid2", startDate: new Date(), endDate: new Date().next()],
+            [program: Program.findWhere(name: "Program3"), priority: 5, eventID: "valid3", startDate: new Date(), endDate: new Date().next()],
+            [program: Program.findWhere(name: "Program1"), priority: 22, eventID: "valid11", startDate: new Date().next(), endDate: new Date().next().next()],
+            [program: Program.findWhere(name: "Program2"), priority: 13, eventID: "valid21", startDate: new Date().next(), endDate: new Date().next().next()] ])
           
     }
     
@@ -48,7 +53,7 @@ class EventTests {
      */
     void testConstraintEvent() {
         def badEvent = new Event(
-                program: Program.findWhere(name: "Program2"),
+                program: Program.findWhere(name: "Program3"),
                 eventID: "",
                 startDate: new Date(),
                 endDate: new Date().next(),
@@ -58,7 +63,7 @@ class EventTests {
                 )
         assert !badEvent.validate()
         assert "blank" == badEvent.errors["eventID"].code
-        badEvent.eventID = "valid"
+        badEvent.eventID = "valid3"
         assert !badEvent.validate()
         assert "unique" == badEvent.errors["eventID"].code
         assert "min.notmet" == badEvent.errors["priority"].code
@@ -70,11 +75,11 @@ class EventTests {
      * Test custom validators in Event
      */
     void testValidEvent() {
-        def sDate = new Date()
+        def sDate = new Date().next()
         def eDate = sDate.next()
         def badValidateEvent = new Event(
-                program: Program.findWhere(name: "Program2"),
-                eventID: "valid2",
+                program: Program.findWhere(name: "Program3"),
+                eventID: "valid31",
                 startDate: eDate,
                 endDate: sDate,
                 priority: 1L,
@@ -95,4 +100,18 @@ class EventTests {
         assert !badValidateEvent.validate()
         assert "validator.invalid" == badValidateEvent.errors["program"].code        
     }
+    
+    /**
+     * Test compareTo through list.sort()
+     */
+    void testCompareTo() {
+        def eventList = Event.list().sort()
+        def orderedList = []
+        orderedList << Event.findWhere(eventID: "valid2")
+        orderedList << Event.findWhere(eventID: "valid3")
+        orderedList << Event.findWhere(eventID: "valid1")
+        orderedList << Event.findWhere(eventID: "valid11")
+        orderedList << Event.findWhere(eventID: "valid21")
+        assert eventList == orderedList
+      }
 }

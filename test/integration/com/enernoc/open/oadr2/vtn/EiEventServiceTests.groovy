@@ -44,7 +44,7 @@ import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
 import com.enernoc.open.oadr2.model.OadrDistributeEvent.OadrEvent
 import com.enernoc.open.oadr2.model.Properties.Tolerance
 import com.enernoc.open.oadr2.model.Properties.Tolerance.Tolerate
-
+import com.enernoc.open.oadr2.vtn.StatusCode
 /**
  * Integration Test for EiEventService
  *
@@ -91,8 +91,8 @@ class EiEventServiceTests {
             intervals: 2L,
             modificationNumber: 0L
             )
-        def venstatus1 = new VenStatus( optStatus: "Opted In", time: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"), requestID: "vs1")
-        def venstatus2 = new VenStatus( optStatus: "Opted In", time: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"), requestID: "vs2")
+        def venstatus1 = new VenStatus( optStatus: StatusCode.OPT_IN, time: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"), requestID: "vs1")
+        def venstatus2 = new VenStatus( optStatus: StatusCode.OPT_IN, time: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"), requestID: "vs2")
         pro1.addToVens(ven1)
         pro1.addToEvents(event1)
         
@@ -336,7 +336,7 @@ class EiEventServiceTests {
         
         Ven.findWhere(venID: "ven1").venStatuses.each { v ->
             assert v.time.format( "dd/MM/yyyy HH:mm" ) == new Date().format( "dd/MM/yyyy HH:mm" )
-            v.optStatus = optType.toString()
+            assert v.getStatusText() == optType.value()
             
         }
     }
@@ -353,7 +353,7 @@ class EiEventServiceTests {
         eiEventService.handleOadrResponse( oadrResponse )
         
         Ven.findWhere(venID: "ven1").venStatuses.each { venStatus ->
-            assert venStatus.optStatus == "Awaiting Response"
+            assert venStatus.optStatus == StatusCode.DISTRIBUTE_SENT
             assert venStatus.time.format( "dd/MM/yyyy HH:mm" ) == new Date().format( "dd/MM/yyyy HH:mm" )
         }
         

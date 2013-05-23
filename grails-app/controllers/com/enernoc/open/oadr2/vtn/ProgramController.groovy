@@ -117,12 +117,7 @@ class ProgramController {
      * @return on fail: a chain to editProgram with invalid program
      */
     def updateProgram() {
-        def program = Program.get params.id
-        if ( ! program ) {
-            response.sendError 404, "No program for ID $params.id"
-            return
-        }
-        
+        def program = Program.get params.id     
 //        bindData program, params, exclude:['id']
         program.properties = params
         if (program.validate()) {
