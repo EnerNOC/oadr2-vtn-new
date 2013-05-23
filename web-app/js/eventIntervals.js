@@ -11,8 +11,8 @@
 		var prev = self.getPreviousInterval(this)
 		var err = null
 
-		if ( ! self.validateNumber(model.level) )
-			err = "Invalid level"
+		if ( ! self.validateNumber(model.val) )
+			err = "Invalid value"
 
 		if ( prev ) {
 			if ( model.end < prev.end ) 
