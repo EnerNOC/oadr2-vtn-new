@@ -19,7 +19,10 @@ class Ven {
 
     static constraints = {
         venID blank: false, unique: true
-        clientURI nullable: true, url:true
+        clientURI nullable: true, url:true, validator: {val, obj ->
+            new URI(val).scheme in ["http", "https", "xmpp"]
+        }
         programs nullable: false
-    }    
+    }
+ 
 }
