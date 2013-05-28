@@ -26,6 +26,8 @@ public class PushService {
     static transactional = true
 
     String vtnID // injected
+    XmppService xmppService
+    HttpService httpService
 
     final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>()
     ThreadPoolExecutor threadPool = null
@@ -59,7 +61,7 @@ public class PushService {
             venLog.push = true
             venLog.UID = UID
             venLog.save(flush: true)
-            queue.add( new EventPushTask( ven.clientURI, payload ) )
+            queue.add( new EventPushTask( ven.clientURI, payload, this ) )
         }
     }
 

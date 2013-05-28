@@ -3,37 +3,31 @@ package com.enernoc.open.oadr2.vtn
 
 /**
  * Runnable task to be submitted to the PushService
- * 
- * @author Jeff LaJoie
- *
  */
 public class EventPushTask implements Runnable {
     
-    Object oadrObject = null;
-    String uri = null;
-    String pid = null;
+    Object payload
+    String uri
+    PushService pushService
     
-    //XmppService xmppService = XmppService.getInstance();
-    //ProtocolRegistry protocolRegistry = ProtocolRegistry.getInstance();
-    
-    public EventPushTask(String uri, Object oadrObject){
-        this.oadrObject = oadrObject;
-        this.uri = uri;
+    public EventPushTask(String uri, Object payload, PushService pushService ){
+        this.payload = payload
+        this.uri = uri
+        this.pushService = pushService
     }
 
     /**
      * Called when the Runnable is executed by the thread pool,
      * sends the object to the jid w/ or w/o a packet id
      */
-   // @Override
+    @Override
     public void run() {
-        /*IProtocol protocol = protocolRegistry.getProtocol(uri);		TODO this is affected with the protocol is xmpp
-        if(pid != null){
-            protocol.send(uri, (OadrResponse)oadrObject, pid);
-        }
-        else{
-            protocol.send(uri, oadrObject);
-        }*/
+        URI parsed = new URI( this.uri );
+        
+        if ( parsed.scheme in ["http", "https"] )
+            this.pushService.httpService.send( this.payload, this.uri )
+            
+        else if ( parsed.scheme == "xmpp" )
+            this.pushService.xmppService.send( this.payload, this.uri ) 
     }
-
 }
