@@ -113,8 +113,8 @@ public class XmppService implements PacketListener {
     def send( Object payload, String jid ) {
         IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, marshaller));
         iq.setTo(jid)
-        //log.debug "the iq id is: " + iq.id
-        iq.setType(IQ.Type.RESULT)
+        iq.setType(IQ.Type.SET)
+        IQCache.put(iq.getPacketID(), payload)
         xmppConn.sendPacket(iq)
     }
 
