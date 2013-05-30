@@ -19,8 +19,8 @@ class Ven {
 
     static constraints = {
         venID blank: false, unique: true
-        clientURI nullable: true, url:true, validator: {val ->
-            new URI(val).scheme in ["http", "https", "xmpp"]
+        clientURI nullable: true, validator: {val ->
+            val ==~ /\b(https?|xmpp):\/\/[-\w+&#\/%?=~_|!:,;]*((\.[-\w+&#\/\.%=~_|]*)|(@[-\w+&#\/%=~_|]*\.[-\w+&#\/\.%=~_|]*))/
         }
         programs nullable: false
     }
