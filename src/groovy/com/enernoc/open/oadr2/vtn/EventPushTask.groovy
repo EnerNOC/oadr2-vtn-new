@@ -9,11 +9,11 @@ public class EventPushTask implements Runnable {
     Object payload
     String uri
     PushService pushService
-    
     public EventPushTask(String uri, Object payload, PushService pushService ){
         this.payload = payload
         this.uri = uri
         this.pushService = pushService
+        println "created eventpushtask"
     }
 
     /**
@@ -23,11 +23,14 @@ public class EventPushTask implements Runnable {
     @Override
     public void run() {
         URI parsed = new URI( this.uri );
+        println "INSIDE RUN"
         
+        println "INSIDE RUN WITH XMPP " + pushService.xmppService
         if ( parsed.scheme in ["http", "https"] )
             this.pushService.httpService.send( this.payload, this.uri )
             
-        else if ( parsed.scheme == "xmpp" )
-            this.pushService.xmppService.send( this.payload, this.uri ) 
+        else if ( parsed.scheme == "xmpp" ) {
+            this.pushService.xmppService.send( this.payload, this.uri.substring( 7 ) )
+        }
     }
 }

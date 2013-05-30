@@ -26,7 +26,7 @@ public class PushService {
     static transactional = true
 
     String vtnID // injected
-    XmppService xmppService
+    XmppService xmppService = XmppService.getInstance()
     HttpService httpService
 
     final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>()
@@ -49,11 +49,11 @@ public class PushService {
         vens.each { ven ->
             if (!ven.clientURI)
                 return
+            def UID = UUID.randomUUID().toString()     
             OadrDistributeEvent payload = new OadrDistributeEvent()
-            def UID = UUID.randomUUID().toString()
-            payload.withVtnID( this.vtnID )
-                    .withRequestID( UUID.randomUUID().toString() )
-                    .withOadrEvents(new OadrEvent().withEiEvent(e))
+                    .withVtnID( this.vtnID )
+                    .withRequestID( UID )
+                    .withOadrEvents(new OadrEvent().withEiEvent(e))//A bug around this line that does not initially xmppService.send
                     
             def venLog = new VenTransactionLog()
             venLog.venID = ven.venID

@@ -95,7 +95,7 @@ class EventController {
             def eiEvent = eiEventService.buildEiEvent(event)
             prepareVenStatus event
             program.save(flush: true)
-//            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
             flash.message = "Success, your event has been created"
         }
         else {

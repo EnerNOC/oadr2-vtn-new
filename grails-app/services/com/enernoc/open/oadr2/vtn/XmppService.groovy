@@ -40,6 +40,17 @@ public class XmppService implements PacketListener {
 
     Marshaller marshaller
 
+    private static final INSTANCE = new XmppService()
+    
+    /**
+     * Returns the singleton instance of XmppService
+     * 
+     */
+    static getInstance() {
+        synchronized (this) { 
+            return INSTANCE
+        }
+    }
     /**
      * Constructor to establish the XMPP connection
      *
@@ -111,12 +122,15 @@ public class XmppService implements PacketListener {
      * @param jid - the Jid to receive the object
      */
     def send( Object payload, String jid ) {
+        log.debug "XMPP send to $jid: $payload"
         IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, marshaller));
-        iq.setTo(jid)
-        iq.setType(IQ.Type.SET)
+        iq.to = jid
+        iq.type = IQ.Type.SET
         IQCache.put(iq.getPacketID(), payload)
+        log.debug "about to send jid"
         xmppConn.sendPacket(iq)
     }
+
 
     /**
      * Send an object to a jid with the specified packetId
@@ -134,6 +148,6 @@ public class XmppService implements PacketListener {
         }
         else iq.type = IQ.Type.SET
         iq.to = jid
-        this.xmppConn.sendPacket iq
+        xmppConn.sendPacket iq
     }
 }
