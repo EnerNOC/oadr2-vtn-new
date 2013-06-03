@@ -13,7 +13,7 @@ class UrlMappings {
 			}
 		}
 		
-		"/OpenADR2/Simple/EiEvent"(controller : "eiEvent") {
+		"/eiEvent/sendHttpResponse"(controller : "eiEvent") {
             action = [POST:"post"]
         }
         

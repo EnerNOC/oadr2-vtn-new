@@ -23,9 +23,6 @@ public class EventPushTask implements Runnable {
     @Override
     public void run() {
         URI parsed = new URI( this.uri );
-        println "INSIDE RUN"
-        
-        println "INSIDE RUN WITH XMPP " + pushService.xmppService
         if ( parsed.scheme in ["http", "https"] )
             this.pushService.httpService.send( this.payload, this.uri )
             
