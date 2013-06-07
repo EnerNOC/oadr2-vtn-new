@@ -26,8 +26,8 @@ class VenStatusControllerTests {
         def ven1 = new Ven(programs: [pro1], venID:"VEN1", name:"ven-one", clientURI:"http://URI1.com").save(flush: true, failOnError: true)
         def ven2 = new Ven(programs: [pro1], venID:"VEN2", name:"ven-two", clientURI:"http://URI2.com").save(flush: true, failOnError: true)
         def event1 = new Event(program: pro1, eventID: "valid", startDate: new Date(), endDate: new Date().next()).save(flush: true, failOnError: true)
-        def venstatus1 = new VenStatus( event: event1, ven: ven1, optStatus: "Opted In", time: new Date()).save(flush: true, failOnError: true)
-        def venstatus2 = new VenStatus( event: event1, ven: ven2, optStatus: "Opted In", time: new Date()).save(flush: true, failOnError: true)
+        def venstatus1 = new VenStatus( event: event1, ven: ven1, optStatus: StatusCode.OPT_IN, time: new Date()).save(flush: true, failOnError: true)
+        def venstatus2 = new VenStatus( event: event1, ven: ven2, optStatus: StatusCode.OPT_IN, time: new Date()).save(flush: true, failOnError: true)
 
     }
     

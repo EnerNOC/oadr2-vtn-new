@@ -48,7 +48,7 @@ class VenTests {
         def badVen = new Ven(programs: Program.findWhere(name: "Program1"), name: "", venID: "VEN1", clientURI: "URI")
         assert !badVen.validate()
         assert "unique" == badVen.errors["venID"].code
-        assert "url.invalid" == badVen.errors["clientURI"].code
+        assert "validator.invalid" == badVen.errors["clientURI"].code
         badVen.venID = "ven"
         badVen.clientURI = "http://Valid.com"
         assert badVen.validate()

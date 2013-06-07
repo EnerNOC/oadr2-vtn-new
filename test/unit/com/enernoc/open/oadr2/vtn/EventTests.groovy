@@ -67,7 +67,6 @@ class EventTests {
         assert !badEvent.validate()
         assert "unique" == badEvent.errors["eventID"].code
         assert "min.notmet" == badEvent.errors["priority"].code
-        assert "min.notmet" == badEvent.errors["intervals"].code
         assert "min.notmet" == badEvent.errors["modificationNumber"].code        
     }
     
@@ -88,11 +87,11 @@ class EventTests {
                 )
         assert !badValidateEvent.validate()
         assert "validator.invalid" == badValidateEvent.errors["startDate"].code
-        assert "validator.invalid" == badValidateEvent.errors["endDate"].code
+        assert "beforestart" == badValidateEvent.errors["endDate"].code
         badValidateEvent.startDate = eDate
         badValidateEvent.endDate = eDate
         assert "validator.invalid" == badValidateEvent.errors["startDate"].code
-        assert "validator.invalid" == badValidateEvent.errors["endDate"].code
+        assert "beforestart" == badValidateEvent.errors["endDate"].code
         badValidateEvent.startDate = sDate
         badValidateEvent.endDate = eDate
         assert badValidateEvent.validate()

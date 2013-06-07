@@ -25,13 +25,13 @@ class EventSignalControllerTests {
         def duration = end.time - start.time
         
         def program = new Program(
-            programName : "FCM",
-            programURI : "http://www.enernoc.com/OpenADR/FCM"
+            name : "FCM",
+            marketContext : "http://www.enernoc.com/OpenADR/FCM"
         )
         
         def event = new Event(
             eventID: "hi",
-            marketContext: program,
+            program: program,
             startDate: start,
             endDate: end
         )
@@ -42,18 +42,21 @@ class EventSignalControllerTests {
             event: event
         )
         
-        
         def interval = new EventInterval(
                 level: 1.0F,
                 durationMillis: duration,
                 signal: signal
             )
         
-        program.event = [event]
+        program.events = [event]
         event.signals = [signal]
         signal.intervals = [interval]
 
-        event.save flush:true, failOnError:true
+        program.save flush:true, failOnError:true
+        event.save flush: true, failOnError:true
+        signal.save flush: true, failOnError:true
+        interval.save flush: true, failOnError:true
+        
         this.event = event
     }
     
@@ -61,11 +64,11 @@ class EventSignalControllerTests {
         def controller = new EventSignalController()
         
         println "Using event ID: ${this.event.id}"
-        controller.metaClass.params = [ id: this.event.id]
+        controller.metaClass.params = [ eventID: this.event.id]
         
         def model = controller.edit()
         
-        // if event wasn't found, no model is returned instead we've aborted w/ a 401:
+        // if event wasn't found, no model is returned instead we've aborted w/ a 404:
         assert controller.response.status == 200
 
         assert model != null, "model is null!"

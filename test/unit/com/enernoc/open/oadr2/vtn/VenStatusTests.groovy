@@ -47,7 +47,7 @@ class VenStatusTests {
         def venStatus = new VenStatus(
             event: Event.findWhere(eventID: "event1"),
             ven: Ven.findWhere(venID: "VEN1"), 
-            optStatus: "Opted In",
+            optStatus: StatusCode.OPT_IN,
             time: new Date()
             )
         assert venStatus.validate()
@@ -63,12 +63,51 @@ class VenStatusTests {
         def venStatus = new VenStatus(
             event: Event.findWhere(eventID: "event1"),
             ven: Ven.findWhere(venID: "VEN1"),
-            optStatus: "Opted In",
+            optStatus: StatusCode.OPT_IN,
             time: new Date()
             )
         assert venStatus.validate()
         def displayTime = venStatus.time.format("dd/MM/yyyy HH:mm")
         assert venStatus.displayTime() == displayTime
+    }
+    
+    public String getStatusText() {
+        switch(this.optStatus) {
+            case(StatusCode.PENDING_DISTRIBUTE) :
+                return "Pending Distribute"
+            case(StatusCode.DISTRIBUTE_SENT) :
+                if (this.event.responseRequired) {
+                    return "Awaiting Response"
+                } else {
+                    return "Payload Sent"
+                }
+            case(StatusCode.OPT_IN) :
+                return "optIn"
+            case(StatusCode.OPT_OUT) :
+                return "optOut"
+            default:
+                return null
+        }
+    }
+    
+    /**
+     * Test venstatus getStatusText() {
+     */
+    void testGetStatusText() {
+        def venStatus = new VenStatus(
+            event: Event.findWhere(eventID: "event1"),
+            ven: Ven.findWhere(venID: "VEN1"),
+            optStatus: StatusCode.PENDING_DISTRIBUTE,
+            time: new Date()
+            )
+        assert venStatus.getStatusText() == "Pending Distribute"
+        venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
+        assert venStatus.getStatusText() == "Awaiting Response"
+        venStatus.optStatus = StatusCode.OPT_IN
+        assert venStatus.getStatusText() == "optIn"
+        venStatus.optStatus = StatusCode.OPT_OUT
+        assert venStatus.getStatusText() == "optOut"
+        
     }
 
 }
