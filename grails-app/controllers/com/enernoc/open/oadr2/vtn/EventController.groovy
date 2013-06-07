@@ -84,18 +84,23 @@ class EventController {
         try {
             program = Program.get( params.programID.toLong() )
         }
-        catch ( ex ) { } //Program is null and will fail validation
+        catch ( ex ) { } 
         
         params.remove 'programID'
         def event = new Event(params)
         event.program = program
+
+        if ( ! program ) {
+            // fail & show event validation error messages:
+            event.validate()
+            return chain(action:"blankEvent", model:[errors: errors, event: event])
+        }
         
         program.addToEvents event
         if ( program.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             prepareVenStatus event
-            program.save(flush: true)
-            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+            program.save flush: true
             flash.message = "Success, your event has been created"
         }
         else {
@@ -108,8 +113,6 @@ class EventController {
             return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
-        event.refresh()
-//        redirect controller:"VenStatus", action:"venStatuses", params:[eventID: event.eventID
         redirect mapping: "eventSignal", params:[eventID: event.id]
     }
 
