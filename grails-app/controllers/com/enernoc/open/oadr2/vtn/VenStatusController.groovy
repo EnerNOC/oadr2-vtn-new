@@ -27,7 +27,6 @@ public class VenStatusController {
      * @return venStatus/vens.gsp for VENStatus display, edit and deletion
      */
     def venStatuses() {
-        //def eventList = Event.list()
         def event = Event.findWhere(eventID: params.eventID)
         def venStatuses = event.venStatuses
         def	eventList = Event.list()

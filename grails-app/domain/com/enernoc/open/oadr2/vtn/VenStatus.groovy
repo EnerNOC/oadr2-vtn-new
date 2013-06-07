@@ -18,8 +18,6 @@ class VenStatus {
     static constraints = {
         requestID nullable: true
         time nullable: false
-        //TODO create enum object for optStatus
-        //optStatus inList: ['optIn', 'optOut']
     }
 
     /**

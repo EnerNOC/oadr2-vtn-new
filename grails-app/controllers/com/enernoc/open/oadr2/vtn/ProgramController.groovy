@@ -118,10 +118,8 @@ class ProgramController {
      */
     def updateProgram() {
         def program = Program.get params.id     
-//        bindData program, params, exclude:['id']
         program.properties = params
         if (program.validate()) {
-            //TODO Once ven.programID is remove this loop will be removed
             program.save(flush: true)
             flash.message = "Success, your Program has been updated"
         }
