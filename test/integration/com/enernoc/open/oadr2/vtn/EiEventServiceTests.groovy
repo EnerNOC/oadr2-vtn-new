@@ -135,8 +135,6 @@ class EiEventServiceTests {
             new OadrCreatedEvent().withEiCreatedEvent( new EiCreatedEvent()
                 .withEiResponse( new EiResponse()
                     .withResponseCode( new ResponseCode("500")) ) )
-            
-        def oadrResponseObject = new OadrResponse()
         
         def nullObject
         try {
@@ -157,7 +155,6 @@ class EiEventServiceTests {
         assert nullObject == "Payload may not be null"
         assert eiEventService.handleOadrPayload(oadrRequestEventObject) instanceof OadrDistributeEvent
         assert eiEventService.handleOadrPayload(oadrCreatedEventObject) instanceof OadrResponse
-        assert eiEventService.handleOadrPayload(oadrResponseObject) == null
         assert otherObject == "Payload was unknown type: ${ob?.class}"
     }
     
@@ -341,23 +338,5 @@ class EiEventServiceTests {
             
         }
     }
-
-    /**
-     * 8: Test handleOadrResponse
-     */
-    def testHandleOadrResponse() {
-        def eiEventService = new EiEventService()
-        def oadrResponse = new OadrResponse()
-            .withEiResponse(new EiResponse()
-                .withRequestID("ven1ID")
-                .withResponseCode(new ResponseCode("200")))
-        eiEventService.handleOadrResponse( oadrResponse )
-        
-        Ven.findWhere(venID: "ven1").venStatuses.each { venStatus ->
-            assert venStatus.optStatus == StatusCode.DISTRIBUTE_SENT
-            assert venStatus.time.format( "dd/MM/yyyy HH:mm" ) == new Date().format( "dd/MM/yyyy HH:mm" )
-        }
-        
-    }
-
+    //TODO test oadrResponse
 }

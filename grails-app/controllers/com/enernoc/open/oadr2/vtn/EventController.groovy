@@ -90,17 +90,15 @@ class EventController {
         def event = new Event(params)
         event.program = program
 
-        if ( ! program ) {
-            // fail & show event validation error messages:
-            event.validate()
-            return chain(action:"blankEvent", model:[errors: errors, event: event])
-        }
-        
         program.addToEvents event
         if ( program.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
-            prepareVenStatus event
             program.save flush: true
+            //This is required to prevent automatic flush when event.program.vens is used
+            def vens = event.program.vens.collect { it }
+            prepareVenStatus(event, vens)
+            program.save(flush: true)
+            pushService.pushNewEvent eiEvent, vens
             flash.message = "Success, your event has been created"
         }
         else {
@@ -159,8 +157,8 @@ class EventController {
             return
         }
         def program = event.program
-        // this is causing the entire event list to re-validate, which is bad.
-//        event.program.removeFromEvents event
+        // this is causing the entire event list to re-validate, which is bad. -> Necessary to prevent cascade
+        event.program.removeFromEvents event
         event.delete()
         program.save()
         redirect actions: "events"
@@ -232,10 +230,10 @@ class EventController {
      * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
      * @param event - Event containing the EventID which will be used for construction of a VENStatus object
      */
-    protected void prepareVenStatus( Event event ) {
+    protected void prepareVenStatus( Event event, ArrayList<Ven> vens) {
         
-        event.program.vens.each { v ->
-            // TODO create a method called VenStatus.create( ven, event ) that 
+        vens.each { v ->
+            // TODO create a method called VenStatus.create( ven, event ) that
             // creates a new VenStatus object
             def venStatus = new VenStatus()
             venStatus.optStatus = StatusCode.PENDING_DISTRIBUTE

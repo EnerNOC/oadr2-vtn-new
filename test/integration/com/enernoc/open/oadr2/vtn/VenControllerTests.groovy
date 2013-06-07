@@ -81,7 +81,7 @@ class VenControllerTests {
     void testSuccessfulNewVEN() {
         def Ven3 = new Ven(venID:"VEN3", name:"ven-three", clientURI:"http://URI3.com")
         def controller = new VenController()
-        controller.params.programID = ["1", "2"]
+        controller.params.programID = [Program.findByName("Program1").id, Program.findByName("Program2").id]
         controller.params.venID = Ven3.venID
         controller.params.name = Ven3.name
         controller.params.clientURI = Ven3.clientURI
@@ -119,13 +119,14 @@ class VenControllerTests {
      */
     void testEditVEN() {
         def controller = new VenController()
-        controller.params.id = 1
+        def id = Ven.findByVenID("VEN1").id
+        controller.params.id = id
         def model = controller.editVEN()
 
-        assert model.currentVen.programs == Ven.get( 1 ).programs
-        assert model.currentVen.venID == Ven.get( 1 ).venID
-        assert model.currentVen.name == Ven.get( 1 ).name
-        assert model.currentVen.clientURI == Ven.get( 1 ).clientURI
+        assert model.currentVen.programs == Ven.get( id ).programs
+        assert model.currentVen.venID == Ven.get( id ).venID
+        assert model.currentVen.name == Ven.get( id ).name
+        assert model.currentVen.clientURI == Ven.get( id ).clientURI
 
     }
 
@@ -146,9 +147,10 @@ class VenControllerTests {
      */
     void testSuccessfulUpdateVEN() {
         def controller = new VenController()
-        controller.params.id = 1
+        def id = Ven.findByVenID("VEN1").id
+        controller.params.id = id
         def Ven4 = new Ven(venID:"VEN4", name:"ven-four", clientURI:"http://URI4.com")
-        controller.params.programID = ["2", "3"]
+        controller.params.programID = [Program.findByName("Program2").id, Program.findByName("Program3").id]
         controller.params.venID = Ven4.venID
         controller.params.name = Ven4.name
         controller.params.clientURI = Ven4.clientURI
@@ -156,10 +158,10 @@ class VenControllerTests {
 
         assert controller.response.redirectedUrl == '/ven/vens'
         assert controller.flash.message == "Success, your VEN has been updated"
-        assert Ven.get(1).programs.contains(Program.get( 2 )) && Ven.get(1).programs.contains(Program.get( 3 ))
-        assert Ven.get(1).venID == Ven4.venID
-        assert Ven.get(1).name == Ven4.name
-        assert Ven.get(1).clientURI == Ven4.clientURI
+        assert Ven.get(id).programs.contains(Program.findByName("Program2")) && Ven.get(id).programs.contains(Program.findByName("Program3"))
+        assert Ven.get(id).venID == Ven4.venID
+        assert Ven.get(id).name == Ven4.name
+        assert Ven.get(id).clientURI == Ven4.clientURI
 
     }
 
@@ -168,7 +170,7 @@ class VenControllerTests {
      */
     void testInvalidUpdateVEN() {
         def controller = new VenController()
-        controller.params.id = 1
+        controller.params.id = Ven.findByVenID("VEN1").id
         def Ven = new Ven(venID:"VENFAIL", name:"ven-fail", clientURI:"http://URI")
         controller.params.programID = []
         controller.params.venID = Ven.venID
@@ -191,10 +193,11 @@ class VenControllerTests {
      */
     void testDeleteVEN() {
         def controller = new VenController()
-        controller.params.id = 1
+        def id = Ven.findByVenID("VEN1").id
+        controller.params.id = id
         controller.deleteVEN()
 
-        assert Ven.get( 1 ) == null
+        assert Ven.get( id ) == null
         assert controller.response.redirectedUrl == '/ven/vens'
 
     }

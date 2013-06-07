@@ -130,7 +130,7 @@ class EventControllerTests {
         controller.newEvent()
 
         assert controller.flash.message == "Success, your event has been created"
-        assert controller.response.redirectedUrl == '/venStatus/venStatuses?eventID=event2'
+        assert controller.response.redirectedUrl == '/event/6/signals'
         assert Event.findWhere(eventID: "event1") != null
 
     }
@@ -145,8 +145,8 @@ class EventControllerTests {
                 eventID: "eventFail",
                 startDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2025 12:00"),
                 endDate: Date.parse( "dd/MM/yyyy HH:mm", "01/01/2030 12:00"),
-                priority: 4L,
-                intervals: -2L
+                priority: -4L,
+                intervals: 2L
                 )
         def controller = new EventController()
         controller.params.programID = eventFail.program.id

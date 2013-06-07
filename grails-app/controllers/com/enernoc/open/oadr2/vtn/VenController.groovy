@@ -56,11 +56,10 @@ class VenController {
         def programs = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
-            programs << p
+            if ( p ) programs << p
         }
         params.remove( 'programID' )
         def ven = new Ven(params)
-        
         if (programs!=[]) {
             programs.each  { p->
                 p.addToVens(ven)
@@ -135,7 +134,7 @@ class VenController {
         def newPrograms = []
         params.programID.each { pID->
             def p =  Program.get( pID.toLong() )
-            newPrograms << p
+            if ( p ) newPrograms << p
         }
         if ( newPrograms == []) ven.programs = null
         params.remove('programID')
