@@ -74,11 +74,11 @@ public class EiEventService {
             log.debug "oadrCreatedEvent"
             return handleOadrCreated( (OadrCreatedEvent)o )
         }
-        else if( o instanceof OadrResponse ) {
+      /*  else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
             handleOadrResponse( (OadrResponse)o )
             return null
-        }
+        }*/
         else {
             log.error "Unknown type: ${o?.class}"
             throw new RuntimeException("Payload was unknown type: ${o?.class}")
@@ -273,18 +273,22 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    public void handleOadrResponse( OadrResponse response ) {
-        def venLog = VenTransactionLog.findWhere(UID: response.eiResponse?.requestID)
-        
-        if ( venLog ) {
-            def ven = Ven.findWhere(venID: venLog.venID)
-            ven.venStatuses.each { status ->
+    public void handleOadrResponse( OadrResponse re, String uri ) {
+        //def venLog = VenTransactionLog.findWhere(UID: response.eiResponse?.requestID)
+        //if ( venLog ) {
+        log.debug "inside OadrResponse"
+        def ven = Program.list()
+        println "after ven" + ven
+        if ( ven ) {
+            log.debug "before loop with venstatuses: " + ven.venStatuses
+            ven.each { status ->
                 status.time = new Date()
                 status.optStatus = StatusCode.DISTRIBUTE_SENT
                 status.save(flush: true)
             }
+            log.debug "after loop"
         }
-        else log.warn "RequestID $response.eiResponse?.requestID does not exist in VenTransactionLog for response $response"
+        else log.warn "Ven with clientURI $uri not found"
     }
 
     /**
