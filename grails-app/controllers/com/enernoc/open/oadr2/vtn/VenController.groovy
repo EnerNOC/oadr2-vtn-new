@@ -139,6 +139,7 @@ class VenController {
         if ( newPrograms == []) ven.programs = null
         params.remove('programID')
         ven.properties = params
+        if (params.clientURI == null) ven.clientURI = null
         if (ven.validate()) {
             def tempOld = []
             def tempNew = []
