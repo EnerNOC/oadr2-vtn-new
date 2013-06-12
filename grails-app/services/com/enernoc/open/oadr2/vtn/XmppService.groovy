@@ -98,9 +98,10 @@ public class XmppService implements PacketListener {
     }
 
     void disconnect() {
-        if ( ! this.xmppConn?.connected )
+        if ( ! this.xmppConn?.connected ) {
             log.warn "XMPP not connected"
-        return
+            return
+        }
         this.xmppConn.disconnect()
     }
     
