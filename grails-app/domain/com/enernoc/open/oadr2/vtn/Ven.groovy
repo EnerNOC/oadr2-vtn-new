@@ -10,6 +10,8 @@ package com.enernoc.open.oadr2.vtn
  */
 class Ven {
 
+    static VALID_CLIENT_URI_SCHEMES = ['http', 'https', 'xmpp']
+    
     String venID
     String name
     String clientURI
@@ -20,7 +22,18 @@ class Ven {
     static constraints = {
         venID blank: false, unique: true
         clientURI blank: false, nullable: true, validator: {val ->
-            val==null || val ==~ /\b(https?|xmpp):\/\/[-\w+&#\/%?@\.=~_|!:,;]*/ 
+            if ( val==null ) return true
+            if ( val.size() == 0 ) return "blank"
+            
+            try {
+                def uri = new URI(val)
+                if ( ! (uri.scheme in VALID_CLIENT_URI_SCHEMES) )
+                    return "invalidscheme"
+            }
+            catch(ex) {
+                return "invalid"
+            }
+            return true
         }
         programs nullable: false
     }
