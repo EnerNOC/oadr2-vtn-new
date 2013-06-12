@@ -40,17 +40,6 @@ public class XmppService implements PacketListener {
 
     Marshaller marshaller
 
-    private static final INSTANCE = new XmppService()
-    
-    /**
-     * Returns the singleton instance of XmppService
-     * 
-     */
-    static getInstance() {
-        synchronized (this) { 
-            return INSTANCE
-        }
-    }
     /**
      * Constructor to establish the XMPP connection
      *

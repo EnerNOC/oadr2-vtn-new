@@ -26,8 +26,8 @@ public class PushService {
     static transactional = true
 
     String vtnID // injected
-    XmppService xmppService = XmppService.getInstance()
-    HttpService httpService = new HttpService()
+    XmppService xmppService
+    HttpService httpService
 
     final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>()
     ThreadPoolExecutor threadPool = null
