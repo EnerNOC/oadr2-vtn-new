@@ -48,13 +48,25 @@ use a simple, file-based database that persists betwen shutdowns, you can remove
 `mem:` from the `url` parameter and change `dbCreate='update'`.
 
 
-### Testing Locally
+## Testing
+
+### Unit Testing
+
+You can unit test classes by using Grails' built-in testing features:
+
+    grails test-app -echoOut # runs all tests, with console output
+
+    grails test-app -unit Ven # runs only test/unit/VenTests.groovy
+
+
+### Functional Testing
 
 You can use `curl` to execute OpenADR requests on the server like so:
 
     curl -vd @xmpp-http-tests/httpRequest1.xml -H "Content-Type: application/xml" \
        http://localhost:8080/oadr2-vtn-groovy/OpenADR2/Simple/EiEvent
-    
+
+Or use the test console located at http://localhost:8080/oadr2-vtn-groovy/OADRTest/index
 
 
 ### Packaging
