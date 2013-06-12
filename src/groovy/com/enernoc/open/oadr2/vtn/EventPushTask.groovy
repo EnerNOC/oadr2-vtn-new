@@ -24,10 +24,10 @@ public class EventPushTask implements Runnable {
     public void run() {
         URI parsed = new URI( this.uri );
         if ( parsed.scheme in ["http", "https"] )
-            this.pushService.httpService.send( this.payload, this.uri )
+            this.pushService.httpService.send this.payload, this.uri
             
         else if ( parsed.scheme == "xmpp" ) {
-            this.pushService.xmppService.send( this.payload, this.uri.substring( 7 ) )
+            this.pushService.xmppService.send this.payload, this.uri
         }
     }
 }

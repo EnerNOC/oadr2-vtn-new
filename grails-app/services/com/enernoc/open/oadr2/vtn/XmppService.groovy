@@ -103,6 +103,7 @@ public class XmppService implements PacketListener {
         return
         this.xmppConn.disconnect()
     }
+    
 
     /**
      * Sends an object to a JID
@@ -113,7 +114,7 @@ public class XmppService implements PacketListener {
     def send( Object payload, String jid ) {
         log.debug "XMPP send to $jid: $payload"
         IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, marshaller));
-        iq.to = jid
+        iq.to = uriToJid( jid )
         iq.type = IQ.Type.SET
         IQCache.put(iq.getPacketID(), payload)
         log.debug "about to send jid"
@@ -136,7 +137,13 @@ public class XmppService implements PacketListener {
             iq.type = IQ.Type.RESULT            
         }
         else iq.type = IQ.Type.SET
-        iq.to = jid
+        iq.to = uriToJid( jid )
         xmppConn.sendPacket iq
+    }
+    
+    public static uriToJid( uri ) {
+        if ( uri.startsWith( 'xmpp:' ) )
+            return new URI(uri).schemeSpecificPart    
+        return uri
     }
 }
