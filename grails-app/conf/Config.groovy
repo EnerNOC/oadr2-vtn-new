@@ -122,6 +122,19 @@ log4j = {
 //    trace 'org.hibernate.type'
 }
 
+rabbitmq {
+	connectionfactory {
+		username = 'guest'
+		password = 'guest'
+		hostname = 'localhost'
+	}
+	
+	queues = {
+		eventIDQueue()
+		httpEventQueue()
+	}
+}
+
 //configuration for jabber accounts
 /*
 xmpp.autoStartup = true

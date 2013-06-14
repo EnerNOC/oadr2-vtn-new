@@ -143,6 +143,14 @@
 			<type>zip</type>
 		</dependency>
 
+		<dependency>
+			<groupId>org.grails.plugins</groupId>
+			<artifactId>rabbitmq</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
+			<type>zip</type>
+		</dependency>
+
 	</dependencies>
 
 	<build>
