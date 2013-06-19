@@ -32,7 +32,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-		compile 'com.enernoc.open.oadr2:oadr2-xmpp:0.2-SNAPSHOT',
+		compile 'com.enernoc.open.oadr2:oadr2-xmpp:0.3-SNAPSHOT',
 		        'org.apache.httpcomponents:fluent-hc:4.2.3',
 				'org.apache.httpcomponents:httpclient:4.2.3'
 				 
@@ -52,6 +52,7 @@ grails.project.dependency.resolution = {
 
         runtime ":database-migration:1.1"
 
-        compile ':cache:1.0.0'
+        compile ':cache:1.0.0',
+			':rabbitmq:1.0.0'
     }
 }

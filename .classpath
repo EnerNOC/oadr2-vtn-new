@@ -12,13 +12,6 @@
 	<classpathentry kind="src" path="test/unit"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
-	<classpathentry kind="lib" path="lib/oadr2-model-0.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/oadr2-xmpp-0.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/jaxb2-basics-runtime-0.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/smack.jar"/>
-	<classpathentry kind="lib" path="lib/httpclient-4.2.3.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/fluent-hc-4.2.3.jar"/>
 	<classpathentry kind="con" path="org.grails.ide.eclipse.core.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>

@@ -23,12 +23,12 @@
 		<dependency>
 			<groupId>com.enernoc.open.oadr2</groupId>
 			<artifactId>oadr2-model</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.enernoc.open.oadr2</groupId>
 			<artifactId>oadr2-xmpp</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -140,6 +140,14 @@
 			<artifactId>jquery-ui-timepicker</artifactId>
 			<version>0.9.8.1</version>
 			<scope>runtime</scope>
+			<type>zip</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.grails.plugins</groupId>
+			<artifactId>rabbitmq</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
 			<type>zip</type>
 		</dependency>
 
