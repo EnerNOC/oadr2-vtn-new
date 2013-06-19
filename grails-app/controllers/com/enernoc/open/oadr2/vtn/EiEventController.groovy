@@ -17,7 +17,7 @@ import com.enernoc.open.oadr2.xmpp.JAXBManager
 
 public class EiEventController {
     
-    
+    boolean debug = true
     static JAXBManager jaxbManager // this is threadsafe
     
     static { // default initializer
@@ -51,12 +51,26 @@ public class EiEventController {
             }
             
             Unmarshaller unmarshaller = jaxbManager.context.createUnmarshaller()
-            Object payload = unmarshaller.unmarshal( request.reader )
+            def rawPayload = request.reader
+            if ( debug ) {
+                rawPayload = request.reader.text
+                log.debug "<<< $rawPayload"
+                rawPayload = new StringReader(rawPayload)
+            }
+            Object payload = unmarshaller.unmarshal( rawPayload )
             def eiResponse = eiEventService.handleOadrPayload(payload)
             Marshaller marshaller = jaxbManager.createMarshaller()
             response.contentType = "application/xml"
-            marshaller.marshal eiResponse, response.outputStream
-            response.outputStream.flush()
+            
+            def out = new StringWriter() 
+            marshaller.marshal eiResponse, out
+            out = out.toString()
+            if ( debug ) {
+                log.debug ">>> $out"
+            }
+            
+            response.contentLength = out.length()
+            response << out
             return null
         }
         catch ( Exception e ) {
