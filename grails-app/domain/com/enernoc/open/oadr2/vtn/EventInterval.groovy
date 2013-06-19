@@ -22,9 +22,10 @@ class EventInterval {
         }
     }
     
-    Duration getDuration() {
+    String getDuration() {
         // TODO normalize
-        this.signal.event.dtf.newDuration this.durationMillis
+        this.signal.event.dtf.newDuration( 
+            this.durationMillis ).toString().replaceAll(/\.\d+S/,"S")
     }
 }
 

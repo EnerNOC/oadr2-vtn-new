@@ -65,6 +65,9 @@ public class EiEventService {
         if ( o == null )
             throw new RuntimeException("Payload may not be null")
 
+        if ( ! this.vtnID )
+            log.warn "+++++++++++++++ VTN ID should not be null!"
+            
         if ( o instanceof OadrRequestEvent ) {
             log.debug "oadrRequestEvent"
             return handleOadrRequest( (OadrRequestEvent)o )
@@ -175,14 +178,14 @@ public class EiEventService {
             eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID
         else
             eiResponse.requestID = UUID.randomUUID().toString()
-
+            
         OadrDistributeEvent oadrDistributeEvent = new OadrDistributeEvent()
             .withEiResponse(eiResponse)
             .withRequestID(UUID.randomUUID().toString())
             .withVtnID(this.vtnID)
 
         // FIXME validate VEN ID against HTTP credentials
-        def limit = oadrRequestEvent.eiRequestEvent.replyLimit.intValue()
+        def limit = oadrRequestEvent.eiRequestEvent.replyLimit?.intValue() ?: 100
         // TODO order according to date, priority & status
         def events = Event.executeQuery("select e from Event e, Ven v where  v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
             [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit]).sort()
@@ -296,11 +299,12 @@ public class EiEventService {
      * 
      * @param event - EiEvent to have the DurationValue pulled from
      * @return a Duration based on the EiEvent DurationValue
-     */
+     *
     public Duration getDuration( EiEvent event ) {
         return this.df.newDuration(
             event.eiActivePeriod.properties.duration.duration.value)
     }
+    */
 
     /**
      * Takes the Event form pulled from the scala.html and crafts
@@ -321,26 +325,26 @@ public class EiEventService {
                         .withValue(event.xmlStart) ) )
                 .withDuration(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue(event.duration.toString() ) ) )
+                        .withValue(event.duration ) ) )
                 .withTolerance(new Tolerance()
                     .withTolerate(new Tolerate()
                         .withStartafter(new DurationValue()
-                            .withValue(event.toleranceDuration.toString() ) ) ) )
+                            .withValue(event.toleranceDuration ) ) ) )
                 .withXEiNotification(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue(event.notificationDuration.toString() ) ) )
+                        .withValue(event.notificationDuration ) ) )
                 .withXEiRampUp(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue(event.rampUpDuration.toString() ) ) )
+                        .withValue(event.rampUpDuration ) ) )
                 .withXEiRecovery(new DurationPropType()
                     .withDuration(new DurationValue()
-                        .withValue( event.recoveryDuration.toString() ) ) ) 
+                        .withValue( event.recoveryDuration ) ) ) 
                 ) 
             )
-//                .withEiTarget(new EiTarget()) // TODO
+            .withEiTarget(new EiTarget()) // TODO
         .withEventDescriptor(new EventDescriptor()
             .withCreatedDateTime(new DateTime()
-                .withValue( df.newXMLGregorianCalendar(now) ) )
+                .withValue( df.newXMLGregorianCalendar(now).normalize() ) )
             .withEiMarketContext(new EiMarketContext()
                 .withMarketContext(new MarketContext()
                     .withValue( event.program.marketContext ) ) )
@@ -361,12 +365,13 @@ public class EiEventService {
                         .withSignalName( signal.name )
                         .withSignalType( signal.type.xmlType )
 
-                    def currentInterval = signal.currentInterval
-                    if ( currentInterval )
-                        eiSignal.currentValue = new CurrentValue( new PayloadFloat( signal.currentInterval ) )
+                    def currentValue = signal.currentInterval?.level ?: 0
+                    eiSignal.currentValue = new CurrentValue( new PayloadFloat( currentValue ) )
+                    
                     return eiSignal
                 }
             ))
+        
         return eiEvent
     }
     
@@ -374,7 +379,7 @@ public class EiEventService {
         return new Interval()
             .withDuration( new DurationPropType()
                 .withDuration( new DurationValue()
-                    .withValue( interval.duration.toString() )))
+                    .withValue( interval.duration )))
             .withUid( new Uid( interval.uid.toString() ) )
             .withStreamPayloadBase(
                 objectFactory.createSignalPayload(

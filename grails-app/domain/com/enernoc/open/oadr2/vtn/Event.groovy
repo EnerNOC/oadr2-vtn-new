@@ -46,10 +46,10 @@ class Event implements Comparable{
     long priority
     Date startDate
     Date endDate
-    long tolerance
-    long notification
-    long rampUp
-    long recovery
+    long tolerance = 0
+    long notification = 0
+    long rampUp = 0
+    long recovery = 0
     boolean cancelled
     boolean responseRequired = true
     long intervals = 1
@@ -124,30 +124,30 @@ class Event implements Comparable{
         GregorianCalendar cal = new GregorianCalendar()
         cal.time = date
         duration.normalizeWith cal
-        return duration
+        return duration.toString().replaceAll( /\.\d+S/, "S" )
     }
     
     public long getDurationMillis() {
         return this.endDate.time - this.startDate.time
     }
 
-    public Duration getDuration() {
+    public String getDuration() {
         return makeDuration( this.startDate, this.durationMillis )
     }
     
-    public Duration getToleranceDuration() {
+    public String getToleranceDuration() {
         return makeDuration( this.startDate, this.tolerance )
     }
     
-    public Duration getNotificationDuration() {
+    public String getNotificationDuration() {
         return makeDuration( this.startDate, this.notification )
     }
     
-    public Duration getRampUpDuration() {
+    public String getRampUpDuration() {
         return makeDuration( this.startDate, this.rampUp )
     }
     
-    public Duration getRecoveryDuration() {
+    public String getRecoveryDuration() {
         return makeDuration( this.endDate, this.recovery )
     }
     
