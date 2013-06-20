@@ -118,8 +118,7 @@ class Event implements Comparable{
         return this.dtf.newXMLGregorianCalendar(this.startDate.toCalendar()).normalize()
     }
     
-    protected makeDuration( Date date, long offset ) {
-        def durationMillis = date.time + offset
+    protected makeDuration( Date date, long durationMillis ) {
         def duration = this.dtf.newDuration durationMillis
         GregorianCalendar cal = new GregorianCalendar()
         cal.time = date
@@ -250,4 +249,7 @@ class Event implements Comparable{
         return (this.endDate >= new Date()) && (this.startDate < new Date())
     }
     
+    String toString() {
+        "Event: $properties"
+    }
 }
