@@ -89,35 +89,20 @@ public class EiEventService {
     }
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        def venLog = VenTransactionLog.findWhere(UID: oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
-        def oadrResponse
-        if (venLog) {
-            def responseCode = verifyOadrCreated( oadrCreatedEvent )[0]
-            def description = verifyOadrCreated( oadrCreatedEvent )[1]
-            log.debug responseCode
-            log.debug description
-            if ( isSuccessful( oadrCreatedEvent ) )
-                persistFromCreatedEvent oadrCreatedEvent
-    
-            else
-                log.warn "Incoming oadrCreatedEvent contained a non-200 response: $oadrCreatedEvent"
+        
+        def (responseCode, description) = [200,"OK"]
+        if ( isSuccessful( oadrCreatedEvent ) )
+            (responseCode, description) = processEventResponses( oadrCreatedEvent )
+
+        else
+            log.warn "Incoming oadrCreatedEvent contained a non-200 response: $oadrCreatedEvent"
+        
+        def oadrResponse = new OadrResponse()
+            .withEiResponse(new EiResponse()
+                .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
+                .withResponseCode(new ResponseCode(responseCode))
+                .withResponseDescription(description))
             
-            oadrResponse = new OadrResponse()
-                .withEiResponse(new EiResponse()
-                    .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
-                    .withResponseCode(new ResponseCode(responseCode))
-                    .withResponseDescription(description))
-            venLog.responseDate = new Date()
-            venLog.save(flush: true)
-        } else {
-            def responseCode = "404"
-            def description = "UID does not exist in Ven Transaction Log"
-            oadrResponse = new OadrResponse()
-                .withEiResponse(new EiResponse()
-                    .withRequestID(oadrCreatedEvent.eiCreatedEvent?.eiResponse?.requestID)
-                    .withResponseCode(new ResponseCode(responseCode))
-                    .withResponseDescription(description))
-        }
         return oadrResponse
     }
 
@@ -131,37 +116,76 @@ public class EiEventService {
      * @param oadrCreatedEvent - the OadrCreatedEvent to be checked for errors
      * @return a response code as a string
      */
-    def verifyOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
-        def venID = oadrCreatedEvent.eiCreatedEvent.venID
+    def processEventResponses( OadrCreatedEvent oadrCreatedEvent ) {
         def response = "200"
         def description = "OK"
-        try {
-            oadrCreatedEvent.eiCreatedEvent.eventResponses.eventResponses.each { evtResponse ->
-                if ( evtResponse.responseCode.value != "200" ) {
-                    response = evtResponse.responseCode.value
-                    description = "eventResponse contained a non-200 response: $evtResponse"
-                    return [response, description]// skip remaining elements if there's already an error.
-                }
-                String eventId = evtResponse.qualifiedEventID.eventID
-                long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
-
-                def event = Event.findWhere( eventID: eventId)
-                def venStatuses = VenStatus.where{ ven.venID == venID }.findAll()
-
-                if ( ! event ) {
-                    response = "404"
-                    description = "Event not found"
-                }
-                if ( ! venStatuses ) {
-                    response = "409"
-                    description = "Invalid VEN ID"
-                }
-            }
-        } catch (e) {
+        
+        def venID = oadrCreatedEvent.eiCreatedEvent.venID
+        def eventResponses = oadrCreatedEvent.eiCreatedEvent.eventResponses?.eventResponses
+        
+        if ( ! eventResponses  ) {
             log.warn "oadrCreatedEvent does not have eventResponses"
+            // TODO should this result in an error?
+            return [response, description]
         }
         
-        return [response, description]
+        def errors = eventResponses.collect { evtResponse ->
+            String eventId = evtResponse.qualifiedEventID.eventID
+            long modificationNumber = evtResponse.qualifiedEventID.modificationNumber
+            def optType = evtResponse.optType.value()
+            def eventResponseCode = evtResponse.responseCode.value
+            
+            log.debug "Event response $eventResponseCode from VEN: $venID, " +
+                      "eventID: ${eventId}/${modificationNumber}, opt: $optType"
+            
+            if ( eventResponseCode != "200" ) {
+                // TODO if we get a non-200 response, do we process the opt??
+                log.warn "++++ Not processing non-200 event response!"
+                return
+            }
+            def venTxLog = VenTransactionLog.findWhere(UID: evtResponse.requestID)
+            if ( venTxLog ) {
+                venLog.responseDate = new Date()
+                venLog.save()
+            }
+            else log.warn "Unknown request ID: $evtResponse.requestID"
+            
+
+            def event = Event.findWhere( eventID: eventId )
+            if ( ! event ) {
+                log.warn "Event not found!"
+                return ["404", "Event not found"]
+            }
+
+            def venStatus = VenStatus.where{ ven.venID == venID; event == event }.find()
+
+            if ( ! venStatus ) {
+                log.warn "VEN status not found!" 
+                return ["409", "Invalid VEN ID"]
+            }
+            
+            switch (optType) {
+                case("optIn") :
+                    venStatus.optStatus = StatusCode.OPT_IN
+                    break
+                case("optOut") :
+                    venStatus.optStatus = StatusCode.OPT_OUT
+                    break
+                default :
+                    log.error "Invalid opt Type! $optType"
+                    return [409,"Invalid opt type!"]
+            }
+            venStatus.time = new Date()
+            venStatus.save()
+        }
+        
+        errors.findAll() // filter out null
+        
+        if ( errors ) {
+            (response,description) = errors[0]
+            log.warn "Returning error response: $response, $description"
+        }
+        return [response,description]
     }
 
     /**
@@ -174,43 +198,45 @@ public class EiEventService {
     public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
-        if ( oadrRequestEvent.eiRequestEvent.requestID )
-            eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID
-        else
-            eiResponse.requestID = UUID.randomUUID().toString()
+                
+        eiResponse.requestID = oadrRequestEvent.eiRequestEvent.requestID ?: 
+            UUID.randomUUID().toString()
             
         OadrDistributeEvent oadrDistributeEvent = new OadrDistributeEvent()
             .withEiResponse(eiResponse)
             .withRequestID(UUID.randomUUID().toString())
             .withVtnID(this.vtnID)
 
+        def ven = Ven.findWhere( venID: oadrRequestEvent.eiRequestEvent.venID )
+        if ( ! ven ) {
+            log.warn "Unknown VEN ID! ${oadrRequestEvent.eiRequestEvent.venID}"
+            eiResponse.responseCode.value = "404"
+            return oadrDistributeEvent
+        }
+
         // FIXME validate VEN ID against HTTP credentials
         def limit = oadrRequestEvent.eiRequestEvent.replyLimit?.intValue() ?: 100
         // TODO order according to date, priority & status
-        def events = Event.executeQuery("select e from Event e, Ven v where  v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
-            [vID: oadrRequestEvent.eiRequestEvent.venID , d: new Date()],[max : limit]).sort()
+        def events = Event.executeQuery(
+            "select e from Event e, Ven v where v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
+            [vID: ven.venID , d: new Date()],[max : limit]).sort()
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
                     .withEiEvent(buildEiEvent(e))
                     .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
         }
-        persistFromRequestEvent oadrRequestEvent, events
-        VenStatus.withTransaction { v ->
-            def venLog = new VenTransactionLog()
-            venLog.venID = oadrRequestEvent.eiRequestEvent.venID
-            venLog.sentDate = new Date()
-            venLog.UID = eiResponse.requestID
-            log.debug eiResponse.requestID
-            if (venLog.validate()) {
-                log.debug "inside validate"
-                venLog.save(flush: true)
-            } else {
-                venLog.errors.allErrors.each {
-                    log.debug "validation failed"
-                    log.error it
-                }
-            }
-        }
+        
+        persistFromRequestEvent ven, events
+        
+        def venLog = new VenTransactionLog()
+        venLog.venID = ven.venID
+        venLog.sentDate = new Date()
+        venLog.UID = eiResponse.requestID
+        log.debug eiResponse.requestID
+        if ( venLog.validate() )
+            venLog.save()
+        else log.warn "Couldn't validate VEN TXN!"
+        
         return oadrDistributeEvent
     }
 
@@ -219,56 +245,21 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    protected void persistFromRequestEvent( OadrRequestEvent requestEvent, List<Event> events ) {
-        def ven = Ven.findWhere( venID: requestEvent.eiRequestEvent.venID )
+    protected void persistFromRequestEvent( Ven ven, List<Event> events ) {
         events.each { event ->
             def venStatus = VenStatus.findWhere(
                     ven: ven, event: event )
             if ( ! venStatus ) {
                 venStatus = new VenStatus()
-                ven.addToVenStatuses(venStatus)
-                event.addToVenStatuses(venStatus)
+                ven.addToVenStatuses venStatus
+                event.addToVenStatuses venStatus
             }
             venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
             venStatus.time = new Date()
-            ven.save(flush: true, failOnError: true)
-            event.save(flush: true, failOnError: true)
-        }
-    }
-
-    /**
-     * Persists the information from an OadrCreatedEvent into the database
-     * 
-     * @param requestEvent - The event to be used to form the persistence object
-     */
-    protected void persistFromCreatedEvent( OadrCreatedEvent createdEvent ) {
-        createdEvent.eiCreatedEvent.eventResponses?.eventResponses?.each { response ->
-            String eventId = response.qualifiedEventID.eventID
-            long modificationNumber = response.qualifiedEventID.modificationNumber
-        }
-        // FIXME query for status per event in the eventResponses element,
-        // set venStatus for each event
-        def venStatuses = VenStatus.where{ ven.venID == createdEvent.eiCreatedEvent.venID }.findAll()
-
-        venStatuses.each { status ->
-            if ( createdEvent.eiCreatedEvent.eventResponses ) {
-
-                createdEvent.eiCreatedEvent.eventResponses.eventResponses.each { eventResponse ->
-                    def optType = eventResponse.optType.value()
-                    log.debug "now setting the new optType: $optType"
-                    switch (optType) {
-                        case("optIn") :
-                            status.optStatus = StatusCode.OPT_IN
-                        case("optOut") :
-                            status.optStatus = StatusCode.OPT_OUT
-                        default :
-                            log.error "Invalid opt Type"
-                    }
-                }
-            }
-            status.time = new Date()
-            status.save()
-        }
+            
+            ven.save failOnError: true
+            event.save failOnError: true
+        }        
     }
 
     /**
@@ -277,34 +268,17 @@ public class EiEventService {
      * @param requestEvent - The event to be used to form the persistence object
      */
     public void handleOadrResponse( OadrResponse re, String uri ) {
-        //def venLog = VenTransactionLog.findWhere(UID: response.eiResponse?.requestID)
-        //if ( venLog ) {
-        log.debug "inside OadrResponse"
         def ven = Program.list()
-        println "after ven" + ven
         if ( ven ) {
-            log.debug "before loop with venstatuses: " + ven.venStatuses
             ven.each { status ->
                 status.time = new Date()
                 status.optStatus = StatusCode.DISTRIBUTE_SENT
-                status.save(flush: true)
+                status.save()
             }
             log.debug "after loop"
         }
         else log.warn "Ven with clientURI $uri not found"
     }
-
-    /**
-     * Gets the DurationValue from an EiEvent as a java.util.Duration
-     * 
-     * @param event - EiEvent to have the DurationValue pulled from
-     * @return a Duration based on the EiEvent DurationValue
-     *
-    public Duration getDuration( EiEvent event ) {
-        return this.df.newDuration(
-            event.eiActivePeriod.properties.duration.duration.value)
-    }
-    */
 
     /**
      * Takes the Event form pulled from the scala.html and crafts
@@ -315,7 +289,9 @@ public class EiEventService {
     public EiEvent buildEiEvent( Event event ) {
         GregorianCalendar now = new GregorianCalendar()
         def objectFactory = new ObjectFactory()
-        now.setTime(new Date())
+        now.setTime new Date()
+        
+//        log.debug "--- $event"
 
         EiEvent eiEvent = event.toEiEvent()
         eiEvent.withEiActivePeriod(new EiActivePeriod()
