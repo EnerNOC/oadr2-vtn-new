@@ -42,8 +42,8 @@ class Event implements Comparable{
     static belongsTo = [program: Program]
     static hasMany = [venStatuses: VenStatus, signals: EventSignal]
      
-    String eventID
-    long priority
+    String eventID = UUID.randomUUID().toString()
+    long priority = 1
     Date startDate
     Date endDate
     long tolerance = 0
