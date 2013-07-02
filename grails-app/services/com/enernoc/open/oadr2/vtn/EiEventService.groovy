@@ -77,11 +77,11 @@ public class EiEventService {
             log.debug "oadrCreatedEvent"
             return handleOadrCreated( (OadrCreatedEvent)o )
         }
-      /*  else if( o instanceof OadrResponse ) {
+        else if( o instanceof OadrResponse ) {
             log.debug "OadrResponse"
-            handleOadrResponse( (OadrResponse)o )
+            handleOadrResponse (OadrResponse)o
             return null
-        }*/
+        }
         else {
             log.error "Unknown type: ${o?.class}"
             throw new RuntimeException("Payload was unknown type: ${o?.class}")
@@ -153,8 +153,8 @@ public class EiEventService {
 
             def event = Event.findWhere( eventID: eventId )
             if ( ! event ) {
-                log.warn "Event not found!"
-                return ["404", "Event not found"]
+                log.warn "Event $eventId not found!"
+                return ["404", "Event $eventId not found"]
             }
 
             def venStatus = VenStatus.where{ ven.venID == venID; event == event }.find()
@@ -195,7 +195,7 @@ public class EiEventService {
      * @param oadrRequestEvent - Request incoming from the VEN
      * @return an OadrDistributeEvent containing all payload information
      */
-    public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent){
+    public OadrDistributeEvent handleOadrRequest(OadrRequestEvent oadrRequestEvent) {
         EiResponse eiResponse = new EiResponse()
                 .withResponseCode( new ResponseCode("200") )
                 
@@ -226,13 +226,13 @@ public class EiEventService {
                     .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
         }
         
-        persistFromRequestEvent ven, events
+        updateVenStatus ven, events
         
         def venLog = new VenTransactionLog()
         venLog.venID = ven.venID
         venLog.sentDate = new Date()
         venLog.UID = eiResponse.requestID
-        log.debug eiResponse.requestID
+        log.debug "Request ID: ${eiResponse.requestID}"
         if ( venLog.validate() )
             venLog.save()
         else log.warn "Couldn't validate VEN TXN!"
@@ -245,7 +245,7 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    protected void persistFromRequestEvent( Ven ven, List<Event> events ) {
+    protected void updateVenStatus( Ven ven, List<Event> events ) {
         events.each { event ->
             def venStatus = VenStatus.findWhere(
                     ven: ven, event: event )
@@ -267,17 +267,21 @@ public class EiEventService {
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
-    public void handleOadrResponse( OadrResponse re, String uri ) {
-        def ven = Program.list()
-        if ( ven ) {
-            ven.each { status ->
-                status.time = new Date()
-                status.optStatus = StatusCode.DISTRIBUTE_SENT
-                status.save()
-            }
-            log.debug "after loop"
+    public void handleOadrResponse( OadrResponse resp ) {
+        // TODO mainly need to handle errors e.g. if a push resulted in a 
+        // non-200 response
+        if ( resp.eiResponse.responseCode != 200 )
+            log.warn "oadrResponse: ${resp.eiResponse.responseCode}"
+            
+        def venStatus = VenStatus.findWhere( requestID : resp.eiResponse.requestID )
+        if ( ! venStatus ) { 
+            log.warn "No VEN status for request ID: ${resp.eiResponse.requestID}"
+            return 
         }
-        else log.warn "Ven with clientURI $uri not found"
+        
+        log.debug "Updating VEN status for ${venStatus.ven.venID}; Event: ${venStatus.event.eventID}"
+        venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
+        venStatus.save()
     }
 
     /**
