@@ -6,8 +6,6 @@ import javax.xml.datatype.DatatypeFactory
 import javax.xml.datatype.Duration
 import javax.xml.datatype.XMLGregorianCalendar
 
-import org.springframework.aop.aspectj.RuntimeTestWalker.ThisInstanceOfResidueTestVisitor;
-
 import com.enernoc.open.oadr2.model.CurrentValue
 import com.enernoc.open.oadr2.model.DateTime
 import com.enernoc.open.oadr2.model.Dtstart
@@ -40,7 +38,6 @@ import com.enernoc.open.oadr2.model.EventDescriptor.EiMarketContext
 import com.enernoc.open.oadr2.model.OadrDistributeEvent.OadrEvent
 import com.enernoc.open.oadr2.model.Properties.Tolerance
 import com.enernoc.open.oadr2.model.Properties.Tolerance.Tolerate
-import com.sun.media.jai.opimage.LogCRIF;
 
 /**
  * EiEventService handles all persistence and object creation of payloads
@@ -297,7 +294,7 @@ public class EiEventService {
         
 //        log.debug "--- $event"
 
-        EiEvent eiEvent = event.toEiEvent()
+        EiEvent eiEvent = new EiEvent()
         eiEvent.withEiActivePeriod(new EiActivePeriod()
             .withProperties(new Properties()
                 .withDtstart(new Dtstart()

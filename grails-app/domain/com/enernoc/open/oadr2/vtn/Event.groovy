@@ -52,7 +52,6 @@ class Event implements Comparable{
     long recovery = 0
     boolean cancelled
     boolean responseRequired = true
-    long intervals = 1
     long modificationNumber = 0L
     
     // TODO event target, group, resource IDs
@@ -151,47 +150,6 @@ class Event implements Comparable{
     }
     
     /**
-     * Unwraps the fields of the Event form to an EiEvent object
-     * 
-     * @return the unwrapped EiEvent with certain fields from the form filled
-     */
-    public EiEvent toEiEvent() {
-        ObjectFactory of = new ObjectFactory()
-        
-        return new EiEvent()
-            .withEventDescriptor( new EventDescriptor()
-                .withEventID( this.eventID )
-                .withPriority( this.priority )
-                .withCreatedDateTime( new DateTime( this.xmlStart ) )
-                .withModificationNumber( 0 ) )
-            .withEiActivePeriod( new EiActivePeriod()
-                .withProperties( new Properties()
-                    .withDtstart( new Dtstart( new DateTime( this.xmlStart ) ) )
-                    .withDuration( new DurationPropType( new DurationValue(
-                        this.duration.toString() ) ) ) ) )
-            .withEiEventSignals(new EiEventSignals()
-                .withEiEventSignals( this.signals.collect { sig ->
-                    def eiSignal = new EiEventSignal()
-                        .withSignalType( sig.type.xmlType )
-                        .withSignalName( sig.name )
-                        .withSignalID( sig.signalID )
-                        .withIntervals( new Intervals(
-                            sig.intervals.collect { 
-                                new Interval()
-                                .withDuration( new DurationPropType(
-                                    new DurationValue( it.duration.toString() ) ) )
-                                .withStreamPayloadBase( of.createSignalPayload(
-                                    new SignalPayload( new PayloadFloat( it.level ) ) ) )
-                                .withUid( new Uid( it.uid ) )
-                            })) // end intervals
-                        
-                    def currentInterval = sig.currentInterval
-                    if ( currentInterval ) eiSignal.currentValue = new CurrentValue( new PayloadFloat( currentInterval.level ) )
-                    return eiSignal
-                })) // end eiEventSignals
-    }
-
-    /**
      * compares if two events are enrolled in the same program with overlapping times
      * 
      * @return boolean value 
@@ -250,6 +208,6 @@ class Event implements Comparable{
     }
     
     String toString() {
-        "Event: $properties"
+        "Event ${eventID}/$modificationNumber [${status}]"
     }
 }
