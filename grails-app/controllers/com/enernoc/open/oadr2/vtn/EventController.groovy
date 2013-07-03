@@ -98,7 +98,7 @@ class EventController {
             def vens = event.program.vens.collect { it }
             prepareVenStatus(event, vens)
             program.save(flush: true)
-            pushService.pushNewEvent eiEvent, vens
+//            pushService.pushNewEvent eiEvent, vens
             flash.message = "Success, your event has been created"
         }
         else {
@@ -133,10 +133,10 @@ class EventController {
      */
     def cancelEvent() {
         def event = Event.get(params.id)
-    if ( ! event ) {
-        response.sendError 404, "No event for ID $params.id"
-        return
-    }
+        if ( ! event ) {
+            response.sendError 404, "No event for ID $params.id"
+            return
+        }
         //Event event = Event.get(params.id)
         event.modificationNumber = event.modificationNumber + 1
         event.cancelled = true
