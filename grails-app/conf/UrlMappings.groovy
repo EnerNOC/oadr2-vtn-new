@@ -17,7 +17,11 @@ class UrlMappings {
             action = [POST:"post"]
         }
         
+        // test/debug endpoints:
         "/OADRTest/template/$service/$template"(controller: "OADRTest", action: "template")
+        "/OADRTest/ven/$venID?"( controller:"DummyVenController" ) {
+             action = [POST:'push']
+        }
 
 		"/"( controller : "home" )
 		
