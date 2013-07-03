@@ -16,11 +16,13 @@ import javax.xml.bind.Unmarshaller
  * Sends "Push" OpenADR payloads via HTTP
  * @author tnichols
  */
-public class HttpService implements ResponseHandler {
-    def eiEventService = new EiEventService()
+public class HttpService {
+    
+    EiEventService eiEventService
     Marshaller marshaller
     Unmarshaller unmarshaller
     String URI
+    
     public HttpService() {
         JAXBManager jaxb = new JAXBManager()
         this.marshaller = jaxb.createMarshaller()
@@ -28,24 +30,34 @@ public class HttpService implements ResponseHandler {
     }
 
     void send( Object payload, String uri ) {
-        log.debug "HttpService Send"
+        log.debug "HttpService PUSH to $uri"
         StringWriter sw = new StringWriter()
-        this.marshaller.marshal(payload, sw)
-        this.URI = uri //TODO make sure this is threadsafe
+        this.marshaller.marshal(payload, sw) //TODO make sure this is threadsafe
         // TODO client cert
-        Request.Post(uri)
-                .bodyString(sw.toString(), ContentType.APPLICATION_XML)
-                .execute().handleResponse( this )
+        
+        try {
+            Request.Post(uri)
+                    .bodyString(sw.toString(), ContentType.APPLICATION_XML)
+                    .execute()
+                    .handleResponse( { HttpResponse resp -> 
+                        // need to pass request URI
+                        this.handleResponse uri, resp
+                    } as ResponseHandler )
+        }
+        catch ( ex ) {
+            // TODO handle error in eiEventService
+            log.error "HTTP PUSH Error to $uri", ex
+        }
     }
 
-    Object handleResponse( HttpResponse resp ) {
+    Object handleResponse( String uri, HttpResponse resp ) {
         Object payload = unmarshaller.unmarshal( resp.entity.content )
-        if ( payload instanceof OadrResponse) {
-            log.debug "RESPONSE IS BEING HANDLED"
-            eiEventService.handleOadrResponse( (OadrResponse) payload, URI )
+        log.debug "HTTP PUSH response: $payload"
+        
+        if ( payload instanceof OadrResponse ) {
+            eiEventService.handleOadrResponse( (OadrResponse) payload, uri )
         }
         else
             log.error "OadrResponse payload is expected"
-        log.info "Response $resp sent"
     }
 }

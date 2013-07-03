@@ -37,6 +37,8 @@ public class XmppService implements PacketListener {
     XMPPConnection xmppConn
 
     EiEventService eiEventService
+    
+    IQCache iqCache
 
     Marshaller marshaller
 
@@ -51,11 +53,20 @@ public class XmppService implements PacketListener {
     public XmppService() {
         JAXBManager jaxb = new JAXBManager()
         this.marshaller = jaxb.createMarshaller()
+        this.iqCache = new IQCache()
     }
 
     public void processPacket(Packet packet) {        
         log.debug "Got packet: $packet"
         def payload = packet.getExtension(OADR2_XMLNS)?.payload
+        
+        if ( packet.getError() != null ) {
+            log.warn "Got error packet #${packet.packetID} from ${packet.from}: ${packet.error}"
+            def request = iqCache.get( packet.packetID )
+            // TODO process error
+            return
+        }
+        
         def response = eiEventService.handleOadrPayload( payload )
         if ( response )	send payload, packet.from, packet.getPacketID()
     }
@@ -113,13 +124,7 @@ public class XmppService implements PacketListener {
      * @param jid - the Jid to receive the object
      */
     def send( Object payload, String jid ) {
-        log.debug "XMPP send to $jid: $payload"
-        IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, marshaller));
-        iq.to = uriToJid( jid )
-        iq.type = IQ.Type.SET
-        IQCache.put(iq.getPacketID(), payload)
-        log.debug "about to send jid"
-        xmppConn.sendPacket(iq)
+        this.send payload, jid, null
     }
 
 
@@ -131,14 +136,19 @@ public class XmppService implements PacketListener {
      * @param packetId - the packetId the packet must contain
      */
     def send( Object payload, String jid, String packetID ) {
-        log.debug "XMPP send to $jid: # $packetID: $payload"
         IQ iq = new OADR2IQ(new OADR2PacketExtension(payload, this.marshaller))
+        iq.to = uriToJid( jid )
+        
         if ( packetID ) { // this is a response
-            iq.setPacketID(packetID)
+            iq.packetID = packetID
             iq.type = IQ.Type.RESULT            
         }
-        else iq.type = IQ.Type.SET
-        iq.to = uriToJid( jid )
+        else {
+            iq.type = IQ.Type.SET
+            iqCache.put iq.getPacketID(), payload
+        }
+        log.debug "XMPP send #${iq.packetID} to $jid: $payload"
+        
         xmppConn.sendPacket iq
     }
     

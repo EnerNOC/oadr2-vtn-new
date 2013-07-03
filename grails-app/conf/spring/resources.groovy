@@ -1,6 +1,4 @@
-import com.enernoc.open.oadr2.vtn.EiEventService
-import com.enernoc.open.oadr2.vtn.XmppService
-import com.enernoc.open.oadr2.vtn.PushService
+import com.enernoc.open.oadr2.vtn.*
 
 beans = {
 	
@@ -22,9 +20,14 @@ beans = {
 	eiEventService(EiEventService) { b ->
 		vtnID = cfg.vtnID
 	}
+
 	pushService(PushService) { b ->
 		vtnID = cfg.vtnID
 
         b.autowire = 'byType'
 	}
+    
+    httpService(HttpService) { b ->
+        b.autowire = 'byType'
+    }
 }
