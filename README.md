@@ -11,7 +11,7 @@ dependency injection, which Grails provides out of the box.
 
 ## Configuration
 
-Most application settings are found in `gails-app/conf/Config.groovy`.  Set the `xmppSvc`
+Most application settings are found in `grails-app/conf/Config.groovy`.  Set the `xmppSvc`
 settings in order to enable XMPP functionality.  Note that if using OpenFire as the 
 XMPP server, `jid` should be just the 'username,' not `username@host.com`
 
@@ -26,6 +26,11 @@ Install locally by running
 
     ~/oadr2-ven $ mvn install -Dmaven.test.skip=true
 
+You also need an AMQP server to handle push operations.  The easiest solution is 
+[RabbitMQ](http://www.rabbitmq.com/download.html).  If you're on a Mac with Homeberw or
+most Linux distros, you can easily install Rabbit via your package manager.
+
+
 ### Running Locally
 
 The app can be run from the command line with Apache Maven or the Grails command line tools.
@@ -39,6 +44,12 @@ If you use Maven:
 
 For more info, see: http://grails.org/doc/latest/guide/commandLine.html#4.5%20Ant%20and%20Maven 
 
+
+### Running an external server with HTTPS
+
+You can use the embedded server and make it accessible externally like so
+ 
+    grails run-app -https -grails.server.host 192.168.56.102
 
 ### Database
 
