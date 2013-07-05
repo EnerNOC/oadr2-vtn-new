@@ -1,9 +1,9 @@
 # EnerNOC OpenADR 2.0 VTN
 
-This is the section developement version of EnerNOC's open source VTN (server) for 
-[OpenADR 2.0](http://openadr.org).  
+EnerNOC's open source VTN (server) for [OpenADR 2.0](http://openadr.org).  
 
-This app supercedes the original VTN, the major difference being the underlying web framework 
+This app supercedes the [first version of oadr2-vtn](http://github.com/EnerNOC/oadr2-vtn), 
+the major difference being the underlying web framework 
 was migrated from [Play 2](http://www.playframework.com/) to [Grails](http://grails.org/).
 Grails is a much more mature web framework while Play 2 had some missing features.
 The original Play app required work-arounds for common features such as services and 
@@ -101,7 +101,6 @@ If you want to extend this project, here are several resources that will be help
 
 ## TODO
 
-* OpenADR Debug page to post example XML from a web form and display the result
 * Filter on OpenADR services to handle certificate auth
 * Web app auth
 
@@ -109,8 +108,8 @@ If you want to extend this project, here are several resources that will be help
 
 Much of the original code is based on a Play 2.0 app written by our 2012 summer intern 
 [Jeff Lajoie](http://www.linkedin.com/pub/jeff-lajoie/5b/424/109).  It was then converted
-to Grails by one of our 2013 interns, Yang Xiang, with help from 
-[Thom Nichols](http://open.enernoc.com/profiles/thom.html).
+to Grails by one of our 2013 interns, [Yang Xiang](www.linkedin.com/pub/yang-xiang/6b/36/300), 
+with help from [Thom Nichols](http://open.enernoc.com/profiles/thom.html).
 
 
 This project also relies on the following open source frameworks and libraries to help make it awesome:
