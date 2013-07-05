@@ -15,6 +15,8 @@ class EventController {
     def pushService
     def eiEventService
     
+    int ONE_HOUR = 60*60*1000
+    
     static defaultAction = 'events'
     
     /**
@@ -54,11 +56,12 @@ class EventController {
      * @return the rendered page to create an event
      */
     def blankEvent() {
-        // TODO 'distinct' should not be necessary (program name should be enforced unique)
         def model = [:]        
         model.programsList = Program.list()
         if( ! flash.chainModel?.event )
-            model.event = new Event(startDate: new Date(), endDate:new Date())
+            model.event = new Event(
+                startDate: new Date(), 
+                endDate:new Date(System.currentTimeMillis()+ONE_HOUR))
         model
     }
 
