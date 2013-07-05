@@ -134,15 +134,3 @@ rabbitmq {
 		httpEventQueue()
 	}
 }
-
-//configuration for jabber accounts
-/*
-xmpp.autoStartup = true
-xmpp.username="yangxiang"
-xmpp.password="password"
-xmpp.connection.host="Yangs-MacBook-Pro.local"
-xmpp.connection.port=5222
-xmpp.connection.service="Yangs-MacBook-Pro.local"
-xmpp.connection.SASLAuthenticationEnabled=true
-*/
-
