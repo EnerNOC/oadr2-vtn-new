@@ -14,12 +14,12 @@
 vtnID = "ENOCtestVTN1"
 
 xmppSvc {
-	jid = '<your account here>@gmail.com'
-	passwd = '<your password here>'
-	resource = vtnID
-	host = 'talk.google.com'
-	port = 5222
-	serviceName = 'gmail.com'
+    jid = '<your account here>@gmail.com'
+    passwd = '<your password here>'
+    resource = vtnID
+    host = 'talk.google.com'
+    port = 5222
+    serviceName = 'gmail.com'
 }
 
 oadrTest.templatesFolder = "oadrTemplates"
@@ -81,6 +81,8 @@ grails.hibernate.cache.queries = false
 // see: http://grails.org/doc/2.1.0/guide/single.html#configGORM
 grails.gorm.failOnError=true
 
+grails.servlet.version = "3.0"
+
 environments {
 	development {
 		grails.logging.jul.usebridge = true
@@ -117,7 +119,8 @@ log4j = {
     
     debug 'grails.app.controllers',
           'grails.app.services',
-          'org.hibernate.SQL'
+          'grails.app.filters'
+//          'org.hibernate.SQL'
           
 //    trace 'org.hibernate.type'
 }
