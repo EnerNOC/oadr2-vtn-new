@@ -9,6 +9,7 @@ import org.apache.http.entity.ContentType
 
 import com.enernoc.open.oadr2.model.OadrResponse
 import com.enernoc.open.oadr2.xmpp.JAXBManager
+import javax.xml.bind.JAXBException
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
 
@@ -21,33 +22,26 @@ public class HttpService {
     EiEventService eiEventService
     Marshaller marshaller
     Unmarshaller unmarshaller
-    String URI
     
     public HttpService() {
         JAXBManager jaxb = new JAXBManager()
         this.marshaller = jaxb.createMarshaller()
         this.unmarshaller = jaxb.context.createUnmarshaller()
     }
-
-    void send( Object payload, String uri ) {
-        log.debug "HttpService PUSH to $uri"
-        StringWriter sw = new StringWriter()
-        this.marshaller.marshal(payload, sw) //TODO make sure this is threadsafe
+    
+    /**
+     * Send a payload to the given VEN URI.
+     */
+    void send( String payload, String uri ) {
         // TODO client cert
         
-        try {
-            Request.Post(uri)
-                    .bodyString(sw.toString(), ContentType.APPLICATION_XML)
-                    .execute()
-                    .handleResponse( { HttpResponse resp -> 
-                        // need to pass request URI
-                        this.handleResponse uri, resp
-                    } as ResponseHandler )
-        }
-        catch ( ex ) {
-            // TODO handle error in eiEventService
-            log.error "HTTP PUSH Error to $uri", ex
-        }
+        Request.Post(uri)
+                .bodyString(payload, ContentType.APPLICATION_XML)
+                .execute()
+                .handleResponse( { HttpResponse resp -> 
+                    // need to pass request URI
+                    this.handleResponse uri, resp
+                } as ResponseHandler )
     }
 
     Object handleResponse( String uri, HttpResponse resp ) {

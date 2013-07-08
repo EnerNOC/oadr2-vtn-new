@@ -8,6 +8,8 @@ package com.enernoc.open.oadr2.vtn
 public enum StatusCode {
     PENDING_DISTRIBUTE,
     DISTRIBUTE_SENT,
+    DISTRIBUTE_ERROR,
+    RESPONSE_ERROR,
     OPT_IN,
     OPT_OUT
 }

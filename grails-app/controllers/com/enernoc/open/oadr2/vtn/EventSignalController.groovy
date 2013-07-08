@@ -4,8 +4,7 @@ import javax.xml.bind.DatatypeConverter
 
 class EventSignalController {
 
-    def pushService
-    def eiEventService
+    def eventDistributeService
     
     static defaultAction = 'edit'
     static allowedMethods = [edit:'GET', update:'POST',delete:"POST"]
@@ -75,11 +74,10 @@ class EventSignalController {
             event.modificationNumber +=1
         
         if ( event.validate() ) { //signals.every { it.validate() } ) {
-            event.save flush:true
-            log.debug "Event $event saved with ${event.signals.size()} signals"
-            def eiEvent = eiEventService.buildEiEvent event
-            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+            event.save()
+            eventDistributeService.eventChanged event.id
             
+            log.debug "Event $event saved with ${event.signals.size()} signals"
             flash.message = "Saved event signals"
             render( contentType: 'text/json' ) {
                 location = g.createLink( controller: 'event', id: eventID)
@@ -100,6 +98,8 @@ class EventSignalController {
         def signal = EventSignal.get(params.id) 
         if ( signal ) {
             signal.delete()
+            // FIXME event should be marked as "dirty" to be pushed to VENs;
+            // increment event modification number
             render( contentType: 'text/json' ) { msg = "OK" } 
             return
         }

@@ -20,14 +20,8 @@ beans = {
 	eiEventService(EiEventService) { b ->
 		vtnID = cfg.vtnID
 	}
-
-	pushService(PushService) { b ->
-		vtnID = cfg.vtnID
-
-        b.autowire = 'byType'
-	}
     
-    httpService(HttpService) { b ->
-        b.autowire = 'byType'
+    payloadPushService(PayloadPushService) { b ->
+        vtnID = cfg.vtnID
     }
 }

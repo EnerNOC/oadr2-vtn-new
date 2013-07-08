@@ -126,14 +126,20 @@ log4j = {
 }
 
 rabbitmq {
-	connectionfactory {
-		username = 'guest'
-		password = 'guest'
-		hostname = 'localhost'
-	}
+    connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+    }
 	
-	queues = {
-		eventIDQueue()
-		httpEventQueue()
-	}
+    queues = {
+        /* when an event is created or modified, a worker queries the VENs 
+         * that should be pushed to and generates the oadrDistributeEvent payloads
+         */
+        "oadr.push.event"()
+        /* For oadrDistributeEvent payloads that perform a (blocking) HTTP push, we 
+         * use a worker queue
+         */
+        "oadr.push.payload"()
+    }
 }
