@@ -140,10 +140,10 @@ public class EiEventService {
                 log.warn "++++ Not processing non-200 event response!"
                 return
             }
-            def venTxLog = VenTransactionLog.findWhere(UID: evtResponse.requestID)
+            def venTxLog = VenTransactionLog.findWhere(requestID: evtResponse.requestID)
             if ( venTxLog ) {
-                venLog.responseDate = new Date()
-                venLog.save()
+                venTxLog.response = oadrCreatedEvent
+                venTxLog.save()
             }
             else log.warn "Unknown request ID: $evtResponse.requestID"
             
@@ -230,7 +230,7 @@ public class EiEventService {
         def venLog = new VenTransactionLog()
         venLog.venID = ven.venID
         venLog.type = "pull_request"
-        venLog.UID = eiResponse.requestID
+        venLog.requestID = eiResponse.requestID
         log.debug "Request ID: ${eiResponse.requestID}"
         if ( venLog.validate() )
             venLog.save()
