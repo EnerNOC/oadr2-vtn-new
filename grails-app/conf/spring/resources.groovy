@@ -8,9 +8,9 @@ beans = {
 		jid = cfg.xmppSvc.jid
 		xmppPasswd = cfg.xmppSvc.passwd
 		xmppResource = cfg.xmppSvc.resource
-		xmppHost = cfg.xmppSvc.host
-		xmppPort = cfg.xmppSvc.port
-		xmppServiceName = cfg.xmppSvc.serviceName
+		xmppHost = cfg.xmppSvc.host ?: null
+		xmppPort = cfg.xmppSvc.port ?: 5222
+		xmppServiceName = cfg.xmppSvc.serviceName ?: null
 		
 		b.autowire = 'byType'
 		b.initMethod = 'connect'
@@ -20,8 +20,4 @@ beans = {
 	eiEventService(EiEventService) { b ->
 		vtnID = cfg.vtnID
 	}
-    
-    payloadPushService(PayloadPushService) { b ->
-        vtnID = cfg.vtnID
-    }
 }
