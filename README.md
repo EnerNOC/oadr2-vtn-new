@@ -16,6 +16,10 @@ Most application settings are found in `grails-app/conf/Config.groovy`.  Set the
 settings in order to enable XMPP functionality.  Note that if using OpenFire as the 
 XMPP server, `jid` should be just the 'username,' not `username@host.com`
 
+AMQP configuration can be found at the bottom of `Config.groovy` in the `rabbitmq` section.
+See the [plugin documentation](http://grails-plugins.github.io/grails-rabbitmq/docs/manual/)
+for more details.
+
 
 ## Development
 
