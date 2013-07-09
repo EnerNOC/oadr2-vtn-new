@@ -209,7 +209,7 @@ class EventController {
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            event.save()
+            event.save flush: true
             event.refresh() // so event.id is populated
             
             eventDistributeService.eventChanged event.id

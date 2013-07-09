@@ -74,7 +74,11 @@ class EventSignalController {
             event.modificationNumber +=1
         
         if ( event.validate() ) { //signals.every { it.validate() } ) {
-            event.save()
+            
+            /* event must be flushed before messages are enqueued, otherwise
+             * workers will get a stale event object
+             */
+            event.save flush: true 
             eventDistributeService.eventChanged event.id
             
             log.debug "Event $event saved with ${event.signals.size()} signals"
