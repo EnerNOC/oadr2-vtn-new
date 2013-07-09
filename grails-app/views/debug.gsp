@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="layout" content="bootstrap" />
-<title>EnerNOC OpenADR2 :: About</title>
+<title>EnerNOC OpenADR2 :: Debug Info</title>
 <style>
 </style>
 
@@ -74,11 +74,12 @@
 					<div class="span4">
 						<h2>Fork the code</h2>
 						<p>
-							You can download, fork &amp; raise issues on this project on <a
-								href="http://github.enernoc.net/tnichols/oadr2-vtn-groovy">GitHub</a>.
+							You can download, fork &amp; raise issues on this project on 
+							<a href="https://github.com/EnerNOC/oadr2-vtn-new">GitHub</a>.
 						</p>
-						<p>To start:</p>
-						<pre>git clone git://github.enernoc.net/tnichols/oadr2-vtn-groovy.git</pre>
+						<p>To check out the code with Git:</p>
+						<pre>git clone https://github.com/EnerNOC/oadr2-vtn-new.git</pre>
+						<p>or <a href="https://github.com/EnerNOC/oadr2-vtn-new/fork">fork it</a> on Github!</p>
 					</div>
 
 				</div>
