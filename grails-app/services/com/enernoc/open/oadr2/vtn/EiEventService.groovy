@@ -87,7 +87,7 @@ public class EiEventService {
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
         
-        def (responseCode, description) = [200,"OK"]
+        def (responseCode, description) = ["200","OK"]
         if ( isSuccessful( oadrCreatedEvent ) )
             (responseCode, description) = processEventResponses( oadrCreatedEvent )
 
@@ -97,7 +97,7 @@ public class EiEventService {
         def oadrResponse = new OadrResponse()
             .withEiResponse(new EiResponse()
                 .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
-                .withResponseCode(new ResponseCode(responseCode))
+                .withResponseCode(new ResponseCode(responseCode.toString()))
                 .withResponseDescription(description))
             
         return oadrResponse
@@ -295,7 +295,7 @@ public class EiEventService {
             .withVtnID( this.vtnID )
             .withRequestID( UUID.randomUUID().toString() )
             .withOadrEvents( new OadrEvent()
-                .withEiEvent( buildEiEvent( event ) )
+                .withEiEvent( this.buildEiEvent( event ) )
                 .withOadrResponseRequired(
                     event.responseRequired ? ResponseRequiredType.ALWAYS
                         : ResponseRequiredType.NEVER ) )
