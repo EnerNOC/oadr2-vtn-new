@@ -2,8 +2,11 @@ package com.enernoc.open.oadr2.vtn
 
 import com.enernoc.open.oadr2.model.OadrDistributeEvent
 import com.enernoc.open.oadr2.model.OadrDistributeEvent.OadrEvent
+import com.enernoc.open.oadr2.model.ResponseRequiredType;
+
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import groovy.json.JsonException
 
 class PayloadPushService {
 
@@ -26,14 +29,13 @@ class PayloadPushService {
             return
         }
         
-        rabbitSend(
-            rabbitQueue,
-            new JsonBuilder().call {
-                type "event"
-                eventID event.id
-                venID ven.id
-            }.toString()
-        )
+        def payload = new JsonBuilder()
+        payload.call {
+            type "event"
+            eventID event.id
+            venID ven.id
+        }
+        rabbitSend rabbitQueue, payload.toString()
     }
     
     /**
@@ -41,14 +43,19 @@ class PayloadPushService {
      */
     public void handleMessage(String payload) {
         
-        def msg = new JsonSlurper().parseText(payload)
-        
-        switch ( msg.type ) {
-            case 'event':
-                handleDistributeEvent msg
-                break;
-            default:
-                log.warn "Unknown message type! $msg"
+        try {
+            def msg = new JsonSlurper().parseText(payload)
+            
+            switch ( msg.type ) {
+                case 'event':
+                    handleDistributeEvent msg
+                    break;
+                default:
+                    log.warn "Unknown message type! $msg"
+            }
+        }
+        catch ( JsonException ex ) {
+            log.error "Error parsing json from dequeued payload: $payload", ex
         }
         
     }
@@ -68,13 +75,7 @@ class PayloadPushService {
         log.debug "Sending event $event to VEN: $ven"
         
         // TODO currently all VENs get pushed the same event payload:
-        def eiEvent = eiEventService.buildEiEvent(event)
-
-        def payload = new OadrDistributeEvent()
-                .withVtnID( this.vtnID )
-                .withRequestID( UUID.randomUUID().toString() )
-                .withOadrEvents( 
-                    new OadrEvent( eiEvent ) )
+        def payload = eiEventService.buildDistributeEvent( event )
 
         def venStatus = VenStatus.findWhere( event: event, ven: ven  )
         
