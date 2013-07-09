@@ -87,7 +87,7 @@ public class EiEventService {
 
     public OadrResponse handleOadrCreated( OadrCreatedEvent oadrCreatedEvent ) {
         
-        def (responseCode, description) = [200,"OK"]
+        def (responseCode, description) = ["200","OK"]
         if ( isSuccessful( oadrCreatedEvent ) )
             (responseCode, description) = processEventResponses( oadrCreatedEvent )
 
@@ -97,7 +97,7 @@ public class EiEventService {
         def oadrResponse = new OadrResponse()
             .withEiResponse(new EiResponse()
                 .withRequestID(oadrCreatedEvent.eiCreatedEvent.eiResponse.requestID)
-                .withResponseCode(new ResponseCode(responseCode))
+                .withResponseCode(new ResponseCode(responseCode.toString()))
                 .withResponseDescription(description))
             
         return oadrResponse
@@ -217,17 +217,19 @@ public class EiEventService {
         def events = Event.executeQuery(
             "select e from Event e, Ven v where v.venID = :vID and e.program in elements(v.programs) and e.endDate > :d",
             [vID: ven.venID , d: new Date()],[max : limit]).sort()
+                        
         oadrDistributeEvent.oadrEvents = events.collect { e ->
             new OadrEvent()
-                    .withEiEvent(buildEiEvent(e))
-                    .withOadrResponseRequired(ResponseRequiredType.ALWAYS)
+                    .withEiEvent( buildEiEvent(e) )
+                    .withOadrResponseRequired( e.responseRequired ? 
+                        ResponseRequiredType.ALWAYS : ResponseRequiredType.NEVER )
         }
         
         updateVenStatus ven, events
         
         def venLog = new VenTransactionLog()
         venLog.venID = ven.venID
-        venLog.sentDate = new Date()
+        venLog.type = "pull_request"
         venLog.UID = eiResponse.requestID
         log.debug "Request ID: ${eiResponse.requestID}"
         if ( venLog.validate() )
@@ -254,13 +256,14 @@ public class EiEventService {
             venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
             venStatus.time = new Date()
             
-            ven.save failOnError: true
-            event.save failOnError: true
+            ven.save()
+            event.save()
         }        
     }
 
     /**
-     * Persists the information from an OadrResponse into the database
+     * Persists the information from an OadrResponse into the database.
+     * This occurs after a push is sent and acknowledged by a VEN
      * 
      * @param requestEvent - The event to be used to form the persistence object
      */
@@ -279,6 +282,23 @@ public class EiEventService {
         log.debug "Updating VEN status for ${venStatus.ven.venID}; Event: ${venStatus.event.eventID}"
         venStatus.optStatus = StatusCode.DISTRIBUTE_SENT
         venStatus.save()
+    }
+    
+    /**
+     * Build an <code>{@code OadrDistributeEvent}</code> with a single 
+     * event in it
+     * @param event
+     * @return an OadrDistributeEvent payload
+     */
+    public OadrDistributeEvent buildDistributeEvent( Event event ) {
+        return new OadrDistributeEvent()
+            .withVtnID( this.vtnID )
+            .withRequestID( UUID.randomUUID().toString() )
+            .withOadrEvents( new OadrEvent()
+                .withEiEvent( this.buildEiEvent( event ) )
+                .withOadrResponseRequired(
+                    event.responseRequired ? ResponseRequiredType.ALWAYS
+                        : ResponseRequiredType.NEVER ) )
     }
 
     /**

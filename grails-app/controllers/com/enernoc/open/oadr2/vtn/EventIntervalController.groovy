@@ -9,6 +9,8 @@ class EventIntervalController {
         
         if ( interval ) {
             interval.delete()
+            // FIXME event should be marked as dirty to be pushed to VENs;
+            // increment event modification number
             render( contentType: 'text/json' ) { msg = "OK" } 
             return
         }

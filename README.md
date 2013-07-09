@@ -1,6 +1,7 @@
 # EnerNOC OpenADR 2.0 VTN
 
-EnerNOC's open source VTN (server) for [OpenADR 2.0](http://openadr.org).  
+EnerNOC's open source VTN (server) for [OpenADR 2.0](http://openadr.org).  You can find more 
+documentation on the [project wiki](http://github.com/EnerNOC/oadr2-vtn-new/wiki/).
 
 This app supercedes the [first version of oadr2-vtn](http://github.com/EnerNOC/oadr2-vtn), 
 the major difference being the underlying web framework 
@@ -15,6 +16,10 @@ Most application settings are found in `grails-app/conf/Config.groovy`.  Set the
 settings in order to enable XMPP functionality.  Note that if using OpenFire as the 
 XMPP server, `jid` should be just the 'username,' not `username@host.com`
 
+AMQP configuration can be found at the bottom of `Config.groovy` in the `rabbitmq` section.
+See the [plugin documentation](http://grails-plugins.github.io/grails-rabbitmq/docs/manual/)
+for more details.
+
 
 ## Development
 
@@ -24,7 +29,7 @@ The VTN depends on the oadr2-ven code found here: http://github.com/enernoc/oadr
 
 Install locally by running 
 
-    ~/oadr2-ven $ mvn install -Dmaven.test.skip=true
+    mvn install -Dmaven.test.skip=true
 
 You also need an AMQP server to handle push operations.  The easiest solution is 
 [RabbitMQ](http://www.rabbitmq.com/download.html).  If you're on a Mac with Homeberw or

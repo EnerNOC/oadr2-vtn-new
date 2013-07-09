@@ -12,7 +12,7 @@ import java.util.List;
  */
 class EventController {
     def messageSource
-    def pushService
+    def eventDistributeService
     def eiEventService
     
     int ONE_HOUR = 60*60*1000
@@ -87,7 +87,7 @@ class EventController {
         try {
             program = Program.get( params.programID.toLong() )
         }
-        catch ( ex ) { } 
+        catch ( ex ) { }
         
         params.remove 'programID'
         def event = new Event(params)
@@ -95,13 +95,9 @@ class EventController {
 
         program.addToEvents event
         if ( program.validate() ) {
-            def eiEvent = eiEventService.buildEiEvent(event)
+            // program save cascades to the event
             program.save flush: true
-            //This is required to prevent automatic flush when event.program.vens is used
-            def vens = event.program.vens.collect { it }
-            prepareVenStatus(event, vens)
-            program.save(flush: true)
-//            pushService.pushNewEvent eiEvent, vens
+
             flash.message = "Success, your event has been created"
         }
         else {
@@ -114,6 +110,7 @@ class EventController {
             return chain(action:"blankEvent", model:[errors: errors, event: event])
         }
 
+        event.refresh()
         redirect mapping: "eventSignal", params:[eventID: event.id]
     }
 
@@ -212,8 +209,11 @@ class EventController {
         if ( event.validate() ) {
             def eiEvent = eiEventService.buildEiEvent(event)
             event.modificationNumber +=1 // TODO this could be done with a save hook
-            event.save(flush:true)
-            pushService.pushNewEvent eiEvent, event.program.vens.collect { it }
+            event.save flush: true
+            event.refresh() // so event.id is populated
+            
+            eventDistributeService.eventChanged event.id
+            
             flash.message="Success, your event has been updated"
         }
         else {
@@ -227,28 +227,5 @@ class EventController {
         chain action:"events", model:[error: null]
     }
 
-    /**
-     * Prepares the VENs by creating a VENStatus object for each and setting the OptStatus to Pending 1
-     *
-     * @param vens - List of VENs to be traversed and will be used to construct a VENStatus object
-     * @param event - Event containing the EventID which will be used for construction of a VENStatus object
-     */
-    protected void prepareVenStatus( Event event, ArrayList<Ven> vens) {
-        
-        vens.each { v ->
-            // TODO create a method called VenStatus.create( ven, event ) that
-            // creates a new VenStatus object
-            def venStatus = new VenStatus()
-            venStatus.optStatus = StatusCode.PENDING_DISTRIBUTE
-            event.addToVenStatuses(venStatus)
-            v.addToVenStatuses(venStatus)
-            venStatus.time = new Date()
-            if ( venStatus.validate() ) {
-                v.save(flush:true)
-                log.debug "Created new VenStatus for Event: ${event.eventID}, VEN: ${v.venID}"
-            }
-            // TODO raise exception if VenStatus couldn't be created!
-            else log.warn "Validation error for venStatus ${venStatus}"
-        }
-    }
+
 }
