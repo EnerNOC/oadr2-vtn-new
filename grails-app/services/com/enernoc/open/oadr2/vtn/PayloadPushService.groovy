@@ -13,8 +13,10 @@ class PayloadPushService {
     static transactional = true
     static rabbitQueue = 'oadr.push.payload'
     
-    String vtnID // injected
-    def eiEventService
+    // injected:
+    EiEventService eiEventService
+    HttpService httpService
+    XmppService xmppService
     
     /**
      * called by clients who want to enqueue an event to be
@@ -46,12 +48,15 @@ class PayloadPushService {
         try {
             def msg = new JsonSlurper().parseText(payload)
             
-            switch ( msg.type ) {
-                case 'event':
-                    handleDistributeEvent msg
-                    break;
-                default:
-                    log.warn "Unknown message type! $msg"
+            Event.withTransaction { txn ->
+                
+                switch ( msg.type ) {
+                    case 'event':
+                        handleDistributeEvent msg
+                        break;
+                    default:
+                        log.warn "Unknown message type! $msg"
+                }
             }
         }
         catch ( JsonException ex ) {
@@ -83,7 +88,7 @@ class PayloadPushService {
         venLog.venID = ven.venID
         venLog.uri = ven.clientURI
         venLog.type = 'push_request'
-        venLog.body = payload.toString() // TODO
+        venLog.request = payload.toString()
         venLog.requestID = payload.requestID
 
         try {
@@ -93,7 +98,7 @@ class PayloadPushService {
             log.debug "Event pushed to VEN: ${ven.clientURI}"
         }
         catch ( ex ) {
-            log.e "Error sending payload to ven ID ${ven.id} (URI: ${ven.clientURI}): ${ex.message}"
+            log.error "Error sending payload to ven ID ${ven.id} (URI: ${ven.clientURI}): ${ex.message}"
             venLog.error = ex.message
             venStatus.optStatus = StatusCode.DISTRIBUTE_ERROR
             // TODO update venLog

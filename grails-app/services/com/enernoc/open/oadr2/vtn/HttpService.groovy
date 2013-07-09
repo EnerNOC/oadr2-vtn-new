@@ -32,11 +32,14 @@ public class HttpService {
     /**
      * Send a payload to the given VEN URI.
      */
-    void send( String payload, String uri ) {
+    void send( Object payload, String uri ) {
+        log.debug "PUSH to $uri\n$payload"
+        StringWriter sw = new StringWriter()
+        this.marshaller.marshal(payload, sw) //TODO make sure this is threadsafe
         // TODO client cert
         
         Request.Post(uri)
-                .bodyString(payload, ContentType.APPLICATION_XML)
+                .bodyString(sw.toString(), ContentType.APPLICATION_XML)
                 .execute()
                 .handleResponse( { HttpResponse resp -> 
                     // need to pass request URI
