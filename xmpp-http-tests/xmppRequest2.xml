@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<iq id="M1M0k-12" to="yangxiang@Yangs-MacBook-Pro.local/vtn" type="set">
-<oadr:oadrRequestEvent xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<iq id="M1M0k-12" to="yangxiang@Yangs-MacBook-Pro.local/vtn" from="haxor@capulet.com" type="set">
+<oadr:oadrRequestEvent xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07">
 	<pyld:eiRequestEvent>
 		<pyld:requestID>String</pyld:requestID>
-		<ei:eventID>test-event-two</ei:eventID>
-		<emix:marketContext>http://www.altova.com</emix:marketContext>
 		<ei:venID>test-customer-two</ei:venID>
-		<pyld:eventFilter>all</pyld:eventFilter>
-		<pyld:replyLimit>0</pyld:replyLimit>
+		<pyld:replyLimit>1</pyld:replyLimit>
 	</pyld:eiRequestEvent>
 </oadr:oadrRequestEvent>
 </iq>
