@@ -32,13 +32,13 @@ Setup:
 		c. Switch to the /xmpp-http-tests directory
 		d. Using curl, input the command
 		
-      curl -v -d @httpRequest1.xml -H "Accept:application/xml" -H "Content-Type:application/xml" http://localhost:8080/oadr2-vtn-groovy/eiEvent/sendHttpResponse
+			curl -v -d @httpRequest1.xml -H "Accept:application/xml" -H "Content-Type:application/xml" http://localhost:8080/oadr2-vtn-groovy/OpenADR2/Simple/EiEvent
     			
 		e. Wait for the response to refresh through AJAX or to refresh through the Refresh button in the top right
 		
 		f. Using curl, input the command
 		
-			curl -v -d @httpCreated1.xml -H "Accept:application/xml" -H "Content-Type:application/xml" http://localhost:8080/oadr2-vtn-groovy/eiEvent/sendHttpResponse
+			curl -v -d @httpCreated1.xml -H "Accept:application/xml" -H "Content-Type:application/xml" http://localhost:8080/oadr2-vtn-groovy/OpenADR2/Simple/EiEvent
 		
 		g. Using refresh, Status should now read Opted In and be a green button instead of the grey Pending
 		
