@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iq id="M1M0k-12" to="yangxiang@Yangs-MacBook-Pro.local/vtn" from="haxor@capulet.com" type="set">
-<oadr:oadrCreatedEvent xsi:schemaLocation="http://openadr.org/oadr-2.0a/2012/01 oadr_20a_010312.xsd" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<oadr:oadrCreatedEvent xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07">
 	<pyld:eiCreatedEvent>
 		<ei:eiResponse>
 			<ei:responseCode>200</ei:responseCode>
