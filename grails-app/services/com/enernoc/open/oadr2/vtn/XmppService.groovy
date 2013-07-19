@@ -68,7 +68,7 @@ public class XmppService implements PacketListener {
         }
         
         def response = eiEventService.handleOadrPayload( payload )
-        if ( response )	send payload, packet.from, packet.getPacketID()
+        if ( response )	send response, packet.from, packet.getPacketID()
     }
 
     /**
