@@ -176,7 +176,7 @@ public class EiEventService {
             venStatus.save()
         }
         
-        errors.findAll() // filter out null
+        errors = errors.findAll() // filter out null
         
         if ( errors ) {
             (response,description) = errors[0]
