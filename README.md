@@ -56,6 +56,9 @@ You can use the embedded server and make it accessible externally like so
  
     grails run-app -https -grails.server.host 192.168.56.102
 
+*Note that VEN certificate authentication is not yet implemented.*
+
+
 ### Database
 
 Edit `grails-app/conf/DataSrouce.groovy`.  By default when running with `grails run-app`, 
@@ -103,11 +106,14 @@ If you want to extend this project, here are several resources that will be help
 * [Java EE API](http://docs.oracle.com/javaee/6/api/)
 * [Java SE API](http://docs.oracle.com/javase/7/docs/api/)
 
+The OpenADR spec can be downloaded [here](http://www.openadr.org/specification).
+
 
 ## TODO
 
 * Filter on OpenADR services to handle certificate auth
 * Web app auth
+
 
 ## Credits 
 
@@ -117,7 +123,8 @@ to Grails by one of our 2013 interns, [Yang Xiang](www.linkedin.com/pub/yang-xia
 with help from [Thom Nichols](http://open.enernoc.com/profiles/thom.html).
 
 
-This project also relies on the following open source frameworks and libraries to help make it awesome:
+This project also relies on the following open source frameworks and libraries 
+to help make it awesome:
 
 * [Twitter Bootstrap](http://twitter.github.io/bootstrap/index.html)
 * [JQuery](http://jquery.com/) 
