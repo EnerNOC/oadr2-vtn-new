@@ -25,11 +25,15 @@ for more details.
 
 ### Prerequisites
 
-The VTN depends on the oadr2-ven code found here: http://github.com/enernoc/oadr2-ven
+The VTN depends on the oadr2-ven code found here: https://github.com/enernoc/oadr2-ven
 
-Install locally by running 
+Clone and install *oadr2-ven* by running 
 
-    mvn install -Dmaven.test.skip=true
+```bash
+git clone https://github.com/EnerNOC/oadr2-ven.git
+cd oadr2-ven
+mvn install -Dmaven.test.skip=true
+```
 
 You also need an AMQP server to handle push operations.  The easiest solution is 
 [RabbitMQ](http://www.rabbitmq.com/download.html).  If you're on a Mac with Homeberw or
@@ -55,6 +59,7 @@ For more info, see: http://grails.org/doc/latest/guide/commandLine.html#4.5%20An
 You can use the embedded server and make it accessible externally like so
  
     grails run-app -https -grails.server.host 192.168.56.102
+
 
 ### Database
 
