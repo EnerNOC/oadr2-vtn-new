@@ -178,7 +178,7 @@ public class EiEventService {
         
         errors.findAll() // filter out null
         
-        if ( errors ) {
+        if ( errors && !(errors[0] instanceof VenStatus) ) {
             (response,description) = errors[0]
             log.warn "Returning error response: $response, $description"
         }
@@ -230,6 +230,7 @@ public class EiEventService {
         def venLog = new VenTransactionLog()
         venLog.venID = ven.venID
         venLog.type = "pull_request"
+        venLog.request = oadrRequestEvent
         venLog.requestID = eiResponse.requestID
         log.debug "Request ID: ${eiResponse.requestID}"
         if ( venLog.validate() )
